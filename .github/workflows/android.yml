@@ -5,6 +5,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,10 +23,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Unit tests
-        run: ./gradlew --stacktrace testDebugUnitTest
+        run: set -o pipefail; ./gradlew --stacktrace testDebugUnitTest 2>&1 | tee -a build.log
 
       - name: Lint
-        run: ./gradlew --stacktrace lintRelease
+        run: set -o pipefail; ./gradlew --stacktrace lintRelease 2>&1 | tee -a build.log
 
       # Signing and real AdMob IDs are optional repository secrets. Without them the release
       # outputs are unsigned and use Google's test ad units.
@@ -42,7 +45,7 @@ jobs:
           FRAME_KEY_PASSWORD: ${{ secrets.FRAME_KEY_PASSWORD }}
           FRAME_ADMOB_APP_ID: ${{ secrets.FRAME_ADMOB_APP_ID }}
           FRAME_ADMOB_BANNER_ID: ${{ secrets.FRAME_ADMOB_BANNER_ID }}
-        run: ./gradlew --stacktrace assembleRelease bundleRelease
+        run: set -o pipefail; ./gradlew --stacktrace assembleRelease bundleRelease 2>&1 | tee -a build.log
 
       - uses: actions/upload-artifact@v4
         with:
@@ -52,3 +55,18 @@ jobs:
             app/build/outputs/bundle/release/*.aab
             app/build/outputs/mapping/release/mapping.txt
           if-no-files-found: warn
+
+      # Mirrors the build log to the ci-results branch so it can be read with plain git.
+      - name: Publish CI result
+        if: always()
+        run: |
+          mkdir -p /tmp/ci
+          cp build.log /tmp/ci/ 2>/dev/null || echo "no log" > /tmp/ci/build.log
+          find app/build/reports -name "*.txt" -exec cp {} /tmp/ci/ \; 2>/dev/null || true
+          echo "${{ job.status }} ${{ github.sha }} ${{ github.ref_name }}" > /tmp/ci/status.txt
+          cd /tmp/ci
+          git init -q
+          git checkout -q -b ci-results
+          git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "CI ${{ github.sha }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-results

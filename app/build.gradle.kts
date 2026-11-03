@@ -90,6 +90,8 @@ android {
     lint {
         checkReleaseBuilds = true
         abortOnError = true
+        textReport = true
+        textOutput = file("stdout")
         // Translations are not shipped yet.
         disable += listOf("MissingTranslation")
     }
