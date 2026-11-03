@@ -1,6 +1,6 @@
 package app.frame.studio.ads
 
-import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
@@ -8,7 +8,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -20,7 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun BannerAd(modifier: Modifier = Modifier) {
     val canShow by AdsService.canShowAds.collectAsStateWithLifecycle()
     if (!canShow) return
-    val activity = LocalContext.current as? Activity ?: return
+    val activity = LocalActivity.current ?: return
     val adView = remember(activity) { AdsService.createBanner(activity) }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(adView, lifecycleOwner) {

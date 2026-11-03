@@ -1,6 +1,6 @@
 package app.frame.studio.ui.projects
 
-import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,6 +75,7 @@ fun ProjectsScreen(
     val privacyRequired by AdsService.privacyOptionsRequired.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val activity = LocalActivity.current
 
     var showCreate by remember { mutableStateOf(false) }
     var renameTarget by remember { mutableStateOf<Project?>(null) }
@@ -107,7 +108,7 @@ fun ProjectsScreen(
                                     text = { Text("Privacy choices") },
                                     onClick = {
                                         menuOpen = false
-                                        (context as? Activity)?.let(AdsService::showPrivacyOptions)
+                                        activity?.let(AdsService::showPrivacyOptions)
                                     },
                                 )
                             }
