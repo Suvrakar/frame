@@ -19,4 +19,15 @@ fi
 if [ -z "$(adb shell pidof "$PKG" | tr -d '\r')" ]; then
   echo "SMOKE: PROCESS NOT RUNNING" >> "$LOG"; exit 1
 fi
+echo "SMOKE: LAUNCH OK" >> "$LOG"
+
+# End-to-end export through the real Media3 pipeline.
+adb push /tmp/sample.mp4 /data/local/tmp/sample.mp4 >> "$LOG" 2>&1
+adb push /tmp/sample.m4a /data/local/tmp/sample.m4a >> "$LOG" 2>&1
+if ./gradlew connectedDebugAndroidTest >> "$LOG" 2>&1; then
+  echo "SMOKE: EXPORT OK" >> "$LOG"
+else
+  find app/build/outputs/androidTest-results -name "*.xml" -exec cat {} \; >> "$LOG" 2>/dev/null
+  echo "SMOKE: EXPORT FAILED" >> "$LOG"; exit 1
+fi
 echo "SMOKE: OK" >> "$LOG"
