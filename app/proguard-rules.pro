@@ -1,0 +1,4 @@
+-keep class app.frame.studio.domain.** { *; }
+-keep class androidx.media3.** { *; }
+-dontwarn androidx.media3.**
+-keep class com.google.android.gms.ads.** { *; }
