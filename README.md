@@ -65,6 +65,11 @@ add these repository secrets: `FRAME_KEYSTORE_BASE64` (`base64 -w0 release.jks`)
 `FRAME_KEYSTORE_PASSWORD`, `FRAME_KEY_ALIAS`, `FRAME_KEY_PASSWORD`, `FRAME_ADMOB_APP_ID`,
 `FRAME_ADMOB_BANNER_ID`.
 
+A second job boots an Android 14 emulator, launches the app (`scripts/smoke-test.sh`) and runs
+`ExportPipelineTest`, which renders a project using every editing feature through Media3 and
+checks the output's duration, resolution and audio. Logs from both jobs are mirrored to the
+`ci-results` and `ci-smoke` branches.
+
 ## Play Store checklist
 
 - [ ] Real AdMob app + banner IDs configured; `app-ads.txt` published on your developer website.
