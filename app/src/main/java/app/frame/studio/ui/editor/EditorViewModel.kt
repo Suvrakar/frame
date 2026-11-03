@@ -8,6 +8,7 @@ import app.frame.studio.domain.AudioClip
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.VideoClip
+import app.frame.studio.export.centerCrop
 import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.timeline.TimelineOps
 import kotlinx.coroutines.Dispatchers
@@ -295,7 +296,7 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
     fun setVideoFadeOut(id: String, ms: Long) = editVideo(id, "fadeOut") { it.copy(fadeOutMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
     fun rotate(id: String) = editVideo(id) { TimelineOps.rotate(it) }
     fun setCrop(id: String, ratio: Float?) = editVideo(id) { clip ->
-        clip.copy(crop = ratio?.let { app.frame.studio.export.centerCrop(clip.width, clip.height, it) })
+        clip.copy(crop = ratio?.let { centerCrop(clip.width, clip.height, it) })
     }
 
     fun splitSelected() {

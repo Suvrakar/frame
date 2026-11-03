@@ -109,6 +109,7 @@ import app.frame.studio.domain.Project
 import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.export.ExportPlan
+import app.frame.studio.export.centerCrop
 import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.timeline.TimelineOps
 import app.frame.studio.ui.common.TextInputDialog
@@ -819,7 +820,7 @@ private fun VideoTools(vm: EditorViewModel, clip: VideoClip, index: Int, count: 
             val options = listOf<Pair<String, Float?>>("Original" to null, "1:1" to 1f, "4:5" to 0.8f, "9:16" to 9f / 16f, "16:9" to 16f / 9f)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 options.forEach { (label, ratio) ->
-                    val selected = if (ratio == null) clip.crop == null else clip.crop == app.frame.studio.export.centerCrop(clip.width, clip.height, ratio)
+                    val selected = if (ratio == null) clip.crop == null else clip.crop == centerCrop(clip.width, clip.height, ratio)
                     FilterChip(selected = selected, onClick = { vm.setCrop(clip.id, ratio) }, label = { Text(label) })
                 }
             }
