@@ -6,13 +6,18 @@ import kotlin.math.abs
 
 object TimelineOps {
 
+    /** Shortest piece a split may produce. */
+    const val MIN_SPLIT_MS = 100L
+
     fun trim(clip: VideoClip, startMs: Long, endMs: Long): VideoClip {
+        if (clip.sourceDurationMs < 2) return clip
         val start = startMs.coerceIn(0, clip.sourceDurationMs - 1)
         val end = endMs.coerceIn(start + 1, clip.sourceDurationMs)
         return clip.copy(trimStartMs = start, trimEndMs = end)
     }
 
     fun trimAudio(clip: AudioClip, startMs: Long, endMs: Long): AudioClip {
+        if (clip.sourceDurationMs < 2) return clip
         val start = startMs.coerceIn(0, clip.sourceDurationMs - 1)
         val end = endMs.coerceIn(start + 1, clip.sourceDurationMs)
         return clip.copy(trimStartMs = start, trimEndMs = end)
@@ -26,8 +31,9 @@ object TimelineOps {
         val index = clips.indexOfFirst { it.id == clipId }
         if (index < 0) return clips
         val clip = clips[index]
+        if (clip.outputDurationMs() < MIN_SPLIT_MS * 2) return clips
         val relative = atOutputMs.coerceIn(1, clip.outputDurationMs() - 1)
-        val atSource = clip.trimStartMs + (relative * clip.speed).toLong()
+        val atSource = clip.trimStartMs + (relative * clip.speed.coerceIn(0.5f, 2f)).toLong()
         if (atSource <= clip.trimStartMs || atSource >= clip.trimEndMs) return clips
         val left = clip.copy(id = "${clip.id}_a", trimEndMs = atSource)
         val right = clip.copy(id = "${clip.id}_b", trimStartMs = atSource)
@@ -45,6 +51,7 @@ object TimelineOps {
         val index = clips.indexOfFirst { it.id == clipId }
         if (index < 0) return clips
         val clip = clips[index]
+        if (clip.outputDurationMs() < MIN_SPLIT_MS * 2) return clips
         val relative = atOutputMs.coerceIn(1, clip.outputDurationMs() - 1)
         val atSource = clip.trimStartMs + relative
         if (atSource <= clip.trimStartMs || atSource >= clip.trimEndMs) return clips

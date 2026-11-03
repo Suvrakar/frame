@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Frame</string>
-    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
-    <string name="admob_banner_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="privacy_policy_url">https://debashis-bs23.github.io/frame-privacy-policy/</string>
+    <!-- admob_app_id and admob_banner_id are generated per build type in app/build.gradle.kts -->
+    <string name="privacy_policy_url" translatable="false">https://debashis-bs23.github.io/frame-privacy-policy/</string>
 </resources>

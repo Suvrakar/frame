@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+. Projects are backed up; rendered videos are too large and are excluded. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="exports/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="exports/" />
+    </device-transfer>
+</data-extraction-rules>

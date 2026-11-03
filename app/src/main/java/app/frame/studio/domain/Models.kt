@@ -26,6 +26,11 @@ data class VideoClip(
     val fadeOutMs: Long = 0,
     val rotationDegrees: Int = 0,
     val crop: CropRect? = null,
+    /** Display width after container rotation metadata is applied. 0 when unknown. */
+    val width: Int = 0,
+    /** Display height after container rotation metadata is applied. 0 when unknown. */
+    val height: Int = 0,
+    val displayName: String = "",
 ) {
     fun outputDurationMs(): Long {
         val source = (trimEndMs - trimStartMs).coerceAtLeast(0)
@@ -44,6 +49,7 @@ data class AudioClip(
     val volume: Float = 1f,
     val fadeInMs: Long = 0,
     val fadeOutMs: Long = 0,
+    val displayName: String = "",
 ) {
     fun outputDurationMs(): Long = (trimEndMs - trimStartMs).coerceAtLeast(0)
 }
@@ -68,6 +74,7 @@ data class Project(
     val textOverlays: List<TextOverlay> = emptyList(),
     val crossfadeMs: Long = 0,
     val exportHeight: ExportHeight = ExportHeight.HD_1080,
+    val updatedAtEpochMs: Long = createdAtEpochMs,
 )
 
 @Serializable
@@ -77,4 +84,9 @@ data class ExportRecord(
     val filePath: String,
     val createdAtEpochMs: Long,
     val height: Int,
+    val projectName: String = "",
+    val durationMs: Long = 0,
+    val sizeBytes: Long = 0,
+    /** content:// URI of the copy saved to the shared Movies collection, if any. */
+    val galleryUri: String? = null,
 )

@@ -1,9 +1,27 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
+
+// Release configuration comes from keystore.properties (git-ignored) or environment variables,
+// so secrets never live in the repository. See README.md.
+val keystoreProperties = Properties().apply {
+    val file = rootProject.file("keystore.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+
+fun secret(name: String, env: String): String? =
+    (keystoreProperties.getProperty(name) ?: System.getenv(env))?.takeIf { it.isNotBlank() }
+
+// Google's public test IDs. Debug builds always use them; release builds use real IDs when provided.
+val testAdmobAppId = "ca-app-pub-3940256099942544~3347511713"
+val testAdmobBannerId = "ca-app-pub-3940256099942544/9214589741"
+val releaseAdmobAppId = secret("admobAppId", "FRAME_ADMOB_APP_ID")
+val releaseAdmobBannerId = secret("admobBannerId", "FRAME_ADMOB_BANNER_ID")
 
 android {
     namespace = "app.frame.studio"
@@ -13,11 +31,20 @@ android {
         applicationId = "app.frame.studio"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = (findProperty("frame.versionCode") as String?)?.toInt() ?: 1
+        versionName = (findProperty("frame.versionName") as String?) ?: "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        ndk {
-            abiFilters += listOf("arm64-v8a")
+    }
+
+    signingConfigs {
+        create("release") {
+            val storePath = secret("storeFile", "FRAME_KEYSTORE_PATH")
+            if (storePath != null) {
+                storeFile = rootProject.file(storePath)
+                storePassword = secret("storePassword", "FRAME_KEYSTORE_PASSWORD")
+                keyAlias = secret("keyAlias", "FRAME_KEY_ALIAS")
+                keyPassword = secret("keyPassword", "FRAME_KEY_PASSWORD")
+            }
         }
     }
 
@@ -29,9 +56,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            val releaseSigning = signingConfigs.getByName("release")
+            if (releaseSigning.storeFile != null) signingConfig = releaseSigning
+            resValue("string", "admob_app_id", releaseAdmobAppId ?: testAdmobAppId)
+            resValue("string", "admob_banner_id", releaseAdmobBannerId ?: testAdmobBannerId)
         }
         debug {
             isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            resValue("string", "admob_app_id", testAdmobAppId)
+            resValue("string", "admob_banner_id", testAdmobBannerId)
         }
     }
 
@@ -40,25 +75,43 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
-    }
-
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 
     packaging {
-        jniLibs {
-            excludes += listOf("lib/x86_64/**", "lib/armeabi-v7a/**", "lib/x86/**")
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+
+    lint {
+        checkReleaseBuilds = true
+        abortOnError = true
+        // Translations are not shipped yet.
+        disable += listOf("MissingTranslation")
     }
 
     testOptions {
         unitTests.isReturnDefaultValues = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+}
+
+gradle.taskGraph.whenReady {
+    val buildingRelease = allTasks.any { it.name.contains("Release") && it.project == project }
+    if (buildingRelease && (releaseAdmobAppId == null || releaseAdmobBannerId == null)) {
+        logger.warn("WARNING: Release build is using Google's TEST AdMob IDs. Set admobAppId/admobBannerId before publishing.")
+    }
+    if (buildingRelease && android.signingConfigs.getByName("release").storeFile == null) {
+        logger.warn("WARNING: No release keystore configured; release outputs will be unsigned.")
     }
 }
 
@@ -90,6 +143,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     implementation("com.google.android.gms:play-services-ads:24.5.0")
+    implementation("com.google.android.ump:user-messaging-platform:3.2.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
