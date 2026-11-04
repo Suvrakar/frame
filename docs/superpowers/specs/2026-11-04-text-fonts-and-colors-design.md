@@ -73,7 +73,7 @@ to `Typeface.DEFAULT` and is logged, never thrown.
 ## Rendering
 
 `CompositionFactory.timedTextOverlay` and `CaptionSpans.build` apply a new
-`CustomTypefaceSpan(typeface)` (a `MetricAffectingSpan` that sets `paint.typeface`, preserving
+`FontSpan(typeface)` (a `MetricAffectingSpan` that sets `paint.typeface`, preserving
 the fake-bold flag when `bold` is on). `TypefaceSpan(Typeface)` is API 28+, minSdk is 26, hence
 the custom span. `CompositionFactory` is an `object` with no `Context`, called from
 `ExportManager` and `PreviewController`; rather than threading a context through, `FrameApp.onCreate`
@@ -92,7 +92,7 @@ size, so wide fonts (Bungee, Pixel) and narrow ones (Bebas Neue) get correct dra
 
 `TextStylePanel` (ui/editor/Panels.kt), top to bottom:
 
-1. **Text field** (moved in from `TextEditPanel`) — non-sticker text only.
+1. **Text field** (moved in from `TextEditPanel`) — also shown for stickers (labelled "Sticker"), since the Edit tool was removed and this is the only way to change a sticker's emoji.
 2. **Presets** row (unchanged).
 3. **Font** row: horizontal chips, each label rendered in its own font; selected chip outlined.
    Hidden for stickers.
