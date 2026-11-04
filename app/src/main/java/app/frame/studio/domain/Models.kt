@@ -190,6 +190,8 @@ data class TextOverlay(
     val opacity: Float = 1f,
     /** Animation over time (relative to [startMs]); empty = static. */
     val keyframes: List<Keyframe> = emptyList(),
+    /** Id from [app.frame.studio.text.TextFonts]; "default" = system font. */
+    val font: String = app.frame.studio.text.TextFonts.DEFAULT_ID,
 ) {
     val isCaption: Boolean get() = words.isNotEmpty()
 }

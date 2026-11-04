@@ -55,4 +55,24 @@ class ProjectJsonTest {
         val decoded = ProjectJson.decode(ProjectJson.encode(project))
         assertEquals(project, decoded)
     }
+
+    @Test
+    fun legacyTextWithoutFontDecodesToDefault() {
+        val base = Project(
+            id = "p2", name = "Old", createdAtEpochMs = 1L,
+            textOverlays = listOf(TextOverlay(id = "t1", text = "Hi", startMs = 0, endMs = 1_000)),
+        )
+        val legacy = ProjectJson.encode(base).replace(",\"font\":\"default\"", "")
+        assertEquals(false, legacy.contains("\"font\""))
+        assertEquals("default", ProjectJson.decode(legacy).textOverlays.single().font)
+    }
+
+    @Test
+    fun roundTripsTextFont() {
+        val project = Project(
+            id = "p3", name = "Fonts", createdAtEpochMs = 1L,
+            textOverlays = listOf(TextOverlay(id = "t1", text = "Hi", startMs = 0, endMs = 1_000, font = "pacifico")),
+        )
+        assertEquals("pacifico", ProjectJson.decode(ProjectJson.encode(project)).textOverlays.single().font)
+    }
 }

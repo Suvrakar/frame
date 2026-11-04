@@ -300,6 +300,9 @@ object CompositionFactory {
                 setSpan(BackgroundColorSpan(0x99000000.toInt()), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
             if (overlay.bold) setSpan(StyleSpan(Typeface.BOLD), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (overlay.font != app.frame.studio.text.TextFonts.DEFAULT_ID) {
+                setSpan(app.frame.studio.text.FontSpan(overlay.font), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
         // TextOverlay renders at a fixed 100px; scale it relative to a 1080p short side.
         val base = (minOf(size.width, size.height) / 1080f).coerceAtLeast(0.3f)
@@ -357,7 +360,7 @@ object CompositionFactory {
     private fun captionOverlay(overlay: app.frame.studio.domain.TextOverlay, size: ExportPlan.Size): TextureOverlay {
         val words = overlay.words
         val variants = (-1 until words.size).map { active ->
-            CaptionSpans.build(words, overlay.captionStyle, overlay.color.toInt(), active, overlay.bold)
+            CaptionSpans.build(words, overlay.captionStyle, overlay.color.toInt(), active, overlay.bold, overlay.font)
         }
         val base = (minOf(size.width, size.height) / 1080f).coerceAtLeast(0.3f)
         val scale = base * overlay.scale.coerceIn(0.3f, 4f)
