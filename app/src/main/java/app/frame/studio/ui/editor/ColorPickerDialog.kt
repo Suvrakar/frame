@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -50,7 +53,10 @@ fun ColorPickerDialog(initial: Long, onDismiss: () -> Unit, onPick: (Long) -> Un
         confirmButton = { TextButton(onClick = { onPick(current) }) { Text("Done") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Column(
+                Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
                 SaturationValueSquare(hue, sat, value) { s, v -> sat = s; value = v }
                 HueStrip(hue) { hue = it }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -72,7 +78,7 @@ private fun SaturationValueSquare(hue: Float, sat: Float, value: Float, onChange
     fun pick(p: Offset, w: Float, h: Float) =
         onChange((p.x / w).coerceIn(0f, 1f), 1f - (p.y / h).coerceIn(0f, 1f))
     Canvas(
-        Modifier.fillMaxWidth().aspectRatio(1.4f).clip(RoundedCornerShape(12.dp))
+        Modifier.fillMaxWidth().heightIn(max = 200.dp).aspectRatio(1.4f).clip(RoundedCornerShape(12.dp))
             .pointerInput(Unit) { detectTapGestures { pick(it, size.width.toFloat(), size.height.toFloat()) } }
             .pointerInput(Unit) {
                 detectDragGestures { change, _ -> change.consume(); pick(change.position, size.width.toFloat(), size.height.toFloat()) }

@@ -2,6 +2,10 @@
 
 package app.frame.studio.ui.editor
 
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import app.frame.studio.ui.common.bounceClick
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.filled.GridView
@@ -906,6 +910,7 @@ fun TextStylePanel(
                             ),
                         )
                         .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                        .semantics { contentDescription = "Custom color"; role = Role.Button }
                         .clickable { showPicker = true },
                     contentAlignment = Alignment.Center,
                 ) { Text("+", color = Color.White, fontWeight = FontWeight.Bold) }
