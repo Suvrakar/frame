@@ -209,15 +209,17 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             for (uri in uris) {
                 probe.persistPermission(uri)
                 val clip = if (probe.isImage(uri)) {
-                    probe.probeImage(uri)?.let { info ->
+                    // Oversized photos are downscaled once so editing and export stay light.
+                    val name = probe.probeImage(uri)?.displayName.orEmpty()
+                    app.imageNormalizer.normalize(uri)?.let { image ->
                         VideoClip(
                             id = newId(),
-                            sourceUri = uri.toString(),
+                            sourceUri = image.uri.toString(),
                             sourceDurationMs = VideoClip.MAX_IMAGE_MS,
                             trimEndMs = VideoClip.DEFAULT_IMAGE_MS,
-                            width = info.width,
-                            height = info.height,
-                            displayName = info.displayName,
+                            width = image.width,
+                            height = image.height,
+                            displayName = name,
                             isImage = true,
                         )
                     }

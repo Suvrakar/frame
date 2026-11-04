@@ -25,9 +25,14 @@ echo "SMOKE: LAUNCH OK" >> "$LOG"
 adb push /tmp/sample.mp4 /data/local/tmp/sample.mp4 >> "$LOG" 2>&1
 adb push /tmp/sample.m4a /data/local/tmp/sample.m4a >> "$LOG" 2>&1
 adb push /tmp/sample.png /data/local/tmp/sample.png >> "$LOG" 2>&1
+adb push /tmp/big.jpg /data/local/tmp/big.jpg >> "$LOG" 2>&1
+adb logcat -G 8M >/dev/null 2>&1 || true
+adb logcat -c
 if ./gradlew connectedDebugAndroidTest >> "$LOG" 2>&1; then
+  adb logcat -d -s FramePerf:I > perf.log 2>&1 || true
   echo "SMOKE: EXPORT OK" >> "$LOG"
 else
+  adb logcat -d -s FramePerf:I > perf.log 2>&1 || true
   find app/build/outputs/androidTest-results -name "*.xml" -exec cat {} \; >> "$LOG" 2>/dev/null
   mkdir -p shots
   adb pull /data/local/tmp/shots/. shots/ >> "$LOG" 2>&1 || true

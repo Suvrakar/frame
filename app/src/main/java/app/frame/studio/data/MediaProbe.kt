@@ -15,7 +15,9 @@ import android.util.Log
 import android.util.LruCache
 import app.frame.studio.device.DeviceProfile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 
@@ -145,9 +147,68 @@ class MediaProbe(private val context: Context, device: DeviceProfile) {
     /** Limits concurrent decoders; filmstrips request many frames at once. */
     private val frameLimiter = Semaphore(device.decoderParallelism)
 
+    /**
+     * Open decoders kept for filmstrips: opening a file is far more expensive than grabbing a
+     * frame, and a filmstrip asks for dozens of frames from the same file.
+     */
+    private class PooledRetriever(val retriever: MediaMetadataRetriever, val lock: Mutex = Mutex())
+
+    private val pool = object : LinkedHashMap<String, PooledRetriever>(4, 0.75f, true) {}
+    private val poolLock = Mutex()
+    private val maxPooled = device.decoderParallelism + 1
+
+    private suspend fun pooled(uri: String): PooledRetriever? {
+        val evicted = mutableListOf<PooledRetriever>()
+        val entry = poolLock.withLock {
+            pool[uri] ?: run {
+                val r = MediaMetadataRetriever()
+                try {
+                    r.setDataSource(context, Uri.parse(uri))
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to open $uri", e)
+                    runCatching { r.release() }
+                    return@withLock null
+                }
+                PooledRetriever(r).also { pool[uri] = it }
+            }.also {
+                while (pool.size > maxPooled) {
+                    val eldest = pool.entries.first()
+                    pool.remove(eldest.key)
+                    evicted += eldest.value
+                }
+            }
+        }
+        // Release outside the pool lock, waiting for any in-flight frame grab to finish.
+        evicted.forEach { old -> old.lock.withLock { runCatching { old.retriever.release() } } }
+        return entry
+    }
+
+    /** Closes pooled decoders, e.g. when leaving the editor. */
+    suspend fun releaseDecoders() {
+        val all = poolLock.withLock { pool.values.toList().also { pool.clear() } }
+        all.forEach { p -> p.lock.withLock { runCatching { p.retriever.release() } } }
+    }
+
+    /** Frees everything that can be rebuilt, under system memory pressure. */
+    suspend fun trimMemory() {
+        releaseDecoders()
+        thumbnails.evictAll()
+    }
+
     private suspend fun extractFrame(uri: String, atMs: Long, maxSize: Int): Bitmap? {
-        return withContext(Dispatchers.IO) {
-            withRetriever(Uri.parse(uri)) { r ->
+        val entry = pooled(uri) ?: return null
+        return entry.lock.withLock {
+            withContext(Dispatchers.IO) {
+                runCatching { grabFrame(entry.retriever, atMs, maxSize) }
+                    .onFailure { Log.w(TAG, "Frame grab failed for $uri", it) }
+                    .getOrNull()
+            }
+        }
+    }
+
+    private fun grabFrame(r: MediaMetadataRetriever, atMs: Long, maxSize: Int): Bitmap? {
+        return run {
+            run {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                     r.getScaledFrameAtTime(atMs * 1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC, maxSize, maxSize)
                 } else {

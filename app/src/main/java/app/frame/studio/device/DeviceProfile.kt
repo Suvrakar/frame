@@ -38,6 +38,9 @@ class DeviceProfile(context: Context) {
 
     val decoderParallelism: Int = if (isLowEnd) 2 else 3
 
+    /** Photos larger than this (long side, px) are downscaled once on import. */
+    val maxImageLongSide: Int = if (isLowEnd) 1920 else 3840
+
     /** Delay before rebuilding the preview after an edit (lets slider drags settle). */
     val previewRebuildDelayMs: Long = if (isLowEnd) 260 else 120
 

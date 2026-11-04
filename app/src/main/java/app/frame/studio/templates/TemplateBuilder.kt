@@ -2,6 +2,7 @@ package app.frame.studio.templates
 
 import android.content.Context
 import android.net.Uri
+import app.frame.studio.data.ImageNormalizer
 import app.frame.studio.data.MediaProbe
 import app.frame.studio.data.ProjectRepository
 import app.frame.studio.device.DeviceProfile
@@ -18,6 +19,7 @@ class TemplateBuilder(
     private val context: Context,
     private val repository: ProjectRepository,
     private val probe: MediaProbe,
+    private val normalizer: ImageNormalizer,
     private val device: DeviceProfile,
 ) {
 
@@ -62,7 +64,8 @@ class TemplateBuilder(
     private suspend fun probeSlot(uri: Uri): SlotMedia? {
         probe.persistPermission(uri)
         return if (probe.isImage(uri)) {
-            probe.probeImage(uri)?.let { SlotMedia(uri.toString(), true, 0, it.width, it.height, it.displayName) }
+            val name = probe.probeImage(uri)?.displayName.orEmpty()
+            normalizer.normalize(uri)?.let { SlotMedia(it.uri.toString(), true, 0, it.width, it.height, name) }
         } else {
             probe.probeVideo(uri)?.takeIf { it.durationMs >= 100 }?.let {
                 SlotMedia(uri.toString(), false, it.durationMs, it.width, it.height, it.displayName)

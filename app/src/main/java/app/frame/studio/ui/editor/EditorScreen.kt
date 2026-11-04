@@ -130,6 +130,7 @@ import app.frame.studio.export.ExportPlan
 import app.frame.studio.ui.common.TextInputDialog
 import app.frame.studio.ui.common.formatDuration
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditorScreen(
@@ -182,7 +183,13 @@ private fun EditorContent(
 
     // ---- Preview ----------------------------------------------------------------------------
     val controller = remember { PreviewController(context.applicationContext, app.device.previewHeight) }
-    DisposableEffect(controller) { onDispose { controller.release() } }
+    DisposableEffect(controller) {
+        onDispose {
+            controller.release()
+            // Filmstrip decoders are only needed while the editor is open.
+            app.applicationScope.launch { app.mediaProbe.releaseDecoders() }
+        }
+    }
     // Rebuild shortly after edits settle so slider drags stay smooth.
     LaunchedEffect(project) {
         if (controller.hasPlayer) kotlinx.coroutines.delay(app.device.previewRebuildDelayMs)
