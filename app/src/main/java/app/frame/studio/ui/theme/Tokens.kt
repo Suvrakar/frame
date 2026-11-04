@@ -11,6 +11,7 @@ object TrackColors {
     val text = Color(0xFF7E57C2)
     val sticker = Color(0xFFC2185B)
     val effect = Color(0xFFE09A1E)
+    val overlay = Color(0xFF00897B)
 
     fun audio(kind: AudioKind): Color = when (kind) {
         AudioKind.MUSIC -> music

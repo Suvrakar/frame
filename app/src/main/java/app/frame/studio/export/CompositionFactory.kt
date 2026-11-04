@@ -12,6 +12,7 @@ import androidx.media3.common.C
 import androidx.media3.common.Effect
 import androidx.media3.common.MediaItem
 import androidx.media3.common.OverlaySettings
+import androidx.media3.common.VideoCompositorSettings
 import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.SpeedChangingAudioProcessor
 import androidx.media3.common.audio.SpeedProvider
@@ -33,6 +34,10 @@ import androidx.media3.transformer.Effects
 import app.frame.studio.captions.CaptionPlanner
 import app.frame.studio.captions.CaptionSpans
 import app.frame.studio.domain.AudioClip
+import app.frame.studio.domain.OverlayClip
+import app.frame.studio.timeline.Keyframes
+import app.frame.studio.timeline.OverlayLayout
+import app.frame.studio.timeline.Transform
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.effects.Filters
@@ -54,6 +59,17 @@ object CompositionFactory {
     private const val IMAGE_FPS = 30
     private const val TEXT_FADE_US = 250_000L
 
+    /** A tiny transparent image that fills the gaps of overlay lanes (set by the app at start). */
+    @Volatile
+    var blankFrameUri: String? = null
+
+    /** Overlay lanes composited at once (each is an extra decoder). */
+    @Volatile
+    var maxOverlayLanes: Int = 2
+
+    fun hasOverlays(project: Project): Boolean =
+        blankFrameUri != null && OverlayLayout.clampTo(project.overlays, TimelineMath.totalVideoMs(project.videoClips)).isNotEmpty()
+
     fun build(project: Project, forExport: Boolean = true): Composition {
         require(project.videoClips.isNotEmpty()) { "Add at least one clip" }
         val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect)
@@ -62,9 +78,16 @@ object CompositionFactory {
             // Clips without an audio track (and photos) still contribute silence so the mix stays in sync.
             .experimentalSetForceAudioTrack(true)
             .build()
-        val sequences = mutableListOf(videoSequence)
-
         val totalMs = TimelineMath.totalVideoMs(project.videoClips)
+
+        // Overlay lanes come first: the compositor draws the first sequence on top, and it also
+        // sets the output timing, so every lane spans the whole video (gaps are transparent).
+        val blank = blankFrameUri
+        val lanes = if (blank == null) emptyList() else OverlayLayout.lanes(OverlayLayout.clampTo(project.overlays, totalMs), maxOverlayLanes)
+        val sequences = mutableListOf<EditedMediaItemSequence>()
+        lanes.forEach { lane -> sequences += overlayLane(lane, totalMs, size, blank!!, project.exportFps) }
+        sequences += videoSequence
+
         AudioLayout.byLane(AudioLayout.clampTo(project.audioClips, totalMs)).forEach { lane ->
             if (lane.isEmpty()) return@forEach
             val builder = EditedMediaItemSequence.Builder()
@@ -95,9 +118,75 @@ object CompositionFactory {
             compositionVideoEffects += FrameDropEffect.createDefaultFrameDropEffect(project.exportFps.toFloat())
         }
 
-        return Composition.Builder(sequences)
+        val builder = Composition.Builder(sequences)
             .setEffects(Effects(emptyList(), compositionVideoEffects))
+        if (lanes.isNotEmpty()) builder.setVideoCompositorSettings(OverlayCompositor(lanes, size))
+        return builder.build()
+    }
+
+    /** One overlay lane: its clips, with transparent stills in the gaps, spanning [totalMs]. */
+    private fun overlayLane(lane: List<OverlayClip>, totalMs: Long, size: ExportPlan.Size, blank: String, fps: Int): EditedMediaItemSequence {
+        val items = mutableListOf<EditedMediaItem>()
+        var cursor = 0L
+        fun gap(ms: Long) {
+            if (ms <= 0) return
+            val item = MediaItem.Builder().setUri(Uri.parse(blank)).setImageDurationMs(ms).build()
+            items += EditedMediaItem.Builder(item).setDurationUs(ms * 1000).setFrameRate(fps.coerceIn(24, 60)).setRemoveAudio(true).build()
+        }
+        lane.forEach { o ->
+            gap(o.startMs - cursor)
+            items += overlayItem(o, size, fps)
+            cursor = o.endMs()
+        }
+        gap(totalMs - cursor)
+        return EditedMediaItemSequence.Builder(items).experimentalSetForceAudioTrack(true).build()
+    }
+
+    private fun overlayItem(o: OverlayClip, canvas: ExportPlan.Size, fps: Int): EditedMediaItem {
+        val video = mutableListOf<Effect>()
+        val audio = mutableListOf<AudioProcessor>()
+        val color = Filters.transformFor(o.filterId, 1f, app.frame.studio.domain.ColorAdjust())
+        if (!color.isIdentity) {
+            val matrix = color.toGl()
+            video += RgbMatrix { _, _ -> matrix }
+        }
+        // Scale 1 = the overlay fits the frame; the compositor scales it down from there.
+        val fit = OverlayGeometry.fitSize(o.width, o.height, canvas.width, canvas.height)
+        video += Presentation.createForWidthAndHeight(fit.first, fit.second, Presentation.LAYOUT_SCALE_TO_FIT)
+        if (o.volume != 1f) audio += GainAudioProcessor(o.volume, 0, 0, o.durationMs())
+        val builder = if (o.isImage) {
+            val item = MediaItem.Builder().setUri(Uri.parse(o.sourceUri)).setImageDurationMs(o.durationMs()).build()
+            EditedMediaItem.Builder(item).setDurationUs(o.durationMs() * 1000).setFrameRate(fps.coerceIn(24, 60))
+        } else {
+            EditedMediaItem.Builder(clipped(o.sourceUri, o.trimStartMs, o.trimEndMs)).setDurationUs(o.sourceDurationMs.coerceAtLeast(1) * 1000)
+        }
+        return builder
+            .setRemoveAudio(o.isImage || o.volume <= 0f)
+            .setEffects(Effects(audio, video))
             .build()
+    }
+
+    /** Places each overlay lane per frame from its clip's keyframes; the main video fills the frame. */
+    private class OverlayCompositor(private val lanes: List<List<OverlayClip>>, private val size: ExportPlan.Size) : VideoCompositorSettings {
+        private val hidden = StaticOverlaySettings.Builder().setAlphaScale(0f).build()
+        private val full = StaticOverlaySettings.Builder().build()
+
+        override fun getOutputSize(inputSizes: List<androidx.media3.common.util.Size>): androidx.media3.common.util.Size =
+            androidx.media3.common.util.Size(size.width, size.height)
+
+        override fun getOverlaySettings(inputId: Int, presentationTimeUs: Long): OverlaySettings {
+            val lane = lanes.getOrNull(inputId) ?: return full
+            val ms = presentationTimeUs / 1000
+            val o = lane.firstOrNull { ms >= it.startMs && ms < it.endMs() } ?: return hidden
+            val t = Keyframes.at(Keyframes.base(o), o.keyframes, ms - o.startMs)
+            return StaticOverlaySettings.Builder()
+                .setAlphaScale(t.opacity.coerceIn(0f, 1f))
+                .setScale(t.scale.coerceIn(0.05f, 4f), t.scale.coerceIn(0.05f, 4f))
+                // Media3 rotates counter-clockwise; the editor rotates clockwise.
+                .setRotationDegrees(-t.rotation)
+                .setBackgroundFrameAnchor(t.x.coerceIn(0f, 1f) * 2 - 1, 1 - t.y.coerceIn(0f, 1f) * 2)
+                .build()
+        }
     }
 
     private fun clipped(uri: String, startMs: Long, endMs: Long): MediaItem =
@@ -218,10 +307,23 @@ object CompositionFactory {
         val anchorX = overlay.x.coerceIn(0f, 1f) * 2 - 1
         val anchorY = 1 - overlay.y.coerceIn(0f, 1f) * 2
         fun settings(alpha: Float) = StaticOverlaySettings.Builder()
-            .setAlphaScale(alpha.coerceIn(0f, 1f))
+            .setAlphaScale((alpha * overlay.opacity).coerceIn(0f, 1f))
             .setScale(scale, scale)
+            .setRotationDegrees(-overlay.rotation)
             .setBackgroundFrameAnchor(anchorX, anchorY)
             .build()
+        val keyframes = overlay.keyframes
+        val base = Transform(overlay.x, overlay.y, 1f, overlay.rotation, overlay.opacity)
+        fun animated(presentationTimeUs: Long, alpha: Float): OverlaySettings {
+            val t = Keyframes.at(base, keyframes, presentationTimeUs / 1000 - overlay.startMs)
+            val s = scale * t.scale.coerceIn(0.1f, 6f)
+            return StaticOverlaySettings.Builder()
+                .setAlphaScale((alpha * t.opacity).coerceIn(0f, 1f))
+                .setScale(s, s)
+                .setRotationDegrees(-t.rotation)
+                .setBackgroundFrameAnchor(t.x.coerceIn(0f, 1f) * 2 - 1, 1 - t.y.coerceIn(0f, 1f) * 2)
+                .build()
+        }
         val visible = settings(1f)
         val hidden = settings(0f)
         val startUs = overlay.startMs * 1000
@@ -231,6 +333,14 @@ object CompositionFactory {
             override fun getText(presentationTimeUs: Long): SpannableString = text
             override fun getOverlaySettings(presentationTimeUs: Long): OverlaySettings {
                 if (presentationTimeUs < startUs || presentationTimeUs >= endUs) return hidden
+                if (keyframes.isNotEmpty()) {
+                    val fade = if (animate) minOf(TEXT_FADE_US, (endUs - startUs) / 3) else 0
+                    val alpha = if (fade <= 0) 1f else minOf(
+                        (presentationTimeUs - startUs).toFloat() / fade,
+                        (endUs - presentationTimeUs).toFloat() / fade,
+                    ).coerceAtMost(1f)
+                    return animated(presentationTimeUs, alpha)
+                }
                 if (!animate) return visible
                 val fade = minOf(TEXT_FADE_US, (endUs - startUs) / 3)
                 if (fade <= 0) return visible

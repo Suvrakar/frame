@@ -2,6 +2,15 @@
 
 package app.frame.studio.ui.editor
 
+import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.filled.LayersClear
+import androidx.compose.material.icons.filled.Opacity
+import androidx.compose.material.icons.outlined.Diamond
+import androidx.compose.material.icons.filled.Diamond
+import androidx.compose.material.icons.filled.PictureInPicture
+import app.frame.studio.export.OverlayGeometry
+import app.frame.studio.timeline.Keyframes
+import app.frame.studio.timeline.Transform
 import app.frame.studio.effects.Filters
 import app.frame.studio.domain.CaptionStyle
 import app.frame.studio.pro.ProFeature
@@ -242,6 +251,9 @@ private fun EditorContent(
     val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) {
         vm.addMedia(it)
     }
+    val pickOverlay = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) {
+        vm.addOverlays(it)
+    }
     fun launchMediaPicker() =
         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
 
@@ -344,7 +356,7 @@ private fun EditorContent(
                 if (project.videoClips.isEmpty()) {
                     EmptyPreview(onAdd = ::launchMediaPicker)
                 } else {
-                    PreviewArea(controller, project, selection, onMoveText = vm::setTextPosition)
+                    PreviewArea(controller, project, selection, onTransform = vm::transformSelected)
                 }
             }
 
@@ -388,6 +400,7 @@ private fun EditorContent(
                 onPlaceAudio = vm::placeAudio,
                 onTextRange = vm::setTextRange,
                 onEffectRange = vm::setEffectRange,
+                onPlaceOverlay = vm::placeOverlay,
                 onTransition = { id ->
                     vm.select(Selection.Video(id))
                     tool = Tool.TRANSITION
@@ -406,6 +419,7 @@ private fun EditorContent(
                 if (activeTool != null) {
                     ActivePanel(
                         app = app,
+                        controller = controller,
                         proGate = proGate,
                         captionStyle = captionStyle,
                         onCaptionStyle = { captionStyle = it },
@@ -441,6 +455,8 @@ private fun EditorContent(
                         onTool = { tool = it },
                         onAddMedia = ::launchMediaPicker,
                         onAddText = { showAddText = true },
+                        onAddOverlay = { pickOverlay.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
+                        keyed = keyedAt(project, sel, controller.positionMs),
                     )
                 }
             }
@@ -522,7 +538,8 @@ private fun TimeLabel(controller: PreviewController, modifier: Modifier) {
 
 private fun timelineHeight(project: Project) = run {
     val audioLanes = app.frame.studio.timeline.AudioLayout.lanes(project.audioClips).values.maxOrNull()?.plus(1) ?: 0
-    val textLanes = (if (project.textOverlays.isEmpty()) 0 else 1) + (if (project.effects.isEmpty()) 0 else 1)
+    val textLanes = (if (project.textOverlays.isEmpty()) 0 else 1) + (if (project.effects.isEmpty()) 0 else 1) +
+        (if (project.overlays.isEmpty()) 0 else 1)
     (22 + 56 + 12 + (audioLanes + textLanes).coerceAtMost(3) * 36 + 8).dp
 }
 
@@ -570,7 +587,7 @@ private fun PreviewArea(
     controller: PreviewController,
     project: Project,
     selection: Selection,
-    onMoveText: (id: String, x: Float, y: Float) -> Unit,
+    onTransform: (Transform) -> Unit,
 ) {
     val outputSize = ExportPlan.outputSize(project.videoClips, ExportHeight.HD_720, project.aspect)
     val aspect = outputSize.width.toFloat() / outputSize.height
@@ -621,13 +638,57 @@ private fun PreviewArea(
                     Icon(Icons.Filled.PlayArrow, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
                 }
             }
-            // Selected text: a frame you can drag to reposition (the text itself is rendered by Media3).
-            val overlay = (selection as? Selection.Text)?.let { sel -> project.textOverlays.firstOrNull { it.id == sel.id } }
-            if (overlay != null) {
-                TextDragFrame(overlay, frameW, frameH, onMoveText)
+            // Selected text, sticker or overlay: move, pinch and rotate it on the preview. Animated
+            // objects get a keyframe at the playhead (the outline turns gold on a keyframe).
+            val playhead = controller.positionMs
+            val transform = transformOf(project, selection, playhead)
+            val box = boxOf(project, selection, outputSize.width, outputSize.height)
+            if (transform != null && box != null) {
+                TransformFrame(
+                    transform = transform,
+                    boxFraction = box,
+                    frameW = frameW,
+                    frameH = frameH,
+                    keyed = keyedAt(project, selection, playhead),
+                    onCommit = onTransform,
+                    onTap = controller::togglePlay,
+                )
             }
         }
     }
+}
+
+/** The selected object's placement at [playheadMs], or null when it isn't on screen then. */
+private fun transformOf(project: Project, selection: Selection, playheadMs: Long): Transform? = when (selection) {
+    is Selection.Overlay -> project.overlays.firstOrNull { it.id == selection.id }
+        ?.takeIf { playheadMs >= it.startMs && playheadMs < it.endMs() }
+        ?.let { o -> Keyframes.at(Keyframes.base(o), o.keyframes, playheadMs - o.startMs) }
+    is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }
+        ?.takeIf { playheadMs >= it.startMs - 50 && playheadMs < it.endMs }
+        ?.let { t -> Keyframes.at(Transform(t.x, t.y, 1f, t.rotation, t.opacity), t.keyframes, (playheadMs - t.startMs).coerceAtLeast(0)) }
+    else -> null
+}
+
+/** The object's size at scale 1, in 0..1 frame units. */
+private fun boxOf(project: Project, selection: Selection, canvasW: Int, canvasH: Int): Pair<Float, Float>? = when (selection) {
+    is Selection.Overlay -> project.overlays.firstOrNull { it.id == selection.id }?.let { o ->
+        OverlayGeometry.boxFraction(o.width, o.height, canvasW, canvasH, 1f)
+    }
+    is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }?.let { t ->
+        // Approximate the rendered text box: 100px glyphs per 1080px of short side.
+        val fontPx = minOf(canvasW, canvasH) * 100f / 1080f * t.scale * (if (t.isSticker) 2f else 1f)
+        val longest = t.text.lines().maxOfOrNull { it.length } ?: 1
+        val w = (fontPx * 0.58f * (longest + if (t.background) 2 else 0)).coerceIn(fontPx, canvasW.toFloat())
+        val h = (fontPx * 1.25f * t.text.lines().size.coerceAtLeast(1)).coerceAtMost(canvasH.toFloat())
+        (w / canvasW) to (h / canvasH)
+    }
+    else -> null
+}
+
+private fun keyedAt(project: Project, selection: Selection, playheadMs: Long): Boolean = when (selection) {
+    is Selection.Overlay -> project.overlays.firstOrNull { it.id == selection.id }?.let { Keyframes.nearest(it.keyframes, playheadMs - it.startMs) != null } == true
+    is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }?.let { Keyframes.nearest(it.keyframes, playheadMs - it.startMs) != null } == true
+    else -> false
 }
 
 @Composable
@@ -717,6 +778,8 @@ private fun Toolbar(
     onTool: (Tool) -> Unit,
     onAddMedia: () -> Unit,
     onAddText: () -> Unit,
+    onAddOverlay: () -> Unit,
+    keyed: Boolean,
 ) {
     val hasClips = project.videoClips.isNotEmpty()
     when (selection) {
@@ -724,6 +787,7 @@ private fun Toolbar(
             ToolbarItem(Icons.Filled.ContentCut, "Edit", enabled = hasClips) { vm.selectClipAtPlayhead() }
             ToolbarItem(Icons.Filled.MusicNote, "Audio", enabled = hasClips) { onTool(Tool.AUDIO) }
             ToolbarItem(Icons.Filled.TextFields, "Text", enabled = hasClips) { onAddText() }
+            ToolbarItem(Icons.Filled.PictureInPicture, "Overlay", enabled = hasClips) { onAddOverlay() }
             ToolbarItem(Icons.Filled.ClosedCaption, "Captions", enabled = hasClips) { onTool(Tool.CAPTIONS) }
             ToolbarItem(Icons.Filled.AcUnit, "Effects", enabled = hasClips) { onTool(Tool.EFFECTS) }
             ToolbarItem(Icons.Filled.EmojiEmotions, "Stickers", enabled = hasClips) { onTool(Tool.STICKERS) }
@@ -776,8 +840,22 @@ private fun Toolbar(
             ToolbarItem(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateEffect(selection.id) }
             ToolbarItem(Icons.Filled.Delete, "Delete") { vm.deleteEffect(selection.id) }
         }
+        is Selection.Overlay -> {
+            val o = project.overlays.firstOrNull { it.id == selection.id } ?: return
+            ToolbarRow(onBack = { vm.select(Selection.None) }) {
+                ToolbarItem(if (keyed) Icons.Filled.Diamond else Icons.Outlined.Diamond, if (keyed) "Remove key" else "Keyframe") { vm.toggleKeyframe() }
+                ToolbarItem(Icons.Filled.Opacity, "Opacity") { onTool(Tool.OPACITY) }
+                if (!o.isImage) ToolbarItem(Icons.AutoMirrored.Filled.VolumeUp, "Volume") { onTool(Tool.VOLUME) }
+                ToolbarItem(Icons.Filled.AutoAwesome, "Filter") { onTool(Tool.OVERLAY_FILTER) }
+                ToolbarItem(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
+                ToolbarItem(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateOverlay(o.id) }
+                if (o.keyframes.isNotEmpty()) ToolbarItem(Icons.Filled.LayersClear, "Clear keys") { vm.clearKeyframes() }
+                ToolbarItem(Icons.Filled.Delete, "Delete") { vm.deleteOverlay(o.id) }
+            }
+        }
         is Selection.Text -> ToolbarRow(onBack = { vm.select(Selection.None) }) {
             ToolbarItem(Icons.Filled.Edit, "Edit") { onTool(Tool.TEXT_EDIT) }
+            ToolbarItem(if (keyed) Icons.Filled.Diamond else Icons.Outlined.Diamond, if (keyed) "Remove key" else "Keyframe") { vm.toggleKeyframe() }
             ToolbarItem(Icons.Filled.Palette, "Style") { onTool(Tool.TEXT_STYLE) }
             ToolbarItem(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
             ToolbarItem(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateText(selection.id) }
@@ -789,6 +867,7 @@ private fun Toolbar(
 @Composable
 private fun ActivePanel(
     app: FrameApp,
+    controller: PreviewController,
     proGate: ProGate,
     captionStyle: CaptionStyle,
     onCaptionStyle: (CaptionStyle) -> Unit,
@@ -807,6 +886,7 @@ private fun ActivePanel(
     val audio = (selection as? Selection.Audio)?.let { s -> project.audioClips.firstOrNull { it.id == s.id } }
     val text = (selection as? Selection.Text)?.let { s -> project.textOverlays.firstOrNull { it.id == s.id } }
     val effect = (selection as? Selection.Effect)?.let { s -> project.effects.firstOrNull { it.id == s.id } }
+    val overlayClip = (selection as? Selection.Overlay)?.let { s -> project.overlays.firstOrNull { it.id == s.id } }
 
     val action: (@Composable () -> Unit)? = when {
         clip != null && (tool == Tool.FILTERS || tool == Tool.ADJUST) -> {
@@ -822,6 +902,7 @@ private fun ActivePanel(
             Tool.SPEED -> clip?.let { c -> SpeedPanel(c) { vm.setSpeed(c.id, it) } }
             Tool.DURATION -> clip?.let { c -> DurationPanel(c) { vm.setImageDuration(c.id, it) } }
             Tool.VOLUME -> when {
+                overlayClip != null -> VolumePanel(overlayClip.volume) { vm.setOverlayVolume(overlayClip.id, it) }
                 clip != null -> VolumePanel(clip.volume) { vm.setVideoVolume(clip.id, it) }
                 audio != null -> VolumePanel(audio.volume) { vm.setAudioVolume(audio.id, it) }
             }
@@ -867,6 +948,26 @@ private fun ActivePanel(
                         onClose()
                     },
                 )
+            }
+            Tool.OPACITY -> overlayClip?.let { o ->
+                val at = controller.positionMs - o.startMs
+                val current = Keyframes.at(Keyframes.base(o), o.keyframes, at.coerceIn(0, o.durationMs())).opacity
+                ValueSlider("Opacity", "${(current * 100).roundToInt()}%", current, 0f..1f) { vm.setOverlayOpacity(o.id, it) }
+                if (o.keyframes.isNotEmpty()) {
+                    Text(
+                        "Animated: this sets the opacity keyframe at the playhead.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                }
+            }
+            Tool.OVERLAY_FILTER -> overlayClip?.let { o ->
+                Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Filters.all.filter { !it.pro || app.pro.isPro.value }.take(40).forEach { f ->
+                        FilterChip(selected = o.filterId == f.id, onClick = { vm.setOverlayFilter(o.id, f.id) }, label = { Text(f.name) })
+                    }
+                }
             }
             Tool.CAPTIONS -> {
                 val progress by vm.captioning.collectAsStateWithLifecycle()

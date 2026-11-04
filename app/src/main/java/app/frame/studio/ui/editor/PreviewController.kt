@@ -18,6 +18,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.Size
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.Composition
+import androidx.media3.effect.MultipleInputVideoGraph
 import androidx.media3.transformer.CompositionPlayer
 import app.frame.studio.domain.ExportHeight
 import app.frame.studio.domain.ExportQuality
@@ -151,14 +152,18 @@ class PreviewController(
         hasPlayer = true
         positionMs = resumeAt
         publishedPositionMs = resumeAt
-        onPlayer { buildPlayerOnThread(composition, resumeAt, resume) }
+        val layered = CompositionFactory.hasOverlays(key)
+        onPlayer { buildPlayerOnThread(composition, resumeAt, resume, layered) }
     }
 
-    private fun buildPlayerOnThread(composition: Composition, resumeAt: Long, resume: Boolean) {
+    private fun buildPlayerOnThread(composition: Composition, resumeAt: Long, resume: Boolean, layered: Boolean) {
         // Release first: a Surface can only feed one player at a time.
         releasePlayerOnThread()
         val next = try {
-            CompositionPlayer.Builder(context).setLooper(thread.looper).build()
+            CompositionPlayer.Builder(context).setLooper(thread.looper)
+                // Overlays (picture-in-picture) need the compositing video graph.
+                .apply { if (layered) setVideoGraphFactory(MultipleInputVideoGraph.Factory()) }
+                .build()
         } catch (e: Exception) {
             Log.w(TAG, "Could not create preview player", e)
             main.post { error = "Preview unavailable" }

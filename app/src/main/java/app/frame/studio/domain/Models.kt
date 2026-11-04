@@ -185,8 +185,64 @@ data class TextOverlay(
     /** Word-by-word caption timing, relative to [startMs]. Empty for ordinary text. */
     val words: List<CaptionWord> = emptyList(),
     val captionStyle: CaptionStyle = CaptionStyle.KARAOKE,
+    /** Clockwise degrees. */
+    val rotation: Float = 0f,
+    val opacity: Float = 1f,
+    /** Animation over time (relative to [startMs]); empty = static. */
+    val keyframes: List<Keyframe> = emptyList(),
 ) {
     val isCaption: Boolean get() = words.isNotEmpty()
+}
+
+/** How motion eases between two keyframes. */
+@Serializable
+enum class Easing(val label: String) { LINEAR("Linear"), SMOOTH("Smooth"), EASE_IN("Ease in"), EASE_OUT("Ease out"), HOLD("Hold") }
+
+/**
+ * A keyframe of an object's transform at [atMs] (relative to the object's start).
+ * Position is the object's centre in 0..1 of the frame; [scale] is relative to the object's
+ * default size; [rotation] is clockwise degrees; [opacity] 0..1.
+ */
+@Serializable
+data class Keyframe(
+    val atMs: Long,
+    val x: Float,
+    val y: Float,
+    val scale: Float = 1f,
+    val rotation: Float = 0f,
+    val opacity: Float = 1f,
+    /** Easing from this keyframe to the next. */
+    val easing: Easing = Easing.SMOOTH,
+)
+
+/**
+ * A video or photo layered above the main video (picture-in-picture). It plays from [startMs] on
+ * the timeline; its sound is mixed with everything else.
+ */
+@Serializable
+data class OverlayClip(
+    val id: String,
+    val sourceUri: String,
+    val sourceDurationMs: Long,
+    val trimStartMs: Long = 0,
+    val trimEndMs: Long,
+    val startMs: Long,
+    val width: Int,
+    val height: Int,
+    val isImage: Boolean = false,
+    val displayName: String = "",
+    val x: Float = 0.5f,
+    val y: Float = 0.5f,
+    /** 1 = fits the frame; overlays start smaller. */
+    val scale: Float = 0.45f,
+    val rotation: Float = 0f,
+    val opacity: Float = 1f,
+    val volume: Float = 1f,
+    val filterId: String = "none",
+    val keyframes: List<Keyframe> = emptyList(),
+) {
+    fun durationMs(): Long = (trimEndMs - trimStartMs).coerceAtLeast(0)
+    fun endMs(): Long = startMs + durationMs()
 }
 
 /** One spoken word of a caption; times are relative to the caption's start. */
@@ -251,6 +307,8 @@ data class Project(
     val effects: List<SceneEffect> = emptyList(),
     /** AAC audio bitrate of the export, in kbps. */
     val audioBitrateKbps: Int = 192,
+    /** Videos and photos layered above the main video. */
+    val overlays: List<OverlayClip> = emptyList(),
 )
 
 @Serializable

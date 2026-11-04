@@ -1,5 +1,7 @@
 package app.frame.studio.ui.editor
 
+import androidx.compose.material.icons.filled.PictureInPicture
+import app.frame.studio.domain.OverlayClip
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -110,6 +112,7 @@ fun Timeline(
     onPlaceAudio: (id: String, startMs: Long, trimStartMs: Long, trimEndMs: Long) -> Unit,
     onTextRange: (id: String, startMs: Long, endMs: Long) -> Unit,
     onEffectRange: (id: String, startMs: Long, endMs: Long) -> Unit,
+    onPlaceOverlay: (id: String, startMs: Long, trimStartMs: Long, trimEndMs: Long) -> Unit,
     onTransition: (clipId: String) -> Unit,
     onAddMedia: () -> Unit,
     modifier: Modifier = Modifier,
@@ -183,6 +186,12 @@ fun Timeline(
     }
     val effectLanes = remember(effects) { rangeLanes(effects.map { Triple(it.id, it.startMs, it.endMs) }) }
     val effectLaneCount = (effectLanes.values.maxOrNull() ?: -1) + 1
+    val overlays = project.overlays.map { o ->
+        val d = drag
+        if (d != null && d.id == o.id) previewOverlay(o, d) else o
+    }
+    val overlayLanes = remember(overlays) { rangeLanes(overlays.map { Triple(it.id, it.startMs, it.endMs()) }) }
+    val overlayLaneCount = (overlayLanes.values.maxOrNull() ?: -1) + 1
 
     BoxWithConstraints(
         modifier
@@ -266,6 +275,40 @@ fun Timeline(
                         }
                     }
 
+                    // ---- Overlay lanes (picture-in-picture) ----
+                    for (lane in 0 until if (compact) 0 else overlayLaneCount) {
+                        Box(Modifier.padding(top = LANE_GAP).width(contentWidth).height(LANE_HEIGHT)) {
+                            overlays.filter { overlayLanes[it.id] == lane }.forEach { o ->
+                                val selected = selection is Selection.Overlay && selection.id == o.id
+                                LaneItem(
+                                    markers = o.keyframes.map { dp(it.atMs.toFloat()) },
+                                    label = o.displayName.ifBlank { if (o.isImage) "Photo overlay" else "Video overlay" },
+                                    icon = Icons.Filled.PictureInPicture,
+                                    color = if (o.sourceUri in missing) MaterialTheme.colorScheme.error else TrackColors.overlay,
+                                    width = dp(o.durationMs().toFloat()),
+                                    selected = selected,
+                                    dimmedAfter = null,
+                                    modifier = Modifier.offset(x = half + dp(o.startMs.toFloat())),
+                                    onClick = { onSelect(if (selected) Selection.None else Selection.Overlay(o.id)) },
+                                    onDragStart = { controller.pause() },
+                                    onDrag = { edge, deltaPx ->
+                                        val current = drag?.takeIf { it.id == o.id && it.edge == edge }
+                                        drag = TrimDrag(o.id, edge, (current?.deltaMs ?: 0f) + deltaPx / pxPerMs)
+                                    },
+                                    onDragEnd = {
+                                        val d = drag
+                                        if (d != null) {
+                                            val original = project.overlays.first { it.id == o.id }
+                                            val r = previewOverlay(original, d)
+                                            onPlaceOverlay(o.id, r.startMs, r.trimStartMs, r.trimEndMs)
+                                        }
+                                        drag = null
+                                    },
+                                )
+                            }
+                        }
+                    }
+
                     // ---- Audio lanes ----
                     for (lane in 0 until if (compact) 0 else audioLaneCount) {
                         Box(Modifier.padding(top = LANE_GAP).width(contentWidth).height(LANE_HEIGHT)) {
@@ -312,6 +355,7 @@ fun Timeline(
                             texts.filter { textLanes[it.id] == lane }.forEach { o ->
                                 val selected = selection is Selection.Text && selection.id == o.id
                                 LaneItem(
+                                    markers = o.keyframes.map { dp(it.atMs.toFloat()) },
                                     label = o.text,
                                     icon = if (o.isSticker) null else Icons.Filled.TextFields,
                                     color = if (o.isSticker) TrackColors.sticker else TrackColors.text,
@@ -452,6 +496,20 @@ private fun previewText(o: TextOverlay, d: TrimDrag): TextOverlay {
         }
         Edge.START -> o.copy(startMs = (o.startMs + delta).coerceIn(0, o.endMs - 100))
         Edge.END -> o.copy(endMs = (o.endMs + delta).coerceAtLeast(o.startMs + 100))
+    }
+}
+
+private fun previewOverlay(o: OverlayClip, d: TrimDrag): OverlayClip {
+    val delta = d.deltaMs.toLong()
+    return when (d.edge) {
+        Edge.BODY -> o.copy(startMs = (o.startMs + delta).coerceAtLeast(0))
+        Edge.START -> {
+            // Trimming the head keeps the rest of the clip where it is on the timeline.
+            val minDelta = maxOf(-o.trimStartMs, -o.startMs)
+            val dd = delta.coerceIn(minDelta, o.durationMs() - 300)
+            o.copy(startMs = o.startMs + dd, trimStartMs = o.trimStartMs + dd)
+        }
+        Edge.END -> o.copy(trimEndMs = (o.trimEndMs + delta).coerceIn(o.trimStartMs + 300, o.sourceDurationMs))
     }
 }
 

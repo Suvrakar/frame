@@ -8,6 +8,7 @@ import app.frame.studio.data.SettingsStore
 import app.frame.studio.device.DeviceProfile
 import app.frame.studio.data.ProjectRepository
 import app.frame.studio.export.ExportManager
+import app.frame.studio.export.CompositionFactory
 import app.frame.studio.pro.ProStore
 import app.frame.studio.magic.MagicMovieBuilder
 import app.frame.studio.templates.TemplateBuilder
@@ -54,8 +55,21 @@ class FrameApp : Application() {
         // Entitlement is cached locally; Play is re-checked in the background on every launch.
         magicMovie = MagicMovieBuilder(this, repository, mediaProbe, imageNormalizer, device)
         pro = ProStore(this).also { it.connect() }
+        CompositionFactory.maxOverlayLanes = if (device.isLowEnd) 1 else 2
+        applicationScope.launch(kotlinx.coroutines.Dispatchers.IO) { CompositionFactory.blankFrameUri = blankFrame() }
         // Ads are initialized by AdsService once the user's consent status is known.
     }
+
+    /** A tiny transparent PNG used to fill the gaps of overlay lanes. */
+    private fun blankFrame(): String? = runCatching {
+        val file = java.io.File(filesDir, "blank_frame.png")
+        if (!file.exists() || file.length() == 0L) {
+            val bmp = android.graphics.Bitmap.createBitmap(16, 16, android.graphics.Bitmap.Config.ARGB_8888)
+            file.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+            bmp.recycle()
+        }
+        android.net.Uri.fromFile(file).toString()
+    }.getOrNull()
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)

@@ -101,6 +101,8 @@ enum class Tool(val title: String) {
     EFFECTS("Effects"),
     BEAT_SYNC("Beat sync"),
     CAPTIONS("Captions"),
+    OPACITY("Opacity"),
+    OVERLAY_FILTER("Overlay filter"),
     EFFECT_EDIT("Effect"),
 }
 

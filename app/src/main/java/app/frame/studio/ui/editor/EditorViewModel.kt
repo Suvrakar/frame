@@ -1,5 +1,10 @@
 package app.frame.studio.ui.editor
 
+import app.frame.studio.export.CompositionFactory
+import app.frame.studio.timeline.Transform
+import app.frame.studio.timeline.OverlayLayout
+import app.frame.studio.timeline.Keyframes
+import app.frame.studio.domain.OverlayClip
 import app.frame.studio.domain.CaptionStyle
 import app.frame.studio.captions.CaptionPlanner
 import app.frame.studio.captions.AutoCaptioner
@@ -47,6 +52,7 @@ sealed interface Selection {
     data class Audio(val id: String) : Selection
     data class Text(val id: String) : Selection
     data class Effect(val id: String) : Selection
+    data class Overlay(val id: String) : Selection
 }
 
 class EditorViewModel(private val app: FrameApp, private val projectId: String) : ViewModel() {
@@ -170,6 +176,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                 is Selection.Audio -> p.audioClips.any { it.id == sel.id }
                 is Selection.Text -> p.textOverlays.any { it.id == sel.id }
                 is Selection.Effect -> p.effects.any { it.id == sel.id }
+                is Selection.Overlay -> p.overlays.any { it.id == sel.id }
                 Selection.None -> true
             }
             if (!exists) _selection.value = Selection.None
@@ -357,7 +364,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     private fun checkSources() {
         viewModelScope.launch {
             val p = _project.value ?: return@launch
-            val uris = (p.videoClips.map { it.sourceUri } + p.audioClips.map { it.sourceUri }).toSet()
+            val uris = (p.videoClips.map { it.sourceUri } + p.audioClips.map { it.sourceUri } + p.overlays.map { it.sourceUri }).toSet()
             val missing = withContext(Dispatchers.IO) {
                 uris.filterNot { probe.isReadable(Uri.parse(it)) }.toSet()
             }
@@ -454,6 +461,21 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                     cur.copy(audioClips = cur.audioClips.flatMap { if (it.id == clip.id) listOf(left.copy(fadeOutMs = 0), right) else listOf(it) })
                 }
                 _selection.value = Selection.Audio(right.id)
+            }
+            is Selection.Overlay -> {
+                val o = p.overlays.firstOrNull { it.id == sel.id } ?: return
+                val offset = playhead - o.startMs
+                if (offset < TimelineOps.MIN_SPLIT_MS || o.durationMs() - offset < TimelineOps.MIN_SPLIT_MS) {
+                    messageChannel.trySend("Move the playhead over the selected overlay to split it")
+                    return
+                }
+                val left = o.copy(trimEndMs = o.trimStartMs + offset, keyframes = Keyframes.retime(o.keyframes, 0, offset))
+                val right = o.copy(
+                    id = newId(), trimStartMs = o.trimStartMs + offset, startMs = playhead,
+                    keyframes = Keyframes.retime(o.keyframes, offset, o.durationMs() - offset),
+                )
+                edit { cur -> cur.copy(overlays = cur.overlays.flatMap { if (it.id == o.id) listOf(left, right) else listOf(it) }) }
+                _selection.value = Selection.Overlay(right.id)
             }
             is Selection.Effect -> {
                 val effect = p.effects.firstOrNull { it.id == sel.id } ?: return
@@ -571,6 +593,192 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     }
 
     fun deleteText(id: String) = edit { p -> p.copy(textOverlays = p.textOverlays.filter { it.id != id }) }
+
+    // ---- Overlays (picture-in-picture) ----------------------------------------------------
+
+    /** Adds photos/videos above the main video at the playhead, each on a free lane. */
+    fun addOverlays(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        viewModelScope.launch {
+            _importing.value = true
+            var added: String? = null
+            var blocked = 0
+            for (uri in uris) {
+                probe.persistPermission(uri)
+                val total = totalMs()
+                val start = _playheadMs.value.coerceIn(0, (total - 300).coerceAtLeast(0))
+                val clip: OverlayClip = (if (probe.isImage(uri)) {
+                    val name = probe.probeImage(uri)?.displayName.orEmpty()
+                    app.imageNormalizer.normalize(uri)?.let { img ->
+                        OverlayClip(
+                            id = newId(), sourceUri = img.uri.toString(), sourceDurationMs = VideoClip.MAX_IMAGE_MS,
+                            trimEndMs = minOf(VideoClip.DEFAULT_IMAGE_MS, total - start), startMs = start,
+                            width = img.width, height = img.height, isImage = true, displayName = name,
+                        )
+                    }
+                } else {
+                    probe.probeVideo(uri)?.takeIf { it.durationMs >= 300 }?.let { info ->
+                        OverlayClip(
+                            id = newId(), sourceUri = uri.toString(), sourceDurationMs = info.durationMs,
+                            trimEndMs = minOf(info.durationMs, total - start), startMs = start,
+                            width = info.width, height = info.height, displayName = info.displayName,
+                        )
+                    }
+                }) ?: continue
+                val p = _project.value ?: break
+                if (!OverlayLayout.fits(p.overlays, clip.startMs, clip.durationMs(), CompositionFactory.maxOverlayLanes)) {
+                    blocked++
+                    continue
+                }
+                // Stagger several new overlays so they don't sit exactly on top of each other.
+                val shifted = clip.copy(x = 0.5f + 0.08f * (p.overlays.size % 3), y = 0.42f + 0.06f * (p.overlays.size % 3))
+                edit { cur -> cur.copy(overlays = cur.overlays + shifted) }
+                added = shifted.id
+            }
+            _importing.value = false
+            if (blocked > 0) {
+                val lanes = CompositionFactory.maxOverlayLanes
+                messageChannel.send(
+                    if (lanes == 1) "This phone shows one overlay at a time. Move the playhead to a free spot."
+                    else "Up to $lanes overlays can play at the same time. Move the playhead to a free spot.",
+                )
+            }
+            added?.let { _selection.value = Selection.Overlay(it) }
+        }
+    }
+
+    private fun editOverlay(id: String, key: String? = null, transform: (OverlayClip) -> OverlayClip) =
+        edit(key?.let { "$it:$id" }) { p -> p.copy(overlays = p.overlays.map { if (it.id == id) transform(it) else it }) }
+
+    fun setOverlayOpacity(id: String, opacity: Float) = editOverlay(id, "opacity") { o ->
+        val v = opacity.coerceIn(0f, 1f)
+        if (o.keyframes.isEmpty()) o.copy(opacity = v) else {
+            val at = (_playheadMs.value - o.startMs).coerceIn(0, o.durationMs())
+            val t = Keyframes.at(Keyframes.base(o), o.keyframes, at)
+            o.copy(keyframes = Keyframes.upsert(o.keyframes, at, t.copy(opacity = v)))
+        }
+    }
+
+    fun setOverlayVolume(id: String, volume: Float) = editOverlay(id, "volume") { it.copy(volume = volume.coerceIn(0f, 2f)) }
+
+    fun setOverlayFilter(id: String, filterId: String) = editOverlay(id) { it.copy(filterId = filterId) }
+
+    /** Moves or trims an overlay on the timeline (from the overlay lane). */
+    fun placeOverlay(id: String, startMs: Long, trimStartMs: Long, trimEndMs: Long) {
+        val p = _project.value ?: return
+        val o = p.overlays.firstOrNull { it.id == id } ?: return
+        val total = totalMs()
+        val start = startMs.coerceIn(0, (total - 100).coerceAtLeast(0))
+        val ts = trimStartMs.coerceIn(0, o.sourceDurationMs - 100)
+        val te = trimEndMs.coerceIn(ts + 100, minOf(o.sourceDurationMs, ts + (total - start)))
+        if (!OverlayLayout.fits(p.overlays, start, te - ts, CompositionFactory.maxOverlayLanes, ignoreId = id)) {
+            messageChannel.trySend("Too many overlays at that moment")
+            return
+        }
+        editOverlay(id) {
+            it.copy(
+                startMs = start, trimStartMs = ts, trimEndMs = te,
+                // Keyframes stay attached to the footage when the start is trimmed.
+                keyframes = Keyframes.retime(it.keyframes, ts - it.trimStartMs, te - ts),
+            )
+        }
+    }
+
+    fun deleteOverlay(id: String) = edit { p -> p.copy(overlays = p.overlays.filter { it.id != id }) }
+
+    fun duplicateOverlay(id: String) {
+        val p = _project.value ?: return
+        val o = p.overlays.firstOrNull { it.id == id } ?: return
+        val copy = o.copy(id = newId(), x = (o.x + 0.06f).coerceAtMost(0.95f), y = (o.y + 0.06f).coerceAtMost(0.95f))
+        if (!OverlayLayout.fits(p.overlays, copy.startMs, copy.durationMs(), CompositionFactory.maxOverlayLanes)) {
+            messageChannel.trySend("No free overlay lane at that moment")
+            return
+        }
+        edit { cur -> cur.copy(overlays = cur.overlays + copy) }
+        _selection.value = Selection.Overlay(copy.id)
+    }
+
+    // ---- Moving objects and keyframes -----------------------------------------------------
+
+    /** The selected object's transform at the playhead (what the on-preview handles show). */
+    fun transformAtPlayhead(project: Project, selection: Selection, playheadMs: Long): Transform? = when (selection) {
+        is Selection.Overlay -> project.overlays.firstOrNull { it.id == selection.id }?.let { o ->
+            Keyframes.at(Keyframes.base(o), o.keyframes, (playheadMs - o.startMs).coerceIn(0, o.durationMs()))
+        }
+        is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }?.let { t ->
+            Keyframes.at(Transform(t.x, t.y, 1f, t.rotation, t.opacity), t.keyframes, (playheadMs - t.startMs).coerceIn(0, t.endMs - t.startMs))
+        }
+        else -> null
+    }
+
+    /**
+     * A move/resize/rotate from the preview handles. Static objects simply move; animated ones get
+     * (or update) a keyframe at the playhead.
+     */
+    fun transformSelected(t: Transform) {
+        val playhead = _playheadMs.value
+        when (val sel = _selection.value) {
+            is Selection.Overlay -> editOverlay(sel.id, "move") { o ->
+                val clamped = t.copy(x = t.x.coerceIn(0f, 1f), y = t.y.coerceIn(0f, 1f), scale = t.scale.coerceIn(0.05f, 3f))
+                val at = (playhead - o.startMs).coerceIn(0, o.durationMs())
+                val (base, keys) = Keyframes.edit(Keyframes.base(o), o.keyframes, at, clamped)
+                o.copy(x = base.x, y = base.y, scale = base.scale, rotation = base.rotation, opacity = base.opacity, keyframes = keys)
+            }
+            is Selection.Text -> editText(sel.id, "move") { o ->
+                val clamped = t.copy(x = t.x.coerceIn(0.02f, 0.98f), y = t.y.coerceIn(0.02f, 0.98f))
+                if (o.keyframes.isEmpty()) {
+                    // Static text: resizing changes its size directly.
+                    o.copy(x = clamped.x, y = clamped.y, rotation = clamped.rotation, scale = (o.scale * clamped.scale).coerceIn(0.3f, 4f))
+                } else {
+                    val at = (playhead - o.startMs).coerceIn(0, o.endMs - o.startMs)
+                    o.copy(keyframes = Keyframes.upsert(o.keyframes, at, clamped.copy(scale = clamped.scale.coerceIn(0.1f, 6f))))
+                }
+            }
+            else -> Unit
+        }
+    }
+
+    /** True when the selected object has a keyframe at the playhead. */
+    fun hasKeyframeAtPlayhead(project: Project, selection: Selection, playheadMs: Long): Boolean = when (selection) {
+        is Selection.Overlay -> project.overlays.firstOrNull { it.id == selection.id }?.let { Keyframes.nearest(it.keyframes, playheadMs - it.startMs) != null } == true
+        is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }?.let { Keyframes.nearest(it.keyframes, playheadMs - it.startMs) != null } == true
+        else -> false
+    }
+
+    /** Adds a keyframe of the current placement at the playhead, or removes the one there. */
+    fun toggleKeyframe() {
+        val p = _project.value ?: return
+        val sel = _selection.value
+        val playhead = _playheadMs.value
+        val t = transformAtPlayhead(p, sel, playhead) ?: return
+        when (sel) {
+            is Selection.Overlay -> editOverlay(sel.id) { o ->
+                val at = (playhead - o.startMs).coerceIn(0, o.durationMs())
+                if (Keyframes.nearest(o.keyframes, at) != null) o.copy(keyframes = Keyframes.remove(o.keyframes, at))
+                else o.copy(keyframes = Keyframes.upsert(o.keyframes, at, t))
+            }
+            is Selection.Text -> editText(sel.id) { o ->
+                val at = (playhead - o.startMs).coerceIn(0, o.endMs - o.startMs)
+                if (Keyframes.nearest(o.keyframes, at) != null) o.copy(keyframes = Keyframes.remove(o.keyframes, at))
+                else o.copy(keyframes = Keyframes.upsert(o.keyframes, at, t))
+            }
+            else -> return
+        }
+        val count = when (sel) {
+            is Selection.Overlay -> _project.value?.overlays?.firstOrNull { it.id == sel.id }?.keyframes?.size
+            is Selection.Text -> _project.value?.textOverlays?.firstOrNull { it.id == sel.id }?.keyframes?.size
+            else -> null
+        } ?: 0
+        if (count == 1) messageChannel.trySend("Keyframe added. Move the playhead, then drag or pinch on the preview to animate.")
+    }
+
+    fun clearKeyframes() {
+        when (val sel = _selection.value) {
+            is Selection.Overlay -> editOverlay(sel.id) { it.copy(keyframes = emptyList()) }
+            is Selection.Text -> editText(sel.id) { it.copy(keyframes = emptyList()) }
+            else -> Unit
+        }
+    }
 
     // ---- Animated captions ----------------------------------------------------------------
 
@@ -726,6 +934,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             is Selection.Audio -> deleteAudio(sel.id)
             is Selection.Text -> deleteText(sel.id)
             is Selection.Effect -> deleteEffect(sel.id)
+            is Selection.Overlay -> deleteOverlay(sel.id)
             Selection.None -> Unit
         }
     }
