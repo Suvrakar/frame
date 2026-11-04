@@ -26,6 +26,13 @@ import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Speed
+import androidx.compose.material.icons.outlined.Restore
+import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.WorkspacePremium
+import androidx.compose.material3.Switch
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
+import app.frame.studio.ui.pro.rememberProGate
 import androidx.compose.material.icons.outlined.SettingsSuggest
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,6 +62,9 @@ fun SettingsScreen(app: FrameApp) {
     val privacyRequired by AdsService.privacyOptionsRequired.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = LocalActivity.current
+    val isPro by app.pro.isPro.collectAsStateWithLifecycle()
+    val price by app.pro.price.collectAsStateWithLifecycle()
+    val gate = rememberProGate(app.pro)
 
     Column(
         Modifier
@@ -65,6 +75,24 @@ fun SettingsScreen(app: FrameApp) {
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 8.dp))
+
+        ProCard(isPro, price) { gate.showPaywall() }
+        if (!isPro || BuildConfig.DEBUG) {
+            GlassCard(Modifier.fillMaxWidth()) {
+                SettingsRow(Icons.Outlined.Restore, "Restore purchase", "Already bought Frame Pro on this account?") {
+                    app.pro.restore()
+                }
+                if (BuildConfig.DEBUG) {
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), modifier = Modifier.padding(horizontal = 16.dp))
+                    Row(Modifier.fillMaxWidth().padding(end = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.weight(1f)) {
+                            SettingsRow(Icons.Outlined.BugReport, "Pro (debug)", "Debug builds only: unlock without buying", onClick = null)
+                        }
+                        Switch(checked = isPro, onCheckedChange = app.pro::setDebugPro)
+                    }
+                }
+            }
+        }
 
         Label("Appearance")
         GlassCard(Modifier.fillMaxWidth()) {
@@ -104,6 +132,37 @@ fun SettingsScreen(app: FrameApp) {
             )
         }
         Spacer(Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun ProCard(isPro: Boolean, price: String?, onUpgrade: () -> Unit) {
+    val shape = RoundedCornerShape(22.dp)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(Brush.linearGradient(listOf(Color(0xFF5B63F0), Color(0xFF8E5BF0))))
+            .then(if (isPro) Modifier else Modifier.clickable(onClick = onUpgrade))
+            .padding(18.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Outlined.WorkspacePremium, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+        Column(Modifier.weight(1f).padding(start = 14.dp)) {
+            Text(
+                if (isPro) "Frame Pro is active" else "Get Frame Pro",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White,
+            )
+            Text(
+                if (isPro) "Magic Movie, animated captions, 4K & 60 fps, no ads. Thank you!"
+                else "Magic Movie, animated captions, 4K & 60 fps, no ads" + (price?.let { " · $it once" } ?: ""),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.85f),
+            )
+        }
+        if (!isPro) Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = Color.White)
     }
 }
 

@@ -74,6 +74,9 @@ import app.frame.studio.export.ExportState
 import app.frame.studio.export.GallerySaver
 import app.frame.studio.export.SocialPreset
 import app.frame.studio.export.SocialPresets
+import app.frame.studio.pro.ProFeature
+import app.frame.studio.pro.ProPolicy
+import app.frame.studio.ui.pro.rememberProGate
 import app.frame.studio.ui.editor.SocialPresetPicker
 import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.ui.common.VideoThumbnail
@@ -97,6 +100,8 @@ fun ExportScreen(
     val state by app.exportManager.state.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     var saveToGallery by rememberSaveable { mutableStateOf(true) }
+    val isPro by app.pro.isPro.collectAsStateWithLifecycle()
+    val gate = rememberProGate(app.pro)
 
     val relevant = when (val s = state) {
         is ExportState.Running -> s.projectId == projectId
@@ -128,6 +133,15 @@ fun ExportScreen(
             legacyPermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         } else {
             start(p, saveToGallery)
+        }
+    }
+
+    fun exportOrUpgrade() {
+        val p = project ?: return
+        if (!ProPolicy.exportNeedsPro(p)) return startExport()
+        gate.require(ProFeature.HIGH_RES_EXPORT) {
+            app.pro.consumePass(ProFeature.HIGH_RES_EXPORT)
+            startExport()
         }
     }
 
@@ -192,7 +206,8 @@ fun ExportScreen(
                             onAudioBitrate = { kbps -> update { it.copy(audioBitrateKbps = kbps) } },
                             device = app.device,
                                 onPreset = { preset -> update { SocialPresets.apply(it, preset, app.device::clampExportHeight) } },
-                                onExport = ::startExport,
+                                isPro = isPro,
+                                onExport = ::exportOrUpgrade,
                             )
                             is ExportState.Running -> {
                                 Text(
@@ -323,6 +338,7 @@ private fun Settings(
     onPreset: (SocialPreset) -> Unit,
     onExport: () -> Unit,
     device: app.frame.studio.device.DeviceProfile,
+    isPro: Boolean,
 ) {
     Column(
         Modifier
@@ -361,6 +377,13 @@ private fun Settings(
             unsupportedFps.isNotEmpty() ->
                 Note("${unsupportedFps.joinToString(", ")} fps isn't available at ${project.exportHeight.label} on this phone.")
             else -> Note("Clips filmed at a lower frame rate keep their own rate.")
+        }
+        if (!isPro) {
+            Note(
+                if (ProPolicy.exportNeedsPro(project)) "${project.exportHeight.label} at ${project.exportFps} fps is part of Frame Pro. Watch a short ad to export it once, or upgrade."
+                else "2K, 4K and 50/60 fps are part of Frame Pro.",
+                warning = ProPolicy.exportNeedsPro(project),
+            )
         }
         Segmented("Quality", ExportQuality.entries, project.exportQuality, { it.label }, onQuality)
         Segmented(

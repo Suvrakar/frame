@@ -20,6 +20,8 @@ fun secret(name: String, env: String): String? =
 // Google's public test IDs. Debug builds always use them; release builds use real IDs when provided.
 val testAdmobAppId = "ca-app-pub-3940256099942544~3347511713"
 val testAdmobBannerId = "ca-app-pub-3940256099942544/9214589741"
+val testAdmobRewardedId = "ca-app-pub-3940256099942544/5224354917"
+val releaseAdmobRewardedId = secret("admobRewardedId", "FRAME_ADMOB_REWARDED_ID")
 val releaseAdmobAppId = secret("admobAppId", "FRAME_ADMOB_APP_ID")
 val releaseAdmobBannerId = secret("admobBannerId", "FRAME_ADMOB_BANNER_ID")
 
@@ -60,6 +62,7 @@ android {
             if (releaseSigning.storeFile != null) signingConfig = releaseSigning
             resValue("string", "admob_app_id", releaseAdmobAppId ?: testAdmobAppId)
             resValue("string", "admob_banner_id", releaseAdmobBannerId ?: testAdmobBannerId)
+            resValue("string", "admob_rewarded_id", releaseAdmobRewardedId ?: testAdmobRewardedId)
         }
         debug {
             isMinifyEnabled = false
@@ -67,6 +70,7 @@ android {
             versionNameSuffix = "-debug"
             resValue("string", "admob_app_id", testAdmobAppId)
             resValue("string", "admob_banner_id", testAdmobBannerId)
+            resValue("string", "admob_rewarded_id", testAdmobRewardedId)
         }
     }
 
@@ -150,6 +154,8 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-ads:24.5.0")
     implementation("com.google.android.ump:user-messaging-platform:3.2.0")
+    // In-app purchase of Frame Pro (verified on the device; no server).
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")

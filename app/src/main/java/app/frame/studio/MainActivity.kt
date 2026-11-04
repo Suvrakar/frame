@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import app.frame.studio.ads.AdsService
+import app.frame.studio.ads.RewardedAds
 import app.frame.studio.export.ExportState
 import app.frame.studio.ui.FrameNavHost
 import app.frame.studio.ui.theme.FrameTheme
@@ -25,6 +26,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val app = application as FrameApp
         AdsService.gatherConsent(this)
+
+        // Free users can watch a rewarded ad for a one-off Pro unlock; keep one ready.
+        lifecycleScope.launch {
+            AdsService.canShowAds.collect { ok -> if (ok && !app.pro.isPro.value) RewardedAds.preload(this@MainActivity) }
+        }
 
         // Keep the screen awake while an export is running so the encoder is not interrupted.
         lifecycleScope.launch {
