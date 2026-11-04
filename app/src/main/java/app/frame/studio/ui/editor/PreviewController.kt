@@ -32,6 +32,8 @@ class PreviewController(private val context: Context) {
 
     var player by mutableStateOf<CompositionPlayer?>(null)
         private set
+    val hasPlayer: Boolean get() = player != null
+
     var isPlaying by mutableStateOf(false)
         private set
     var positionMs by mutableLongStateOf(0L)
@@ -125,6 +127,10 @@ class PreviewController(private val context: Context) {
         }
         if (ended || positionMs >= totalMs - 50) seekTo(0)
         p.play()
+    }
+
+    fun play() {
+        player?.play()
     }
 
     fun pause() {

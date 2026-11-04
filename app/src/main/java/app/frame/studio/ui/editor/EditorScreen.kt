@@ -184,7 +184,7 @@ private fun EditorContent(
     DisposableEffect(controller) { onDispose { controller.release() } }
     // Rebuild shortly after edits settle so slider drags stay smooth.
     LaunchedEffect(project) {
-        if (controller.player != null) kotlinx.coroutines.delay(120)
+        if (controller.hasPlayer) kotlinx.coroutines.delay(120)
         controller.setProject(project)
     }
     LaunchedEffect(controller) {
@@ -238,7 +238,7 @@ private fun EditorContent(
         if (recorder.start()) {
             recording = true
             controller.setMuted(true)
-            controller.player?.play()
+            controller.play()
         } else {
             android.widget.Toast.makeText(context, "Microphone is unavailable", android.widget.Toast.LENGTH_SHORT).show()
         }
