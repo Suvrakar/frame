@@ -1,5 +1,7 @@
 package app.frame.studio.ui.common
 
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -46,27 +48,29 @@ import app.frame.studio.ui.theme.LocalGlass
 fun GlassBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
     val glass = LocalGlass.current
     val base = MaterialTheme.colorScheme.background
+    val onSurface = MaterialTheme.colorScheme.onSurface
     Box(
         modifier
             .fillMaxSize()
             .background(base)
-            .drawBehind {
+            // Gradients are built once per size, not on every redraw.
+            .drawWithCache {
                 val r = size.maxDimension
-                drawCircle(
-                    Brush.radialGradient(listOf(glass.glowA, Color.Transparent), center = Offset(size.width * 0.05f, size.height * 0.08f), radius = r * 0.55f),
-                    radius = r * 0.55f, center = Offset(size.width * 0.05f, size.height * 0.08f),
-                )
-                drawCircle(
-                    Brush.radialGradient(listOf(glass.glowB, Color.Transparent), center = Offset(size.width * 1.0f, size.height * 0.42f), radius = r * 0.5f),
-                    radius = r * 0.5f, center = Offset(size.width * 1.0f, size.height * 0.42f),
-                )
-                drawCircle(
-                    Brush.radialGradient(listOf(glass.glowC, Color.Transparent), center = Offset(size.width * 0.15f, size.height * 0.95f), radius = r * 0.45f),
-                    radius = r * 0.45f, center = Offset(size.width * 0.15f, size.height * 0.95f),
-                )
+                val a = Offset(size.width * 0.05f, size.height * 0.08f)
+                val b = Offset(size.width * 1.0f, size.height * 0.42f)
+                val c = Offset(size.width * 0.15f, size.height * 0.95f)
+                val brushA = Brush.radialGradient(listOf(glass.glowA, Color.Transparent), center = a, radius = r * 0.55f)
+                val brushB = Brush.radialGradient(listOf(glass.glowB, Color.Transparent), center = b, radius = r * 0.5f)
+                val brushC = Brush.radialGradient(listOf(glass.glowC, Color.Transparent), center = c, radius = r * 0.45f)
+                onDrawBehind {
+                    drawCircle(brushA, radius = r * 0.55f, center = a)
+                    drawCircle(brushB, radius = r * 0.5f, center = b)
+                    drawCircle(brushC, radius = r * 0.45f, center = c)
+                }
             },
-        content = content,
-    )
+    ) {
+        CompositionLocalProvider(androidx.compose.material3.LocalContentColor provides onSurface) { content() }
+    }
 }
 
 @Composable
@@ -91,7 +95,7 @@ fun GlassCard(
             .clip(shape)
             .background(if (strong) glass.fillStrong else glass.fill)
             .border(1.dp, glass.border, shape)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+            .let { if (onClick != null) it.bounceClick(onClick = onClick) else it },
         content = content,
     )
 }
@@ -139,7 +143,7 @@ fun GlassIconButton(icon: ImageVector, contentDescription: String?, onClick: () 
             .clip(CircleShape)
             .background(glass.fill)
             .border(1.dp, glass.border, CircleShape)
-            .clickable(onClick = onClick),
+            .bounceClick(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, contentDescription = contentDescription, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(22.dp))
@@ -173,7 +177,7 @@ fun GlassBottomBar(tabs: List<NavTab>, current: String?, onSelect: (NavTab) -> U
                     .weight(1f)
                     .clip(RoundedCornerShape(20.dp))
                     .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent)
-                    .clickable { onSelect(tab) }
+                    .bounceClick { onSelect(tab) }
                     .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

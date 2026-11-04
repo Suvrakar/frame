@@ -1,5 +1,6 @@
 package app.frame.studio.ui.templates
 
+import app.frame.studio.ui.common.bounceClick
 import android.graphics.Bitmap
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
@@ -51,7 +52,7 @@ fun TemplateTile(
     val bitmap by produceState<Bitmap?>(previews.cached(template, widthPx), template.id) {
         if (value == null) value = previews.preview(template, widthPx)
     }
-    Column(modifier.clickable(onClick = onClick)) {
+    Column(modifier.bounceClick(onClick = onClick)) {
         Box(
             Modifier
                 .fillMaxWidth()

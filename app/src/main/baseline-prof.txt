@@ -1,0 +1,4 @@
+# Ahead-of-time compile all of Frame's own code (Compose, Media3 and AndroidX ship their own
+# profiles). Removes the "first time it runs, it stutters" effect on cold start and first navigation.
+HSPLapp/frame/studio/**->**(**)**
+Lapp/frame/studio/**;

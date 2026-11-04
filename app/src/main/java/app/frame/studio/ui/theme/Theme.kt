@@ -1,5 +1,6 @@
 package app.frame.studio.ui.theme
 
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -146,10 +147,11 @@ fun isAppInDarkTheme(mode: ThemeMode): Boolean = when (mode) {
 fun FrameTheme(mode: ThemeMode = ThemeMode.SYSTEM, content: @Composable () -> Unit) {
     val dark = isAppInDarkTheme(mode)
     CompositionLocalProvider(LocalGlass provides if (dark) DarkGlass else LightGlass) {
-        MaterialTheme(
-            colorScheme = if (dark) DarkColors else LightColors,
-            typography = FrameTypography,
-            content = content,
-        )
+        val colors = if (dark) DarkColors else LightColors
+        MaterialTheme(colorScheme = colors, typography = FrameTypography) {
+            // Text and icons without an explicit colour follow the theme. Without this they fall back
+            // to Compose's default (black) on our transparent glass screens, unreadable in dark mode.
+            CompositionLocalProvider(LocalContentColor provides colors.onSurface, content = content)
+        }
     }
 }

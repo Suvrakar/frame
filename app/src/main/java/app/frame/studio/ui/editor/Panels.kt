@@ -2,6 +2,7 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.ui.common.bounceClick
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.foundation.background
@@ -248,7 +249,7 @@ fun FiltersPanel(
                 val matrix = Filters.transformFor(filter.id, 1f, ColorAdjust())
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.width(64.dp).clickable { onFilter(filter.id) },
+                    modifier = Modifier.width(64.dp).bounceClick { onFilter(filter.id) },
                 ) {
                     Box(Modifier.size(64.dp).clip(RoundedCornerShape(10.dp))) {
                     VideoThumbnail(
@@ -473,7 +474,7 @@ private fun effectColors(group: EffectGroup): List<Color> = when (group) {
 
 @Composable
 private fun EffectTile(type: SceneEffectType, selected: Boolean, onClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(70.dp).clickable(onClick = onClick)) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(70.dp).bounceClick(onClick = onClick)) {
         Box(
             Modifier
                 .size(62.dp)
@@ -598,7 +599,7 @@ fun SocialPresetPicker(
                     Modifier
                         .clip(RoundedCornerShape(50))
                         .background(if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surfaceContainerHighest)
-                        .clickable { platform = p }
+                        .bounceClick { platform = p }
                         .padding(horizontal = 12.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -633,7 +634,7 @@ fun SocialPresetPill(preset: SocialPreset, selected: Boolean, onClick: () -> Uni
             .clip(RoundedCornerShape(14.dp))
             .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surfaceContainerHigh)
             .border(1.dp, border, RoundedCornerShape(14.dp))
-            .clickable(onClick = onClick)
+            .bounceClick(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -661,7 +662,7 @@ private fun ShapeCard(label: String, ratio: Float, selected: Boolean, dashed: Bo
             .width(64.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent)
-            .clickable(onClick = onClick)
+            .bounceClick(onClick = onClick)
             .padding(vertical = 8.dp),
     ) {
         Box(Modifier.size(36.dp), contentAlignment = Alignment.Center) {
@@ -738,7 +739,7 @@ private fun BigTile(icon: ImageVector, title: String, subtitle: String, modifier
         modifier
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            .clickable(onClick = onClick)
+            .bounceClick(onClick = onClick)
             .padding(14.dp),
     ) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -796,7 +797,7 @@ private fun TextPresetChip(preset: TextPreset, onClick: () -> Unit) {
         Modifier
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-            .clickable(onClick = onClick)
+            .bounceClick(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {

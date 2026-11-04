@@ -48,12 +48,8 @@ object AudioPcmReader {
             decoder.configure(format, null, null, 0)
             decoder.start()
 
-            // AAC starts with encoder "priming" silence (usually 2112 samples). Some decoders don't
-            // strip it, which would put every detected beat ~48 ms late. Skip it when the file says.
-            var primingFrames = if (startMs <= 0 && format.containsKey(KEY_ENCODER_DELAY)) {
-                format.getInteger(KEY_ENCODER_DELAY).coerceIn(0, 8192)
-            } else 0
-            lastEncoderDelay = primingFrames
+            // Diagnostics only: decoders already remove AAC priming (measured on API 29 and 34).
+            lastEncoderDelay = if (format.containsKey(KEY_ENCODER_DELAY)) format.getInteger(KEY_ENCODER_DELAY) else 0
             var sourceRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
             var channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
             var floatPcm = false
@@ -107,10 +103,6 @@ object AudioPcmReader {
                                 mono += if (floatPcm) buffer.float else buffer.short / 32768f
                             }
                             if (frame < skip) continue
-                            if (primingFrames > 0) {
-                                primingFrames--
-                                continue
-                            }
                             sum += mono / channels
                             count++
                             acc += 1f

@@ -221,6 +221,20 @@ class PerfStressTest {
         }
         Thread.sleep(800)
         reportGfx("home", device.executeShellCommand("dumpsys gfxinfo $pkg"))
+        // Template gallery: masonry grid of rendered previews, the heaviest list in the app.
+        device.wait(Until.findObject(By.text("Templates")), 3_000)?.click()
+        device.wait(Until.hasObject(By.textStartsWith("Search")), 5_000)
+        Thread.sleep(2_500) // let previews render/cache once
+        device.executeShellCommand("dumpsys gfxinfo $pkg reset")
+        repeat(4) {
+            val x = device.displayWidth / 2
+            device.swipe(x, device.displayHeight * 3 / 4, x, device.displayHeight / 4, 10)
+            device.swipe(x, device.displayHeight / 4, x, device.displayHeight * 3 / 4, 10)
+        }
+        Thread.sleep(800)
+        reportGfx("templates", device.executeShellCommand("dumpsys gfxinfo $pkg"))
+        device.wait(Until.findObject(By.text("Home")), 3_000)?.click()
+        device.wait(Until.hasObject(By.text("New project")), 5_000)
         // Open the project; verify the editor actually appeared and retry if a tap was lost mid-scroll.
         var opened = false
         repeat(6) {

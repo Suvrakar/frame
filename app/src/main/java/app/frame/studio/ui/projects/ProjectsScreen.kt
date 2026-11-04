@@ -1,5 +1,6 @@
 package app.frame.studio.ui.projects
 
+import app.frame.studio.ui.common.bounceClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -200,7 +201,7 @@ private fun MagicCard(onClick: () -> Unit) {
             .clip(shape)
             .background(glass.fill)
             .border(1.dp, glass.border, shape)
-            .clickable(onClick = onClick)
+            .bounceClick(onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -255,7 +256,7 @@ private fun CreateCard(onStart: () -> Unit) {
                 drawCircle(Color.White.copy(alpha = 0.10f), radius = size.height * 0.9f, center = Offset(size.width * 0.95f, size.height * 0.05f))
                 drawCircle(Color.White.copy(alpha = 0.07f), radius = size.height * 0.55f, center = Offset(size.width * 0.78f, size.height * 1.05f))
             }
-            .clickable(onClick = onStart)
+            .bounceClick(onClick = onStart)
             .padding(20.dp),
     ) {
         Column(Modifier.align(Alignment.CenterStart).fillMaxWidth(0.68f)) {

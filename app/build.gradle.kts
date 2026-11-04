@@ -25,6 +25,11 @@ val releaseAdmobRewardedId = secret("admobRewardedId", "FRAME_ADMOB_REWARDED_ID"
 val releaseAdmobAppId = secret("admobAppId", "FRAME_ADMOB_APP_ID")
 val releaseAdmobBannerId = secret("admobBannerId", "FRAME_ADMOB_BANNER_ID")
 
+composeCompiler {
+    // Our models are immutable data classes: let Compose skip unchanged parts of the UI.
+    stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("app/compose_stability.conf"))
+}
+
 android {
     namespace = "app.frame.studio"
     compileSdk = 36

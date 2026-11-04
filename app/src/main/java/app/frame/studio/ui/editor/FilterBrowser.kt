@@ -1,5 +1,6 @@
 package app.frame.studio.ui.editor
 
+import app.frame.studio.ui.common.bounceClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -178,7 +179,7 @@ private fun FilterTile(
         Modifier
             .clip(shape)
             .border(if (selected) 2.dp else 1.dp, if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant, shape)
-            .clickable(onClick = onClick),
+            .bounceClick(onClick = onClick),
     ) {
         Box(Modifier.fillMaxWidth().aspectRatio(1.25f)) {
             VideoThumbnail(

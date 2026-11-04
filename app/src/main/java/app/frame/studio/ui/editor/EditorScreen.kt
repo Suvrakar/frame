@@ -2,6 +2,7 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.ui.common.bounceClick
 import androidx.compose.material3.FilterChip
 import androidx.compose.material.icons.filled.LayersClear
 import androidx.compose.material.icons.filled.Opacity
@@ -738,7 +739,7 @@ private fun ToolbarItem(icon: ImageVector, label: String, enabled: Boolean = tru
         Modifier
             .width(68.dp)
             .clip(RoundedCornerShape(12.dp))
-            .clickable(enabled = enabled, onClick = onClick)
+            .bounceClick(enabled = enabled, onClick = onClick)
             .padding(vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

@@ -1,5 +1,6 @@
 package app.frame.studio.ui.settings
 
+import app.frame.studio.ui.common.bounceClick
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -143,7 +144,7 @@ private fun ProCard(isPro: Boolean, price: String?, onUpgrade: () -> Unit) {
             .fillMaxWidth()
             .clip(shape)
             .background(Brush.linearGradient(listOf(Color(0xFF5B63F0), Color(0xFF8E5BF0))))
-            .then(if (isPro) Modifier else Modifier.clickable(onClick = onUpgrade))
+            .let { if (isPro) it else it.bounceClick(onClick = onUpgrade) }
             .padding(18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -180,7 +181,7 @@ private fun ThemeOption(option: ThemeMode, icon: ImageVector, selected: ThemeMod
             .clip(shape)
             .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.14f) else Color.Transparent)
             .border(1.dp, if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else Color.Transparent, shape)
-            .clickable { onSelect(option) }
+            .bounceClick { onSelect(option) }
             .padding(vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

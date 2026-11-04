@@ -1,5 +1,6 @@
 package app.frame.studio.ui.magic
 
+import app.frame.studio.ui.common.bounceClick
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -356,7 +357,7 @@ private fun PickTile(
             .clip(shape)
             .background(LocalGlass.current.fill)
             .border(1.dp, LocalGlass.current.border, shape)
-            .clickable(enabled = enabled, onClick = onClick)
+            .bounceClick(enabled = enabled, onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -381,7 +382,7 @@ private fun VibeChip(vibe: MagicVibe, selected: Boolean, enabled: Boolean, onCli
             .clip(shape)
             .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.16f) else LocalGlass.current.fill)
             .border(1.dp, if (selected) MaterialTheme.colorScheme.primary else LocalGlass.current.border, shape)
-            .clickable(enabled = enabled, onClick = onClick)
+            .bounceClick(enabled = enabled, onClick = onClick)
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

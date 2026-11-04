@@ -1,5 +1,11 @@
 package app.frame.studio.ui
 
+import app.frame.studio.ui.common.Motion
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +47,12 @@ import app.frame.studio.ui.templates.TemplateDetailScreen
 import app.frame.studio.ui.magic.MagicMovieScreen
 import app.frame.studio.ui.templates.TemplatesScreen
 
+/** Bottom-tab destinations crossfade; everything else slides. */
+private fun isTabSwitch(from: String?, to: String?): Boolean {
+    val tabs = setOf(Routes.PROJECTS, Routes.TEMPLATES, Routes.EXPORTS, Routes.SETTINGS)
+    return from in tabs && to in tabs
+}
+
 object Routes {
     const val PROJECTS = "projects"
     const val EDITOR = "editor/{projectId}?import={import}"
@@ -72,7 +84,28 @@ fun FrameNavHost(app: FrameApp) {
     }
 
     val nav = rememberNavController()
-    NavHost(navController = nav, startDestination = Routes.PROJECTS) {
+    NavHost(
+        navController = nav,
+        startDestination = Routes.PROJECTS,
+        // Short, consistent shared-axis motion: new screens fade and drift in from the right.
+        enterTransition = {
+            if (isTabSwitch(initialState.destination.route, targetState.destination.route)) {
+                fadeIn(tween(Motion.SHORT))
+            } else {
+                fadeIn(tween(Motion.MEDIUM, easing = Motion.Emphasized)) +
+                    slideInHorizontally(tween(Motion.MEDIUM, easing = Motion.Emphasized)) { it / 10 }
+            }
+        },
+        exitTransition = { fadeOut(tween(Motion.SHORT)) },
+        popEnterTransition = { fadeIn(tween(Motion.MEDIUM, easing = Motion.Emphasized)) },
+        popExitTransition = {
+            if (isTabSwitch(initialState.destination.route, targetState.destination.route)) {
+                fadeOut(tween(Motion.SHORT))
+            } else {
+                fadeOut(tween(Motion.SHORT)) + slideOutHorizontally(tween(Motion.MEDIUM, easing = Motion.Emphasized)) { it / 10 }
+            }
+        },
+    ) {
         composable(Routes.PROJECTS) {
             TabShell(nav, Routes.PROJECTS) {
                 ProjectsScreen(
