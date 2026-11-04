@@ -66,6 +66,18 @@ class ScreenshotTour {
         return false
     }
 
+    /** Closes the open tool panel with its ✓ button. */
+    private fun done() {
+        device.wait(Until.findObject(By.desc("Done")), 3_000)?.click()
+        device.waitForIdle()
+    }
+
+    /** Leaves the selection toolbar via its back chip. */
+    private fun deselect() {
+        device.wait(Until.findObject(By.desc("Back")), 3_000)?.click()
+        device.waitForIdle()
+    }
+
     @Test
     fun tour() {
         val video = sample("sample.mp4")
@@ -96,12 +108,15 @@ class ScreenshotTour {
         shot("1_home")
 
         tap("See all")
+        device.wait(Until.hasObject(By.text("Birthday collection")), 5_000)
         shot("1b_templates")
         tap("Birthday Bash")
         device.wait(Until.hasObject(By.textStartsWith("Use template")), 5_000)
         shot("1c_template_detail")
         device.pressBack()
+        device.wait(Until.hasObject(By.text("Birthday collection")), 5_000)
         device.pressBack()
+        device.wait(Until.hasObject(By.text("New project")), 5_000)
 
         tap("Summer trip", scrollVertically = true)
         device.wait(Until.hasObject(By.text("Export")), 10_000)
@@ -112,21 +127,21 @@ class ScreenshotTour {
         shot("3_clip_tools")
         tap("Speed")
         shot("3b_speed")
-        device.pressBack()
+        done()
 
         tap("Filters")
         Thread.sleep(1_500)
         shot("4_filters")
-        device.pressBack()
+        done()
+        deselect()
 
-        device.pressBack()
         tap("Audio")
         shot("5_audio")
-        device.pressBack()
+        done()
 
         tap("Canvas")
         shot("6_canvas")
-        device.pressBack()
+        done()
 
         tap("Export")
         device.wait(Until.hasObject(By.text("Resolution")), 10_000)

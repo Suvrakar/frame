@@ -108,14 +108,21 @@ fun TemplateDetailScreen(
                     onClick = { pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
                     enabled = !creating,
                     shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
                 ) {
                     if (creating) {
                         CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
                         Spacer(Modifier.size(10.dp))
                         Text("Creating your video…")
                     } else {
-                        Text("Use template · pick ${template.slots} photos or videos", fontWeight = FontWeight.SemiBold, maxLines = 1)
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("Use template", fontWeight = FontWeight.SemiBold)
+                            Text(
+                                "Pick up to ${template.slots} photos or videos",
+                                style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
+                            )
+                        }
                     }
                 }
             }

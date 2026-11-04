@@ -159,7 +159,7 @@ fun SpeedPanel(clip: VideoClip, onSpeed: (Float) -> Unit) {
             steps = SPEEDS.size - 2,
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            listOf("0.25x", "1x", "4x").forEach {
+            listOf("0.25x", "4x").forEach {
                 Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

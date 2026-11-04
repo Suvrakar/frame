@@ -188,7 +188,7 @@ fun TemplateCard(template: VideoTemplate, modifier: Modifier = Modifier, onClick
                 )
             }
             Text(
-                "${template.aspect.label} · ${formatSeconds(template.totalMs)}",
+                template.aspect.label,
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.White,
                 modifier = Modifier
@@ -207,7 +207,7 @@ fun TemplateCard(template: VideoTemplate, modifier: Modifier = Modifier, onClick
             modifier = Modifier.padding(start = 4.dp, top = 8.dp),
         )
         Text(
-            "${template.slots} clips · ${template.category.label}",
+            "${template.slots} clips · ${formatSeconds(template.totalMs)}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
