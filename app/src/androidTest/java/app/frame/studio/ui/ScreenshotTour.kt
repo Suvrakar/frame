@@ -54,8 +54,12 @@ class ScreenshotTour {
         repeat(4) {
             val node = device.wait(Until.findObject(By.text(text)), 2_500)
             if (node != null) {
-                node.click()
-                return true
+                try {
+                    node.click()
+                    return true
+                } catch (_: androidx.test.uiautomator.StaleObjectException) {
+                    // Rebuilt between find and click; look again.
+                }
             }
             if (scrollVertically) {
                 val x = device.displayWidth / 2
@@ -74,14 +78,18 @@ class ScreenshotTour {
 
     /** Taps a chip in a horizontally scrolling row that also contains [anchor]. */
     private fun tapInRow(text: String, anchor: String): Boolean {
-        repeat(4) {
-            device.wait(Until.findObject(By.text(text)), 1_500)?.let {
-                it.click()
-                return true
+        repeat(5) {
+            try {
+                device.wait(Until.findObject(By.text(text)), 1_500)?.let {
+                    it.click()
+                    return true
+                }
+                // Compose may rebuild the row between finding and reading a node: re-find each time.
+                val y = device.findObject(By.text(anchor))?.visibleCenter?.y ?: return false
+                device.swipe(device.displayWidth * 4 / 5, y, device.displayWidth / 5, y, 20)
+            } catch (_: androidx.test.uiautomator.StaleObjectException) {
+                // Try again with fresh nodes.
             }
-            val row = device.findObject(By.text(anchor)) ?: return false
-            val y = row.visibleCenter.y
-            device.swipe(device.displayWidth * 4 / 5, y, device.displayWidth / 5, y, 20)
             device.waitForIdle()
             Thread.sleep(500)
         }
