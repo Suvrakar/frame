@@ -4,6 +4,8 @@ package app.frame.studio.ui.editor
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
@@ -100,7 +102,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
@@ -118,8 +119,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
 import app.frame.studio.FrameApp
 import app.frame.studio.data.VoiceRecorder
 import app.frame.studio.domain.AudioKind
@@ -532,20 +531,25 @@ private fun PreviewArea(
             val frameH = constraints.maxHeight.toFloat()
             AndroidView(
                 factory = { ctx ->
-                    PlayerView(ctx).apply {
-                        useController = false
-                        resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-                        setShutterBackgroundColor(android.graphics.Color.BLACK)
-                        setKeepContentOnPlayerReset(true)
+                    // A plain SurfaceView: frames are composited by the GPU, and the player feeding it
+                    // runs on its own thread (see PreviewController).
+                    SurfaceView(ctx).apply {
                         layoutParams = FrameLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT,
                         )
+                        holder.addCallback(object : SurfaceHolder.Callback {
+                            override fun surfaceCreated(holder: SurfaceHolder) = Unit
+                            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+                                controller.attachSurface(holder.surface, width, height)
+                            }
+                            override fun surfaceDestroyed(holder: SurfaceHolder) {
+                                controller.detachSurface()
+                            }
+                        })
                     }
                 },
-                update = { view -> if (view.player !== controller.player) view.player = controller.player },
-                onRelease = { it.player = null },
-                modifier = Modifier.fillMaxSize().onSizeChanged { controller.redraw() },
+                modifier = Modifier.fillMaxSize(),
             )
             AnimatedVisibility(
                 visible = !controller.isPlaying,

@@ -157,13 +157,15 @@ class ExportPipelineTest {
         Thread.sleep(1_500)
         val position = java.util.concurrent.atomic.AtomicLong()
         val read = CountDownLatch(1)
+        var errorDuringPlayback: androidx.media3.common.PlaybackException? = null
         Handler(Looper.getMainLooper()).post {
             position.set(player?.currentPosition ?: 0)
+            errorDuringPlayback = playerError
             player?.release()
             read.countDown()
         }
         read.await(10, TimeUnit.SECONDS)
-        assertNull("preview failed: ${playerError?.errorCodeName}", playerError)
+        assertNull("preview failed: ${errorDuringPlayback?.errorCodeName}", errorDuringPlayback)
         assertTrue("preview did not advance (${position.get()} ms)", position.get() > 300)
     }
 }

@@ -92,27 +92,7 @@ class ExportManager(
             }
         }
 
-        val t = Transformer.Builder(context)
-            .setVideoMimeType(ExportPolicy.videoMimeType)
-            .setAudioMimeType(ExportPolicy.audioMimeType)
-            .setEncoderFactory(
-                DefaultEncoderFactory.Builder(context)
-                    .setEnableFallback(true)
-                    .setRequestedVideoEncoderSettings(
-                        VideoEncoderSettings.Builder()
-                            .setBitrate(
-                                ExportPlan.bitrate(
-                                    ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect),
-                                    project.exportFps,
-                                    project.exportQuality,
-                                ),
-                            )
-                            .build(),
-                    )
-                    .build(),
-            )
-            .addListener(listener)
-            .build()
+        val t = newTransformer(context, device, project, listener)
         transformer = t
         try {
             t.start(composition, file.absolutePath)
@@ -189,6 +169,39 @@ class ExportManager(
 
     companion object {
         private const val TAG = "ExportManager"
+
+        /**
+         * The exporter used by the app (and by the device tests). Slow phones get a longer muxer
+         * watchdog: a heavy timeline can legitimately take more than Media3's default 10 s to
+         * produce a frame there, and the default would abort a healthy export.
+         */
+        fun newTransformer(
+            context: Context,
+            device: DeviceProfile,
+            project: Project,
+            listener: Transformer.Listener,
+        ): Transformer = Transformer.Builder(context)
+            .setVideoMimeType(ExportPolicy.videoMimeType)
+            .setAudioMimeType(ExportPolicy.audioMimeType)
+            .setMaxDelayBetweenMuxerSamplesMs(if (device.isLowEnd) 90_000 else 30_000)
+            .setEncoderFactory(
+                DefaultEncoderFactory.Builder(context)
+                    .setEnableFallback(true)
+                    .setRequestedVideoEncoderSettings(
+                        VideoEncoderSettings.Builder()
+                            .setBitrate(
+                                ExportPlan.bitrate(
+                                    ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect),
+                                    project.exportFps,
+                                    project.exportQuality,
+                                ),
+                            )
+                            .build(),
+                    )
+                    .build(),
+            )
+            .addListener(listener)
+            .build()
         const val CANCELLED = "Export cancelled"
     }
 }

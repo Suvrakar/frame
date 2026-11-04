@@ -31,6 +31,7 @@ import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.export.CompositionFactory
+import app.frame.studio.export.ExportManager
 import app.frame.studio.timeline.TimelineMath
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -146,14 +147,19 @@ class PerfStressTest {
         Thread.sleep(5_000)
         val position = AtomicLong()
         val released = CountDownLatch(1)
+        var errorDuringPlayback: PlaybackException? = null
         Handler(Looper.getMainLooper()).post {
             position.set(player?.currentPosition ?: 0)
+            errorDuringPlayback = previewError
+            // The app releases players on a background thread; here we only measure how long it takes.
+            val t = SystemClock.elapsedRealtime()
             player?.release()
+            report("preview.releaseMs", SystemClock.elapsedRealtime() - t)
             released.countDown()
         }
         released.await(10, TimeUnit.SECONDS)
         report("preview.advancedMsIn5s", position.get())
-        assertNull("preview error: ${previewError?.errorCodeName}", previewError)
+        assertNull("preview error: ${errorDuringPlayback?.errorCodeName}", errorDuringPlayback)
         assertTrue("preview stalled (${position.get()} ms)", position.get() > 500)
 
         // 3) Export of the whole timeline completes at the device's default resolution.
@@ -162,15 +168,15 @@ class PerfStressTest {
         var exportError: ExportException? = null
         val exportStart = SystemClock.elapsedRealtime()
         Handler(Looper.getMainLooper()).post {
-            Transformer.Builder(context)
-                .addListener(object : Transformer.Listener {
-                    override fun onCompleted(composition: Composition, exportResult: ExportResult) = done.countDown()
-                    override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
-                        exportError = exportException
-                        done.countDown()
-                    }
-                })
-                .build()
+            val listener = object : Transformer.Listener {
+                override fun onCompleted(composition: Composition, exportResult: ExportResult) = done.countDown()
+                override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
+                    exportError = exportException
+                    done.countDown()
+                }
+            }
+            // Same configuration as the app's export screen.
+            ExportManager.newTransformer(context, app.device, project, listener)
                 .start(CompositionFactory.build(project), out.absolutePath)
         }
         assertTrue("export timed out", done.await(10, TimeUnit.MINUTES))
