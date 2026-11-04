@@ -43,6 +43,26 @@ class SocialPresetsTest {
         assertNull(SocialPresets.lengthWarning(story, 45_000))
         assertNotNull(SocialPresets.lengthWarning(story, 75_000))
         assertTrue(SocialPresets.lengthWarning(story, 75_000)!!.contains("1 min"))
+        val x = SocialPresets.all.first { it.id == "x_landscape" }
+        assertTrue(SocialPresets.lengthWarning(x, 150_000)!!.contains("2:20"))
+    }
+
+    @Test
+    fun everyPlatformHasPresetsWithUniqueIds() {
+        SocialPlatform.entries.forEach { assertTrue(it.label, SocialPresets.forPlatform(it).isNotEmpty()) }
+        assertEquals(SocialPresets.all.size, SocialPresets.all.map { it.id }.toSet().size)
+    }
+
+    @Test
+    fun matchingPrefersTheRequestedPlatform() {
+        val tiktok = SocialPresets.all.first { it.id == "tt_video" }
+        val p = SocialPresets.apply(project, tiktok)
+        // Same settings as an Instagram Reel; the platform filter picks the TikTok one.
+        assertEquals("ig_reel", SocialPresets.matching(p)!!.id)
+        assertEquals("tt_video", SocialPresets.matching(p, SocialPlatform.TIKTOK)!!.id)
+        val yt4k = SocialPresets.apply(project, SocialPresets.all.first { it.id == "yt_4k" })
+        assertEquals(ExportPlan.Size(3840, 2160), ExportPlan.outputSize(emptyList(), yt4k.exportHeight, yt4k.aspect))
+        assertEquals(60, yt4k.exportFps)
     }
 
     @Test

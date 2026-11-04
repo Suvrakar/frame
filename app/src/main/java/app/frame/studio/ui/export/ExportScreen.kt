@@ -71,7 +71,7 @@ import app.frame.studio.export.ExportState
 import app.frame.studio.export.GallerySaver
 import app.frame.studio.export.SocialPreset
 import app.frame.studio.export.SocialPresets
-import app.frame.studio.ui.editor.SocialPresetPill
+import app.frame.studio.ui.editor.SocialPresetPicker
 import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.ui.common.VideoThumbnail
 import app.frame.studio.ui.common.formatBytes
@@ -320,16 +320,8 @@ private fun Settings(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Text("Instagram", style = MaterialTheme.typography.titleSmall)
-        val active = SocialPresets.matching(project)
-        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SocialPresets.instagram.forEach { preset ->
-                SocialPresetPill(preset, selected = active?.id == preset.id) { onPreset(preset) }
-            }
-        }
-        active?.let { SocialPresets.lengthWarning(it, durationMs) }?.let { warning ->
-            Text(warning, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
-        }
+        Text("Post to", style = MaterialTheme.typography.titleSmall)
+        SocialPresetPicker(project, onPreset)
         Segmented("Resolution", heights, heights.firstOrNull { it == project.exportHeight } ?: heights.last(), { it.label }, onHeight)
         Segmented("Frame rate", listOf(24, 30, 60), project.exportFps, { "$it" }, onFps)
         Segmented("Quality", ExportQuality.entries, project.exportQuality, { it.label }, onQuality)

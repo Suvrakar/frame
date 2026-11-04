@@ -152,5 +152,6 @@ class ScreenshotTour {
         tap("Export")
         device.wait(Until.hasObject(By.text("Resolution")), 10_000)
         shot("7_export")
+        if (tap("YouTube")) shot("8_export_youtube")
     }
 }

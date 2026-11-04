@@ -127,7 +127,6 @@ import app.frame.studio.domain.ExportHeight
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.TextOverlay
 import app.frame.studio.export.ExportPlan
-import app.frame.studio.export.SocialPresets
 import app.frame.studio.ui.common.TextInputDialog
 import app.frame.studio.ui.common.formatDuration
 import kotlin.math.roundToInt
@@ -752,7 +751,7 @@ private fun ActivePanel(
             Tool.TRANSITION -> clip?.let { c ->
                 TransitionPanel(c, { type, ms -> vm.setTransition(c.id, type, ms) }, { vm.applyTransitionToAll(c.id) })
             }
-            Tool.CANVAS -> CanvasPanel(project.aspect, SocialPresets.matching(project), vm::setAspect, vm::applySocialPreset)
+            Tool.CANVAS -> CanvasPanel(project, vm::setAspect, vm::applySocialPreset)
             Tool.AUDIO -> AddAudioPanel(
                 onMusic = { onPickAudio(AudioKind.MUSIC) },
                 onSound = { onPickAudio(AudioKind.SOUND) },

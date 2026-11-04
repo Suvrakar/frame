@@ -49,7 +49,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
@@ -65,7 +64,9 @@ import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.effects.FilterGroup
+import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.effects.Filters
+import app.frame.studio.export.SocialPlatform
 import app.frame.studio.export.SocialPreset
 import app.frame.studio.export.SocialPresets
 import app.frame.studio.export.centerCrop
@@ -329,21 +330,13 @@ fun CropPanel(clip: VideoClip, onCrop: (Float?) -> Unit) {
 
 @Composable
 fun CanvasPanel(
-    aspect: CanvasAspect,
-    activePreset: SocialPreset?,
+    project: app.frame.studio.domain.Project,
     onAspect: (CanvasAspect) -> Unit,
     onPreset: (SocialPreset) -> Unit,
 ) {
+    val aspect = project.aspect
     Column {
-        Text("Instagram", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Row(
-            Modifier.horizontalScroll(rememberScrollState()).padding(top = 6.dp, bottom = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            SocialPresets.instagram.forEach { preset ->
-                SocialPresetPill(preset, selected = activePreset?.id == preset.id) { onPreset(preset) }
-            }
-        }
+        SocialPresetPicker(project, onPreset, Modifier.padding(bottom = 10.dp))
         Text("Shape", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CanvasAspect.entries.forEach { a ->
@@ -365,6 +358,52 @@ fun CanvasPanel(
     }
 }
 
+/**
+ * Platform tabs (Instagram, TikTok, YouTube…) and that platform's one-tap formats.
+ * Shared by the editor's Canvas panel and the export screen.
+ */
+@Composable
+fun SocialPresetPicker(
+    project: app.frame.studio.domain.Project,
+    onPreset: (SocialPreset) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var platform by remember { mutableStateOf(SocialPresets.matching(project)?.platform ?: SocialPlatform.INSTAGRAM) }
+    val active = SocialPresets.matching(project, platform)
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            SocialPlatform.entries.forEach { p ->
+                val selected = p == platform
+                Row(
+                    Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surfaceContainerHighest)
+                        .clickable { platform = p }
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(Modifier.size(8.dp).clip(RoundedCornerShape(50)).background(Color(p.color.toInt())))
+                    Text(
+                        p.label,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                        color = if (selected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(start = 6.dp),
+                    )
+                }
+            }
+        }
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SocialPresets.forPlatform(platform).forEach { preset ->
+                SocialPresetPill(preset, selected = active?.id == preset.id) { onPreset(preset) }
+            }
+        }
+        active?.let { SocialPresets.lengthWarning(it, TimelineMath.totalVideoMs(project.videoClips)) }?.let { warning ->
+            Text(warning, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+        }
+    }
+}
+
 /** Pill with a tiny frame-shape glyph, used for one-tap social formats. */
 @Composable
 fun SocialPresetPill(preset: SocialPreset, selected: Boolean, onClick: () -> Unit) {
@@ -378,13 +417,13 @@ fun SocialPresetPill(preset: SocialPreset, selected: Boolean, onClick: () -> Uni
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val r = preset.aspect.ratio ?: 1f
+        val r = preset.aspect.ratio ?: (4f / 3f)
         Box(
             Modifier
                 .then(if (r >= 1f) Modifier.width(18.dp) else Modifier.height(18.dp))
                 .aspectRatio(r)
                 .clip(RoundedCornerShape(3.dp))
-                .background(Brush.linearGradient(listOf(Color(0xFFFFB347), Color(0xFFFF5F8F), Color(0xFF8E5CFF)))),
+                .background(Color(preset.platform.color.toInt()).copy(alpha = 0.85f)),
         )
         Column(Modifier.padding(start = 8.dp)) {
             Text(preset.name, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
