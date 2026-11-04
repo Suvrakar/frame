@@ -5,11 +5,15 @@ Exports never carry a watermark.
 
 ## Features
 
-- **Templates** – 18 ready-made templates (6 birthday: Birthday Bash, Golden Birthday, Kids Party,
-  Countdown, Through the Years, Birthday Card; plus anniversary, wedding, graduation, baby, travel,
-  social and seasonal). Type a name/age, pick photos or videos, and Frame builds the video with
-  personalized title cards (rendered on device — no bundled images), captions, stickers, a colour
-  look and transitions. Everything stays editable.
+- **Templates** – 34 ready-made templates. Video templates (Birthday Bash, Golden Birthday, Kids
+  Party, Countdown, Through the Years, Birthday Card, Birthday Sparkle, Love Story, anniversary,
+  wedding, graduation, baby, travel, social and seasonal) and **4-photo collage** templates
+  (Birthday Collage, Party Polaroids, Birthday Film, Birthday Photo Dump, Anniversary Collage,
+  Love Polaroids, Our Years, Friends Forever, Travel Grid, Family Album, Mother's Day, Father's
+  Day, Graduation Film, Baby Milestones) in five layouts: grid, hero + 3, strips, polaroids and
+  film strip. Type a name/age, pick photos or videos, and Frame builds the video with
+  personalized title cards, captions, stickers, a colour look and transitions; collages fill in
+  one photo at a time and then hold. Everything is rendered on device — no bundled images.
 - **What-you-see-is-what-you-export preview** – the editor plays the same Media3 composition the
   exporter renders (speed, filters, crop, transitions, text, mixed audio).
 - **Timeline** – ruler, thumbnail filmstrips, drag-to-trim handles, pinch-to-zoom, snapping,

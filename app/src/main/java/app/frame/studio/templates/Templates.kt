@@ -9,6 +9,9 @@ enum class TemplateCategory(val label: String) {
     TRAVEL("Travel"),
     SOCIAL("Social"),
     SEASONAL("Seasonal"),
+
+    /** Filter only: every template that has a photo collage. */
+    COLLAGE("Collage"),
 }
 
 /** Personalization the user can type in; [key] appears in template text as a placeholder. */
@@ -52,10 +55,18 @@ data class VideoTemplate(
     val captionColor: Long = 0xFFFFFFFF,
     val fields: List<TemplateField> = emptyList(),
     val badge: String? = null,
+    /** When set, photos are arranged in this multi-photo layout instead of shown one by one. */
+    val collage: CollageStyle? = null,
+    /** Title drawn above the collage photos. */
+    val header: CardSpec? = null,
+    /** Per-photo labels inside the collage (polaroid captions); placeholders allowed. */
+    val photoLabels: List<String> = emptyList(),
 ) {
     val introMs: Long get() = if (intro != null) 2_500 else 0
     val outroMs: Long get() = if (outro != null) 2_200 else 0
-    val totalMs: Long get() = introMs + slots * slotMs + outroMs
+    val bodyMs: Long
+        get() = if (collage != null) CollagePlan.durationMs(slots, collage.cells, slotMs) else slots * slotMs
+    val totalMs: Long get() = introMs + bodyMs + outroMs
 }
 
 object Templates {
@@ -274,6 +285,186 @@ object Templates {
             stickers = listOf("💕", "", "💖", "", "💘"),
             fields = listOf(TemplateField.NAME),
         ),
+
+        // ---- More birthday & anniversary videos ----
+        VideoTemplate(
+            id = "birthday_sparkle", name = "Birthday Sparkle", category = TemplateCategory.BIRTHDAY,
+            tagline = "Glowy colour and quick flashes, made for Reels.",
+            colors = listOf(0xFF1B0B3A, 0xFF6A1B9A, 0xFFFF6FB5), accent = GOLD, emoji = "✨",
+            aspect = CanvasAspect.R9_16, slots = 8, slotMs = 1_400, filterId = "glow",
+            transition = TransitionType.FADE_WHITE, transitionMs = 250,
+            intro = CardSpec("{name}'s birthday", "Let the party begin", "✨", fallbackTitle = "Birthday mode: on"),
+            outro = CardSpec("Happy Birthday!", "{name}", "🎂"),
+            captions = listOf("", "Party", "", "Cake", "", "Besties", "", "Make a wish"),
+            stickers = listOf("✨", "", "🥳", "", "🎂", "", "💖", ""),
+            fields = listOf(TemplateField.NAME), badge = "New",
+        ),
+        VideoTemplate(
+            id = "love_story", name = "Love Story", category = TemplateCategory.CELEBRATE,
+            tagline = "Cinematic fades for your favourite person.",
+            colors = listOf(0xFF2B0A1A, 0xFF7A1F3D, 0xFFE07A98), accent = 0xFFFFD1DC, emoji = "💞",
+            aspect = CanvasAspect.R9_16, slots = 6, slotMs = 2_600, filterId = "blockbuster",
+            transition = TransitionType.FADE_BLACK, transitionMs = 800,
+            intro = CardSpec("Our story", "{name}", "💞"),
+            outro = CardSpec("Happy Anniversary", "{title}", "💍"),
+            captions = listOf("It started with a hello", "", "Then came adventures", "", "And a lifetime of us", ""),
+            captionColor = 0xFFFFD1DC, fields = listOf(TemplateField.NAME, TemplateField.TITLE),
+        ),
+
+        // ---- 4-photo collages ----
+        VideoTemplate(
+            id = "birthday_collage", name = "Birthday Collage", category = TemplateCategory.BIRTHDAY,
+            tagline = "Four favourite photos pop into a party grid.",
+            colors = listOf(0xFFFF6FA8, 0xFFA66BFF, 0xFFFFB86B), accent = GOLD, emoji = "🎉",
+            aspect = CanvasAspect.R9_16, slots = 4, slotMs = 3_200, filterId = "vivid",
+            transition = TransitionType.FADE_WHITE, transitionMs = 400,
+            collage = CollageStyle.GRID,
+            header = CardSpec("Happy Birthday {name}!", "{age} years of awesome", "🎉", fallbackTitle = "Happy Birthday!"),
+            outro = CardSpec("Make a wish", "", "✨"),
+            stickers = listOf("🎈", "🎂"),
+            fields = listOf(TemplateField.NAME, TemplateField.AGE), badge = "Popular",
+        ),
+        VideoTemplate(
+            id = "party_polaroids", name = "Party Polaroids", category = TemplateCategory.BIRTHDAY,
+            tagline = "Instant-photo prints scattered on a party table.",
+            colors = listOf(0xFFFFB199, 0xFFFF7EB3, 0xFFFFD27A), accent = 0xFFFFFFFF, emoji = "📸",
+            aspect = CanvasAspect.R4_5, slots = 4, slotMs = 3_500, filterId = "instant",
+            transition = TransitionType.FADE_WHITE, transitionMs = 400,
+            collage = CollageStyle.POLAROIDS,
+            header = CardSpec("{name}'s party", "", "📸", fallbackTitle = "Party time"),
+            photoLabels = listOf("Cake!", "Besties", "Gifts", "Smiles"),
+            outro = CardSpec("Best day ever", "", "🥳"),
+            fields = listOf(TemplateField.NAME), badge = "New",
+        ),
+        VideoTemplate(
+            id = "birthday_filmstrip", name = "Birthday Film", category = TemplateCategory.BIRTHDAY,
+            tagline = "A retro film strip for your birthday memories.",
+            colors = listOf(0xFF140F0A, 0xFF3D2A16, 0xFFB8862E), accent = GOLD, emoji = "🎞️",
+            aspect = CanvasAspect.R9_16, slots = 4, slotMs = 3_200, filterId = "film",
+            transition = TransitionType.FADE_BLACK, transitionMs = 500,
+            collage = CollageStyle.FILMSTRIP,
+            header = CardSpec("Happy Birthday", "{name}", "🎞️"),
+            outro = CardSpec("Here's to you", "", "🥂"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "birthday_dump", name = "Birthday Photo Dump", category = TemplateCategory.BIRTHDAY,
+            tagline = "Eight photos, two grids, zero effort.",
+            colors = listOf(0xFF2E1065, 0xFF7C3AED, 0xFFF472B6), accent = 0xFFFDE68A, emoji = "🥳",
+            aspect = CanvasAspect.R9_16, slots = 8, slotMs = 2_600, filterId = "punch",
+            transition = TransitionType.FADE_WHITE, transitionMs = 300,
+            collage = CollageStyle.GRID,
+            header = CardSpec("{name} turned {age}", "photo dump", "🥳", fallbackTitle = "Birthday dump"),
+            outro = CardSpec("Thanks for the love", "", "💜"),
+            fields = listOf(TemplateField.NAME, TemplateField.AGE), badge = "Trending",
+        ),
+        VideoTemplate(
+            id = "anniversary_collage", name = "Anniversary Collage", category = TemplateCategory.CELEBRATE,
+            tagline = "One big moment and three little ones.",
+            colors = listOf(0xFF3A0F1E, 0xFF8E2A4C, 0xFFF2A7B8), accent = 0xFFFFE4EC, emoji = "💍",
+            aspect = CanvasAspect.R4_5, slots = 4, slotMs = 3_500, filterId = "rose",
+            transition = TransitionType.FADE_BLACK, transitionMs = 600,
+            collage = CollageStyle.HERO,
+            header = CardSpec("Happy Anniversary", "{name}", "💍"),
+            outro = CardSpec("Here's to forever", "", "❤️"),
+            fields = listOf(TemplateField.NAME), badge = "Popular",
+        ),
+        VideoTemplate(
+            id = "love_polaroids", name = "Love Polaroids", category = TemplateCategory.CELEBRATE,
+            tagline = "Your love story in four little prints.",
+            colors = listOf(0xFFFFC2D1, 0xFFFF8FAB, 0xFFFB6F92), accent = 0xFFFFFFFF, emoji = "💌",
+            aspect = CanvasAspect.R9_16, slots = 4, slotMs = 3_500, filterId = "blush",
+            transition = TransitionType.FADE_WHITE, transitionMs = 500,
+            collage = CollageStyle.POLAROIDS,
+            header = CardSpec("Us", "{name}", "💌"),
+            photoLabels = listOf("First date", "Adventures", "Home", "Forever"),
+            outro = CardSpec("Happy Anniversary", "", "💕"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "our_years", name = "Our Years", category = TemplateCategory.CELEBRATE,
+            tagline = "Four strips, four chapters of your story.",
+            colors = listOf(0xFFF5EBDD, 0xFFE8D3B6, 0xFFC9A46A), accent = 0xFFFFFFFF, emoji = "🤍",
+            aspect = CanvasAspect.R9_16, slots = 4, slotMs = 3_500, filterId = "cream",
+            transition = TransitionType.FADE_WHITE, transitionMs = 600,
+            collage = CollageStyle.STRIPS,
+            header = CardSpec("{title} years together", "{name}", "🤍", fallbackTitle = "Our years together"),
+            outro = CardSpec("And counting", "", "💛"),
+            fields = listOf(TemplateField.NAME, TemplateField.TITLE),
+        ),
+        VideoTemplate(
+            id = "friends_forever", name = "Friends Forever", category = TemplateCategory.SOCIAL,
+            tagline = "A bright square grid for your crew.",
+            colors = listOf(0xFF00C9A7, 0xFF00A8E8, 0xFF845EC2), accent = 0xFFFFF59D, emoji = "🤝",
+            aspect = CanvasAspect.R1_1, slots = 4, slotMs = 3_000, filterId = "clean",
+            transition = TransitionType.FADE_WHITE, transitionMs = 300,
+            collage = CollageStyle.GRID,
+            header = CardSpec("Friends forever", "{name}", "🤝"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "travel_grid", name = "Travel Grid", category = TemplateCategory.TRAVEL,
+            tagline = "Your best shot up top, three more below.",
+            colors = listOf(0xFF006D77, 0xFF83C5BE, 0xFFFFB4A2), accent = 0xFFFFFFFF, emoji = "🧭",
+            aspect = CanvasAspect.R4_5, slots = 4, slotMs = 3_200, filterId = "lagoon",
+            transition = TransitionType.FADE_WHITE, transitionMs = 300,
+            collage = CollageStyle.HERO,
+            header = CardSpec("{title}", "travel diary", "🧭", fallbackTitle = "Wanderlust"),
+            fields = listOf(TemplateField.TITLE),
+        ),
+        VideoTemplate(
+            id = "family_album", name = "Family Album", category = TemplateCategory.CELEBRATE,
+            tagline = "Warm prints for the people who matter most.",
+            colors = listOf(0xFF8D5524, 0xFFC68642, 0xFFF1C27D), accent = 0xFFFFF8E1, emoji = "🏡",
+            aspect = CanvasAspect.R4_5, slots = 4, slotMs = 3_500, filterId = "honey",
+            transition = TransitionType.FADE_BLACK, transitionMs = 500,
+            collage = CollageStyle.POLAROIDS,
+            header = CardSpec("Family", "{name}", "🏡"),
+            photoLabels = listOf("Us", "Love", "Home", "Always"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "mothers_day", name = "Mother's Day", category = TemplateCategory.SEASONAL,
+            tagline = "A soft collage to say thank you, Mum.",
+            colors = listOf(0xFFFFE5EC, 0xFFFFB3C6, 0xFFFF8FAB), accent = 0xFFFFFFFF, emoji = "💐",
+            aspect = CanvasAspect.R4_5, slots = 4, slotMs = 3_500, filterId = "soft_skin",
+            transition = TransitionType.FADE_WHITE, transitionMs = 500,
+            collage = CollageStyle.HERO,
+            header = CardSpec("Happy Mother's Day", "{name}", "💐"),
+            outro = CardSpec("Love you, Mum", "", "💗"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "fathers_day", name = "Father's Day", category = TemplateCategory.SEASONAL,
+            tagline = "Classic and bold, for the best dad.",
+            colors = listOf(0xFF0F172A, 0xFF1E3A5F, 0xFF3B82F6), accent = 0xFFFFC94D, emoji = "👔",
+            aspect = CanvasAspect.R4_5, slots = 4, slotMs = 3_500, filterId = "crisp",
+            transition = TransitionType.FADE_BLACK, transitionMs = 500,
+            collage = CollageStyle.GRID,
+            header = CardSpec("Happy Father's Day", "{name}", "👔"),
+            outro = CardSpec("Thanks, Dad", "", "💙"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "graduation_film", name = "Graduation Film", category = TemplateCategory.CELEBRATE,
+            tagline = "Four frames from the big day.",
+            colors = listOf(0xFF0D1B3D, 0xFF1E3A8A, 0xFFB8862E), accent = GOLD, emoji = "🎓",
+            aspect = CanvasAspect.R9_16, slots = 4, slotMs = 3_200, filterId = "golden_hour",
+            transition = TransitionType.FADE_WHITE, transitionMs = 400,
+            collage = CollageStyle.FILMSTRIP,
+            header = CardSpec("Class of {title}", "{name}", "🎓", fallbackTitle = "Graduation day"),
+            fields = listOf(TemplateField.NAME, TemplateField.TITLE),
+        ),
+        VideoTemplate(
+            id = "baby_milestones", name = "Baby Milestones", category = TemplateCategory.CELEBRATE,
+            tagline = "Little moments, big milestones.",
+            colors = listOf(0xFFDDF4FF, 0xFFE0F7EF, 0xFFFFF1D6), accent = 0xFFFFFFFF, emoji = "🍼",
+            aspect = CanvasAspect.R1_1, slots = 4, slotMs = 3_500, filterId = "pastel",
+            transition = TransitionType.FADE_WHITE, transitionMs = 500,
+            collage = CollageStyle.GRID,
+            header = CardSpec("{name}'s first year", "", "🍼", fallbackTitle = "Little milestones"),
+            fields = listOf(TemplateField.NAME),
+        ),
     )
 
     /** Readable text color (ARGB) on top of the template's gradient. */
@@ -303,8 +494,23 @@ object Templates {
 
     fun byId(id: String): VideoTemplate? = all.firstOrNull { it.id == id }
 
-    fun inCategory(category: TemplateCategory?): List<VideoTemplate> =
-        if (category == null) all else all.filter { it.category == category }
+    /** Shown on the home screen: a mix of video and collage templates. */
+    val featured: List<VideoTemplate> by lazy {
+        listOf(
+            "birthday_bash", "birthday_collage", "party_polaroids", "anniversary_collage", "love_polaroids",
+            "kids_party", "birthday_sparkle", "love_story", "getaway", "friends_forever", "quick_reel", "family_album",
+        ).mapNotNull { byId(it) }
+    }
+
+    /** "4 photos · Grid" for collages, "6 clips" otherwise. */
+    fun mediaLabel(t: VideoTemplate): String =
+        t.collage?.let { "${t.slots} photos · ${it.label}" } ?: "${t.slots} clips"
+
+    fun inCategory(category: TemplateCategory?): List<VideoTemplate> = when (category) {
+        null -> all
+        TemplateCategory.COLLAGE -> all.filter { it.collage != null }
+        else -> all.filter { it.category == category }
+    }
 
     /** Fills placeholders in card text; an empty value is removed along with surrounding spacing. */
     fun fillCardText(text: String, values: Map<TemplateField, String>): String {
@@ -326,7 +532,10 @@ object Templates {
     fun fillCard(card: CardSpec, values: Map<TemplateField, String>): Pair<String, String> {
         val missing = TemplateField.entries.any { f -> card.title.contains(f.key) && values[f].isNullOrBlank() }
         val title = if (missing && card.fallbackTitle != null) card.fallbackTitle else fillCardText(card.title, values)
-        return title to fillCardText(card.subtitle, values)
+        val subtitleMissing = TemplateField.entries.any { f -> card.subtitle.contains(f.key) && values[f].isNullOrBlank() }
+        // A subtitle is decoration: drop it rather than show half a sentence.
+        val subtitle = if (subtitleMissing && card.subtitle.trim() != "from {name}") "" else fillCardText(card.subtitle, values)
+        return title to subtitle
     }
 
     /** Captions that still need a missing value are dropped instead of rendered half-empty. */

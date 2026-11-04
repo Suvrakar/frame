@@ -7,7 +7,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
+import app.frame.studio.FrameApp
 import app.frame.studio.MainActivity
+import app.frame.studio.templates.TemplateField
+import app.frame.studio.templates.Templates
 import app.frame.studio.domain.AudioClip
 import app.frame.studio.domain.AudioKind
 import app.frame.studio.domain.Project
@@ -104,6 +107,16 @@ class ScreenshotTour {
         File(context.filesDir, "projects").apply { mkdirs() }
             .resolve("tour.json").writeText(ProjectJson.encode(project))
 
+        // A collage project made by the real template builder.
+        val frameApp = context.applicationContext as FrameApp
+        val collage = kotlinx.coroutines.runBlocking {
+            frameApp.templateBuilder.create(
+                Templates.byId("party_polaroids")!!,
+                mapOf(TemplateField.NAME to "Mia"),
+                listOf(Uri.parse(image), Uri.parse(video), Uri.parse(image), Uri.parse(video)),
+            )
+        }
+        val collageName = collage.name
         context.startActivity(
             Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
         )
@@ -113,6 +126,11 @@ class ScreenshotTour {
         tap("See all")
         device.wait(Until.hasObject(By.text("Birthday collection")), 5_000)
         shot("1b_templates")
+        if (tap("Collage")) shot("1b2_collage_gallery")
+        device.pressBack()
+        device.wait(Until.hasObject(By.text("New project")), 5_000)
+        tap("See all")
+        device.wait(Until.hasObject(By.text("Birthday collection")), 5_000)
         tap("Birthday Bash")
         device.wait(Until.hasObject(By.textStartsWith("Use template")), 5_000)
         shot("1c_template_detail")
@@ -156,6 +174,20 @@ class ScreenshotTour {
         tap("Export")
         device.wait(Until.hasObject(By.text("Resolution")), 10_000)
         shot("7_export")
+
+        // Collage project: play past the build-up and capture the finished collage.
+        device.pressBack()
+        device.wait(Until.hasObject(By.text("Export")), 5_000)
+        device.pressBack()
+        device.wait(Until.hasObject(By.text("New project")), 5_000)
+        if (tap(collageName, scrollVertically = true)) {
+            device.wait(Until.hasObject(By.text("Export")), 10_000)
+            Thread.sleep(2_000)
+            device.wait(Until.findObject(By.desc("Play")), 3_000)?.click()
+            Thread.sleep(2_600)
+            device.wait(Until.findObject(By.desc("Pause")), 2_000)?.click()
+            shot("9_collage_editor")
+        }
         if (tap("YouTube")) shot("8_export_youtube")
     }
 }

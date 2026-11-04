@@ -39,7 +39,8 @@ object CardRenderer {
         return out
     }
 
-    fun draw(canvas: Canvas, template: VideoTemplate, title: String, subtitle: String, emoji: String, w: Float, h: Float) {
+    /** Gradient, soft highlight and confetti shared by title cards and collages. */
+    fun drawBackground(canvas: Canvas, template: VideoTemplate, w: Float, h: Float) {
         val minSide = minOf(w, h)
         val colors = template.colors.map { it.toInt() }.toIntArray()
 
@@ -72,6 +73,12 @@ object CardRenderer {
                 canvas.restore()
             }
         }
+
+    }
+
+    fun draw(canvas: Canvas, template: VideoTemplate, title: String, subtitle: String, emoji: String, w: Float, h: Float) {
+        val minSide = minOf(w, h)
+        drawBackground(canvas, template, w, h)
 
         val onColor = Templates.onColor(template).toInt()
         val dark = onColor != 0xFFFFFFFF.toInt()

@@ -160,7 +160,7 @@ fun ProjectsScreen(
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    rowItems(Templates.all.take(10), key = { it.id }) { t ->
+                    rowItems(Templates.featured, key = { it.id }) { t ->
                         TemplateCard(t, Modifier.width(132.dp)) { onOpenTemplate(t.id) }
                     }
                 }

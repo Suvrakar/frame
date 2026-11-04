@@ -61,4 +61,47 @@ class TemplatesTest {
         assertEquals(3, p.textOverlays.size)
         assertEquals("Happy Birthday Mia!", p.name)
     }
+
+    @Test
+    fun collageCellsStayInsideTheFrame() {
+        listOf(1080f to 1920f, 1080f to 1350f, 1080f to 1080f, 1920f to 1080f).forEach { (w, h) ->
+            CollageStyle.entries.forEach { style ->
+                val cells = CollageLayout.cells(style, w, h)
+                assertEquals(style.cells, cells.size)
+                cells.forEach { c ->
+                    assertTrue("$style $w x $h", c.left >= 0 && c.top >= 0 && c.right <= w && c.bottom <= h && c.width > 50 && c.height > 50)
+                }
+            }
+        }
+        // Grid cells don't overlap.
+        val grid = CollageLayout.cells(CollageStyle.GRID, 1080f, 1920f)
+        assertTrue(grid[0].right < grid[1].left && grid[0].bottom < grid[2].top)
+    }
+
+    @Test
+    fun collagePagesBuildUpThenHold() {
+        val pages = CollagePlan.pages(photoCount = 6, perPage = 4, holdMs = 3_000)
+        assertEquals(listOf(1, 2, 3, 4, 1, 2), pages.map { it.visible })
+        assertEquals(listOf(false, false, false, true, false, true), pages.map { it.isFinal })
+        assertEquals(3 * 450L + 3_000 + 450 + 3_000, CollagePlan.durationMs(6, 4, 3_000))
+    }
+
+    @Test
+    fun buildsCollageProject() {
+        val t = Templates.byId("birthday_collage")!!
+        var n = 0
+        val pages = CollagePlan.pages(4, 4, t.slotMs).mapIndexed { i, p -> p to "page$i" }
+        val project = TemplatePlan.buildCollage(t, name, pages, "id", 0, null, "outro", 1080, 1920) { "c${n++}" }
+        assertEquals(5, project.videoClips.size)
+        assertEquals(TransitionType.NONE, project.videoClips[0].transition)
+        assertEquals(t.transition, project.videoClips[3].transition)
+        assertEquals(TransitionType.NONE, project.videoClips.last().transition)
+        assertEquals(t.totalMs, TimelineMath.totalVideoMs(project.videoClips))
+        assertEquals(2, project.textOverlays.size)
+        assertEquals("Happy Birthday Mia!", project.name)
+        // No age given: the subtitle is dropped instead of reading "years of awesome".
+        assertEquals("", Templates.fillCard(t.header!!, name).second)
+        assertTrue(Templates.inCategory(TemplateCategory.COLLAGE).size >= 12)
+        assertTrue(Templates.inCategory(TemplateCategory.BIRTHDAY).any { it.collage != null })
+    }
 }

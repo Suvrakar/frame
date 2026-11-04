@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,6 +36,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalDensity
@@ -43,6 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.frame.studio.templates.CollageLayout
+import app.frame.studio.templates.CollageStyle
 import app.frame.studio.templates.TemplateField
 import app.frame.studio.templates.Templates
 import app.frame.studio.templates.VideoTemplate
@@ -115,40 +119,45 @@ fun TemplateArt(
                 }
             }
         }
+        val collage = template.collage
+        if (collage != null) {
+            CollagePreview(template, collage, values, onColor, minSide)
+        } else {
         Column(
-            Modifier.fillMaxSize().padding(horizontal = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(emoji, style = TextStyle(fontSize = with(density) { (minSide * 0.2f).toSp() }))
-            Text(
-                title,
-                textAlign = TextAlign.Center,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                style = TextStyle(
-                    color = onColor,
-                    fontWeight = FontWeight.Black,
-                    fontSize = with(density) { (minSide * 0.11f).toSp() },
-                    lineHeight = with(density) { (minSide * 0.12f).toSp() },
-                    shadow = if (onColor == Color.White) Shadow(Color.Black.copy(alpha = 0.35f), Offset(0f, 3f), 10f) else null,
-                ),
-            )
-            if (subtitle.isNotBlank()) {
+                Modifier.fillMaxSize().padding(horizontal = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(emoji, style = TextStyle(fontSize = with(density) { (minSide * 0.2f).toSp() }))
                 Text(
-                    subtitle.uppercase(),
-                    maxLines = 1,
+                    title,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
-                        color = onColor.copy(alpha = 0.88f),
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = with(density) { (minSide * 0.008f).toSp() },
-                        fontSize = with(density) { (minSide * 0.045f).toSp() },
+                        color = onColor,
+                        fontWeight = FontWeight.Black,
+                        fontSize = with(density) { (minSide * 0.11f).toSp() },
+                        lineHeight = with(density) { (minSide * 0.12f).toSp() },
+                        shadow = if (onColor == Color.White) Shadow(Color.Black.copy(alpha = 0.35f), Offset(0f, 3f), 10f) else null,
                     ),
-                    modifier = Modifier.padding(top = 4.dp),
                 )
+                if (subtitle.isNotBlank()) {
+                    Text(
+                        subtitle.uppercase(),
+                        maxLines = 1,
+                        style = TextStyle(
+                            color = onColor.copy(alpha = 0.88f),
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = with(density) { (minSide * 0.008f).toSp() },
+                            fontSize = with(density) { (minSide * 0.045f).toSp() },
+                        ),
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
             }
         }
-        if (showSlots) {
+        if (showSlots && collage == null) {
             // Hint at the number of photo/video slots.
             Row(
                 Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp),
@@ -207,7 +216,7 @@ fun TemplateCard(template: VideoTemplate, modifier: Modifier = Modifier, onClick
             modifier = Modifier.padding(start = 4.dp, top = 8.dp),
         )
         Text(
-            "${template.slots} clips · ${formatSeconds(template.totalMs)}",
+            "${Templates.mediaLabel(template)} · ${formatSeconds(template.totalMs)}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
@@ -217,3 +226,118 @@ fun TemplateCard(template: VideoTemplate, modifier: Modifier = Modifier, onClick
 }
 
 fun formatSeconds(ms: Long): String = "${(ms + 500) / 1000}s"
+
+/** Code-drawn preview of a collage layout: title band plus framed photo placeholders. */
+@Composable
+private fun CollagePreview(
+    template: VideoTemplate,
+    style: CollageStyle,
+    values: Map<TemplateField, String>,
+    onColor: Color,
+    minSide: Float,
+) {
+    val density = LocalDensity.current
+    val accent = Color(template.accent.toInt())
+    val tileTop = Color.White.copy(alpha = 0.92f)
+    val tileBottom = Color(template.colors.last().toInt()).copy(alpha = 0.55f)
+    val (title, subtitle) = remember(template.id, values) {
+        template.header?.let { Templates.fillCard(it, values) } ?: (template.name to "")
+    }
+    Box(Modifier.fillMaxSize()) {
+        Canvas(Modifier.fillMaxSize()) {
+            val cells = CollageLayout.cells(style, size.width, size.height)
+            val r = minOf(size.width, size.height) * 0.025f
+            if (style == CollageStyle.FILMSTRIP) {
+                val first = cells.first()
+                val last = cells.last()
+                val inset = if (size.height >= size.width) first.width * 0.19f else first.height * 0.19f
+                drawRoundRect(
+                    Color(0xF0141414),
+                    topLeft = Offset(minOf(first.left, last.left) - inset, first.top - inset * 0.6f),
+                    size = Size(
+                        maxOf(first.right, last.right) - minOf(first.left, last.left) + inset * 2,
+                        maxOf(first.bottom, last.bottom) - first.top + inset * 1.2f,
+                    ),
+                    cornerRadius = CornerRadius(r * 0.4f),
+                )
+            }
+            cells.forEach { c ->
+                rotate(c.rotation, pivot = Offset(c.centerX, c.centerY)) {
+                    val photoTop: Float
+                    val photoLeft: Float
+                    val photoW: Float
+                    val photoH: Float
+                    if (style == CollageStyle.POLAROIDS) {
+                        drawRect(Color.White, topLeft = Offset(c.left, c.top), size = Size(c.width, c.height))
+                        val inset = c.width * 0.06f
+                        photoLeft = c.left + inset
+                        photoTop = c.top + inset
+                        photoW = c.width - inset * 2
+                        photoH = c.height * 0.8f - inset
+                    } else {
+                        if (style != CollageStyle.FILMSTRIP) {
+                            val mat = r * 0.35f
+                            drawRoundRect(Color.White, topLeft = Offset(c.left - mat, c.top - mat), size = Size(c.width + mat * 2, c.height + mat * 2), cornerRadius = CornerRadius(r + mat))
+                        }
+                        photoLeft = c.left
+                        photoTop = c.top
+                        photoW = c.width
+                        photoH = c.height
+                    }
+                    drawRoundRect(
+                        Brush.verticalGradient(listOf(tileTop, tileBottom), startY = photoTop, endY = photoTop + photoH),
+                        topLeft = Offset(photoLeft, photoTop),
+                        size = Size(photoW, photoH),
+                        cornerRadius = CornerRadius(if (style == CollageStyle.POLAROIDS) 0f else r),
+                    )
+                    // Classic "photo" glyph: a sun and two hills.
+                    val s = minOf(photoW, photoH)
+                    drawCircle(accent.copy(alpha = 0.9f), radius = s * 0.09f, center = Offset(photoLeft + photoW * 0.7f, photoTop + photoH * 0.32f))
+                    val base = photoTop + photoH * 0.8f
+                    val hills = Path().apply {
+                        moveTo(photoLeft + photoW * 0.18f, base)
+                        lineTo(photoLeft + photoW * 0.4f, base - s * 0.32f)
+                        lineTo(photoLeft + photoW * 0.56f, base - s * 0.12f)
+                        lineTo(photoLeft + photoW * 0.66f, base - s * 0.22f)
+                        lineTo(photoLeft + photoW * 0.84f, base)
+                        close()
+                    }
+                    drawPath(hills, Color(template.colors.first().toInt()).copy(alpha = 0.65f))
+                }
+            }
+        }
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(CollageLayout.HEADER_FRACTION)
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                style = TextStyle(
+                    color = onColor,
+                    fontWeight = FontWeight.Black,
+                    fontSize = with(density) { (minSide * 0.075f).toSp() },
+                    shadow = if (onColor == Color.White) Shadow(Color.Black.copy(alpha = 0.3f), Offset(0f, 2f), 6f) else null,
+                ),
+            )
+            if (subtitle.isNotBlank()) {
+                Text(
+                    subtitle.uppercase(),
+                    maxLines = 1,
+                    style = TextStyle(
+                        color = onColor.copy(alpha = 0.85f),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = with(density) { (minSide * 0.032f).toSp() },
+                        letterSpacing = with(density) { (minSide * 0.006f).toSp() },
+                    ),
+                )
+            }
+        }
+    }
+}

@@ -45,7 +45,22 @@ class TemplateBuilder(
             intro?.let { Uri.fromFile(it).toString() } to outro?.let { Uri.fromFile(it).toString() }
         }
 
-        val project = TemplatePlan.build(
+        val style = template.collage
+        val project = if (style != null) {
+            val pages = renderCollagePages(template, style, values, media, size, projectId, cards)
+            TemplatePlan.buildCollage(
+                template = template,
+                values = values,
+                pages = pages,
+                projectId = projectId,
+                nowMs = System.currentTimeMillis(),
+                introUri = introUri,
+                outroUri = outroUri,
+                cardWidth = size.width,
+                cardHeight = size.height,
+                newId = { UUID.randomUUID().toString().take(12) },
+            ).copy(exportHeight = device.defaultExportHeight)
+        } else TemplatePlan.build(
             template = template,
             values = values,
             media = media,
@@ -59,6 +74,41 @@ class TemplateBuilder(
         ).copy(exportHeight = device.defaultExportHeight)
         repository.save(project)
         return project
+    }
+
+    /** Renders every build-up and final collage frame to a JPEG; photos are decoded once per group. */
+    private suspend fun renderCollagePages(
+        template: VideoTemplate,
+        style: CollageStyle,
+        values: Map<TemplateField, String>,
+        media: List<SlotMedia>,
+        size: ExportPlan.Size,
+        projectId: String,
+        dir: File,
+    ): List<Pair<CollagePage, String>> = withContext(Dispatchers.IO) {
+        val header = template.header?.let { Templates.fillCard(it, values) } ?: ("" to "")
+        val labels = template.photoLabels.map { Templates.fillCaption(it, values).orEmpty() }
+        // Each photo only needs to be about half the frame wide.
+        val maxSide = (maxOf(size.width, size.height) * if (device.isLowEnd) 0.5f else 0.6f).toInt()
+        val pages = CollagePlan.pages(media.size, style.cells, template.slotMs)
+        val result = mutableListOf<Pair<CollagePage, String>>()
+        pages.groupBy { it.group }.forEach { (group, groupPages) ->
+            val slice = media.drop(group * style.cells).take(style.cells)
+            val photos = slice.map { CollageRenderer.loadPhoto(context, Uri.parse(it.uri), it.isImage, maxSide) }
+            try {
+                groupPages.forEach { page ->
+                    val file = File(dir, "${projectId}_collage_${group}_${page.visible}.jpg")
+                    CollageRenderer.render(
+                        template, style, photos, page.visible, header.first, header.second,
+                        labels, size.width, size.height, file,
+                    )
+                    result += page to Uri.fromFile(file).toString()
+                }
+            } finally {
+                photos.forEach { it?.recycle() }
+            }
+        }
+        result
     }
 
     private suspend fun probeSlot(uri: Uri): SlotMedia? {

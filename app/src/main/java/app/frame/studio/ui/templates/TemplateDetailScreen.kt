@@ -157,7 +157,7 @@ fun TemplateDetailScreen(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 MetaPill(template.aspect.label)
-                MetaPill("${template.slots} clips")
+                MetaPill(Templates.mediaLabel(template))
                 MetaPill(formatDuration(template.totalMs))
                 template.badge?.let { MetaPill(it) }
             }
@@ -176,7 +176,11 @@ fun TemplateDetailScreen(
                 }
             }
             Text(
-                "Everything stays editable afterwards — swap clips, change text, add music or a voiceover.",
+                if (template.collage != null) {
+                    "Photos are arranged into the collage and pop in one by one. Videos are used as a still. Add music or a voiceover afterwards."
+                } else {
+                    "Everything stays editable afterwards — swap clips, change text, add music or a voiceover."
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

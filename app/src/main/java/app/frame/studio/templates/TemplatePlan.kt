@@ -119,4 +119,71 @@ object TemplatePlan {
             aspect = template.aspect,
         )
     }
+
+    private val COLLAGE_STICKER_SPOTS = listOf(0.1f to 0.075f, 0.9f to 0.075f)
+
+    /** Assembles a collage template from already-rendered collage pages (in [pages] order). */
+    fun buildCollage(
+        template: VideoTemplate,
+        values: Map<TemplateField, String>,
+        pages: List<Pair<CollagePage, String>>,
+        projectId: String,
+        nowMs: Long,
+        introUri: String?,
+        outroUri: String?,
+        cardWidth: Int,
+        cardHeight: Int,
+        newId: () -> String,
+    ): Project {
+        require(pages.isNotEmpty()) { "Pick at least one photo" }
+        val clips = mutableListOf<VideoClip>()
+        val overlays = mutableListOf<TextOverlay>()
+
+        fun still(uri: String, ms: Long, name: String, transition: TransitionType, fadeIn: Long = 0, fadeOut: Long = 0) = VideoClip(
+            id = newId(),
+            sourceUri = uri,
+            sourceDurationMs = VideoClip.MAX_IMAGE_MS,
+            trimEndMs = ms,
+            width = cardWidth,
+            height = cardHeight,
+            isImage = true,
+            displayName = name,
+            transition = transition,
+            transitionMs = template.transitionMs,
+            fadeInMs = fadeIn,
+            fadeOutMs = fadeOut,
+        )
+
+        if (introUri != null && template.intro != null) clips += still(introUri, template.introMs, "Title card", template.transition, fadeIn = 300)
+        var cursor = clips.sumOf { it.outputDurationMs() }
+        pages.forEachIndexed { index, (page, uri) ->
+            // Build-up pages cut straight to the next one so photos "pop" in.
+            val transition = if (page.isFinal) template.transition else TransitionType.NONE
+            clips += still(uri, page.durationMs, "Collage ${page.group + 1}", transition, fadeIn = if (index == 0 && introUri == null) 300 else 0)
+            if (page.isFinal) {
+                template.stickers.take(COLLAGE_STICKER_SPOTS.size).forEachIndexed { i, emoji ->
+                    if (emoji.isBlank()) return@forEachIndexed
+                    val (x, y) = COLLAGE_STICKER_SPOTS[i]
+                    overlays += TextOverlay(
+                        id = newId(), text = emoji, startMs = cursor + 150, endMs = cursor + page.durationMs - 50,
+                        x = x, y = y, isSticker = true, background = false, scale = 0.8f,
+                    )
+                }
+            }
+            cursor += page.durationMs
+        }
+        if (outroUri != null && template.outro != null) clips += still(outroUri, template.outroMs, "Title card", TransitionType.NONE, fadeOut = 500)
+        clips[clips.lastIndex] = clips.last().copy(transition = TransitionType.NONE)
+
+        val headline = (template.header ?: template.intro)?.let { Templates.fillCard(it, values).first }
+        return Project(
+            id = projectId,
+            name = headline?.ifBlank { null } ?: template.name,
+            createdAtEpochMs = nowMs,
+            updatedAtEpochMs = nowMs,
+            videoClips = clips,
+            textOverlays = overlays,
+            aspect = template.aspect,
+        )
+    }
 }
