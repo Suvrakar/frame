@@ -72,4 +72,16 @@ class ColorMathTest {
             assertEquals(f.id, out[1], out[2], 0.08f)
         }
     }
+
+    @Test
+    fun textureCombinesFilterAndAdjust() {
+        val none = Filters.textureFor("none", 1f, ColorAdjust())
+        assertTrue(none.isNone)
+        val reel = Filters.textureFor("old_reel", 0.5f, ColorAdjust(vignette = 0.2f))
+        assertEquals(0.55f * 0.5f + 0.2f, reel.vignette, 1e-5f)
+        assertEquals(0.25f, reel.grain, 1e-5f)
+        assertEquals(1f, Filters.textureFor("pinhole", 1f, ColorAdjust(vignette = 0.9f)).vignette, 1e-5f)
+        assertTrue(ColorAdjust(grain = 0.3f).isColorIdentity)
+        assertTrue(Filters.inGroup(FilterGroup.LOFI).all { it.id == "none" || it.grain > 0f })
+    }
 }

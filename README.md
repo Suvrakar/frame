@@ -15,9 +15,10 @@ Exports never carry a watermark.
 - **Timeline** – ruler, thumbnail filmstrips, drag-to-trim handles, pinch-to-zoom, snapping,
   free-placed audio and text lanes, transition buttons at every cut.
 - **Clips** – videos and photos; split, trim, reorder, duplicate, speed 0.25×–4×, volume up to
-  200%, fades, rotate, mirror, crop presets, 50+ filters in five tabs (Classic, Social looks,
-  Vintage, Cinematic, Black & white) with intensity, brightness / contrast /
-  saturation / warmth, fade or flash transitions, "apply to all".
+  200%, fades, rotate, mirror, crop presets, 70+ filters in eight tabs (Classic, Social looks,
+  Portrait, Nature & food, Vintage, Lo-fi & grain, Cinematic, Black & white) with intensity,
+  vignette and film grain (a custom GPU effect), brightness / contrast /
+  saturation / warmth / vignette / grain, fade or flash transitions, "apply to all".
 - **Audio** – music, sound effects and recorded voiceovers on overlapping lanes with volume,
   fades, split, move and trim.
 - **Text & stickers** – colours, size, bold, background, fade animation, text style presets,
@@ -30,7 +31,7 @@ Exports never carry a watermark.
   resolution (clamped to what the phone can encode), frame rate and quality; a warning appears
   when a video is longer than the destination accepts (Instagram Stories 60 s, Reels and YouTube
   Shorts 3 min, Snapchat Spotlight 60 s, X 2:20). Available in the Canvas panel and on the export
-  screen. Plus 50+ Instagram-style colour looks.
+  screen. Plus 70+ Instagram-style looks.
 - **Export** – 480p–4K (only resolutions the phone's encoder supports are offered), 24/30/60 fps,
   Standard/High/Best quality with a size estimate, optional copy to `Movies/Frame`, share and
   history. No watermark.

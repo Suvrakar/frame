@@ -65,7 +65,7 @@ class ExportPipelineTest {
                 ),
                 VideoClip(
                     id = "c", sourceUri = android.net.Uri.fromFile(image).toString(), sourceDurationMs = VideoClip.MAX_IMAGE_MS,
-                    trimEndMs = 2_000, width = 640, height = 480, isImage = true, filterId = "mono",
+                    trimEndMs = 2_000, width = 640, height = 480, isImage = true, filterId = "old_reel",
                 ),
             ),
             audioClips = listOf(
@@ -127,7 +127,7 @@ class ExportPipelineTest {
             name = "Preview",
             createdAtEpochMs = 0,
             videoClips = listOf(
-                VideoClip(id = "a", sourceUri = android.net.Uri.fromFile(video).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, speed = 1.5f, filterId = "warm", width = 1280, height = 720),
+                VideoClip(id = "a", sourceUri = android.net.Uri.fromFile(video).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, speed = 1.5f, filterId = "vhs", width = 1280, height = 720),
                 VideoClip(id = "b", sourceUri = android.net.Uri.fromFile(image).toString(), sourceDurationMs = VideoClip.MAX_IMAGE_MS, trimEndMs = 1_500, isImage = true, width = 640, height = 480),
             ),
             audioClips = listOf(AudioClip(id = "m", sourceUri = android.net.Uri.fromFile(music).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, startMs = 500)),

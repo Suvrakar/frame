@@ -91,7 +91,7 @@ class ScreenshotTour {
             name = "Summer trip",
             createdAtEpochMs = System.currentTimeMillis(),
             videoClips = listOf(
-                VideoClip(id = "a", sourceUri = video, sourceDurationMs = 4_000, trimEndMs = 4_000, width = 1280, height = 720, transition = TransitionType.FADE_BLACK),
+                VideoClip(id = "a", sourceUri = video, sourceDurationMs = 4_000, trimEndMs = 4_000, width = 1280, height = 720, transition = TransitionType.FADE_BLACK, filterId = "lofi"),
                 VideoClip(id = "b", sourceUri = image, sourceDurationMs = VideoClip.MAX_IMAGE_MS, trimEndMs = 3_000, width = 640, height = 480, isImage = true, filterId = "warm"),
                 VideoClip(id = "c", sourceUri = video, sourceDurationMs = 4_000, trimStartMs = 1_000, trimEndMs = 4_000, speed = 2f, width = 1280, height = 720),
             ),

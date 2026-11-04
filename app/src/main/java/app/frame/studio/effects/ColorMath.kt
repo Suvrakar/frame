@@ -96,7 +96,7 @@ value class ColorTransform(val m: FloatArray) {
         )
 
         fun fromAdjust(a: ColorAdjust): ColorTransform {
-            if (a.isIdentity) return IDENTITY
+            if (a.isColorIdentity) return IDENTITY
             return brightness(a.brightness * 0.4f) *
                 contrast(1f + a.contrast * 0.6f) *
                 saturation(1f + a.saturation) *
@@ -108,7 +108,10 @@ value class ColorTransform(val m: FloatArray) {
 enum class FilterGroup(val label: String) {
     CLASSIC("Classic"),
     SOCIAL("Social looks"),
+    PORTRAIT("Portrait"),
+    NATURE("Nature & food"),
     VINTAGE("Vintage"),
+    LOFI("Lo-fi & grain"),
     CINEMATIC("Cinematic"),
     BW("Black & white"),
 }
@@ -118,7 +121,16 @@ data class FilterPreset(
     val name: String,
     val transform: ColorTransform,
     val group: FilterGroup = FilterGroup.CLASSIC,
+    /** 0..1 darkened corners baked into the look. */
+    val vignette: Float = 0f,
+    /** 0..1 film grain baked into the look. */
+    val grain: Float = 0f,
 )
+
+/** Vignette and grain for a clip (0..1 each). */
+data class TextureLook(val vignette: Float, val grain: Float) {
+    val isNone: Boolean get() = vignette <= 0f && grain <= 0f
+}
 
 object Filters {
     val all: List<FilterPreset> = listOf(
@@ -126,11 +138,11 @@ object Filters {
         FilterPreset("vivid", "Vivid", ColorTransform.saturation(1.45f) * ColorTransform.contrast(1.1f)),
         FilterPreset("warm", "Warm", ColorTransform.warmth(1.2f) * ColorTransform.saturation(1.1f)),
         FilterPreset("cool", "Cool", ColorTransform.warmth(-1.2f)),
-        FilterPreset("film", "Film", ColorTransform.scale(0.92f, 0.92f, 0.92f, 0.06f) * ColorTransform.saturation(0.85f) * ColorTransform.warmth(0.4f), FilterGroup.VINTAGE),
+        FilterPreset("film", "Film", ColorTransform.scale(0.92f, 0.92f, 0.92f, 0.06f) * ColorTransform.saturation(0.85f) * ColorTransform.warmth(0.4f), FilterGroup.VINTAGE, vignette = 0.2f, grain = 0.25f),
         FilterPreset("teal", "Teal & Orange", ColorTransform.scale(1.1f, 1.0f, 0.95f) * ColorTransform(floatArrayOf(1f, 0f, 0f, 0f, 0f, 1f, 0.05f, 0f, -0.05f, 0.1f, 1f, 0f)) * ColorTransform.contrast(1.1f)),
         FilterPreset("fade", "Fade", ColorTransform.contrast(0.8f) * ColorTransform.saturation(0.8f)),
         FilterPreset("mono", "Mono", ColorTransform.saturation(0f), FilterGroup.BW),
-        FilterPreset("noir", "Noir", ColorTransform.contrast(1.35f) * ColorTransform.saturation(0f), FilterGroup.BW),
+        FilterPreset("noir", "Noir", ColorTransform.contrast(1.35f) * ColorTransform.saturation(0f), FilterGroup.BW, vignette = 0.45f, grain = 0.1f),
         FilterPreset("sepia", "Sepia", ColorTransform.sepia(), FilterGroup.VINTAGE),
         FilterPreset("dream", "Dream", ColorTransform.scale(1.03f, 0.97f, 1.06f, 0.05f) * ColorTransform.saturation(1.15f)),
         FilterPreset("punch", "Punch", ColorTransform.contrast(1.25f) * ColorTransform.saturation(1.25f)),
@@ -144,9 +156,9 @@ object Filters {
         FilterPreset("crisp", "Crisp", ColorTransform.saturation(1.05f) * ColorTransform.contrast(1.3f), FilterGroup.SOCIAL),
         FilterPreset("lagoon", "Lagoon", ColorTransform.saturation(1.1f) * ColorTransform.scale(0.9f, 1.05f, 1.1f), FilterGroup.SOCIAL),
         FilterPreset("matte", "Matte", ColorTransform.saturation(0.9f) * ColorTransform.scale(0.85f, 0.85f, 0.85f, 0.08f), FilterGroup.SOCIAL),
-        FilterPreset("retro", "Retro", ColorTransform.contrast(0.92f) * ColorTransform.warmth(0.8f) * ColorTransform.sepia().mix(0.4f), FilterGroup.VINTAGE),
-        FilterPreset("instant", "Instant", ColorTransform.contrast(0.95f) * ColorTransform.saturation(0.9f) * ColorTransform.warmth(0.5f) * ColorTransform.scale(0.95f, 0.95f, 0.9f, 0.05f), FilterGroup.VINTAGE),
-        FilterPreset("moody", "Moody", ColorTransform.warmth(-0.4f) * ColorTransform.brightness(-0.05f) * ColorTransform.saturation(0.7f) * ColorTransform.contrast(1.2f), FilterGroup.SOCIAL),
+        FilterPreset("retro", "Retro", ColorTransform.contrast(0.92f) * ColorTransform.warmth(0.8f) * ColorTransform.sepia().mix(0.4f), FilterGroup.VINTAGE, vignette = 0.25f, grain = 0.2f),
+        FilterPreset("instant", "Instant", ColorTransform.contrast(0.95f) * ColorTransform.saturation(0.9f) * ColorTransform.warmth(0.5f) * ColorTransform.scale(0.95f, 0.95f, 0.9f, 0.05f), FilterGroup.VINTAGE, vignette = 0.2f, grain = 0.15f),
+        FilterPreset("moody", "Moody", ColorTransform.warmth(-0.4f) * ColorTransform.brightness(-0.05f) * ColorTransform.saturation(0.7f) * ColorTransform.contrast(1.2f), FilterGroup.SOCIAL, vignette = 0.35f, grain = 0f),
         FilterPreset("city_night", "City Night", ColorTransform.brightness(-0.04f) * ColorTransform.saturation(1.1f) * ColorTransform.contrast(1.25f) * ColorTransform.warmth(-0.8f), FilterGroup.SOCIAL),
         FilterPreset("ink", "Ink", ColorTransform.brightness(0.03f) * ColorTransform.saturation(0f) * ColorTransform.contrast(1.1f), FilterGroup.BW),
 
@@ -160,20 +172,19 @@ object Filters {
         FilterPreset("lavender", "Lavender", ColorTransform.saturation(0.9f) * ColorTransform.scale(1.0f, 0.96f, 1.08f, 0.03f), FilterGroup.SOCIAL),
 
         // Vintage
-        FilterPreset("seventies", "Seventies", ColorTransform.offset(0.04f, 0.02f, 0f) * ColorTransform.contrast(0.9f) * ColorTransform.sepia().mix(0.55f), FilterGroup.VINTAGE),
-        FilterPreset("faded_film", "Faded Film", ColorTransform.warmth(0.3f) * ColorTransform.saturation(0.7f) * ColorTransform.scale(0.82f, 0.82f, 0.85f, 0.1f), FilterGroup.VINTAGE),
+        FilterPreset("seventies", "Seventies", ColorTransform.offset(0.04f, 0.02f, 0f) * ColorTransform.contrast(0.9f) * ColorTransform.sepia().mix(0.55f), FilterGroup.VINTAGE, vignette = 0.3f, grain = 0.3f),
+        FilterPreset("faded_film", "Faded Film", ColorTransform.warmth(0.3f) * ColorTransform.saturation(0.7f) * ColorTransform.scale(0.82f, 0.82f, 0.85f, 0.1f), FilterGroup.VINTAGE, vignette = 0.15f, grain = 0.3f),
         FilterPreset("sun_bleached", "Sun Bleached", ColorTransform.warmth(0.6f) * ColorTransform.contrast(0.85f) * ColorTransform.saturation(0.65f) * ColorTransform.brightness(0.06f), FilterGroup.VINTAGE),
         FilterPreset("cream", "Cream", ColorTransform.saturation(0.8f) * ColorTransform.scale(1.0f, 0.98f, 0.9f, 0.06f), FilterGroup.VINTAGE),
         FilterPreset("postcard", "Postcard", ColorTransform.scale(1.04f, 1.0f, 0.9f, 0.03f) * ColorTransform.contrast(0.9f) * ColorTransform.saturation(1.25f), FilterGroup.VINTAGE),
-        FilterPreset("old_reel", "Old Reel", ColorTransform.brightness(-0.03f) * ColorTransform.contrast(1.1f) * ColorTransform.sepia().mix(0.8f), FilterGroup.VINTAGE),
+        FilterPreset("old_reel", "Old Reel", ColorTransform.brightness(-0.03f) * ColorTransform.contrast(1.1f) * ColorTransform.sepia().mix(0.8f), FilterGroup.VINTAGE, vignette = 0.55f, grain = 0.5f),
         FilterPreset("daydream", "Daydream", ColorTransform.scale(1.0f, 1.0f, 1.05f, 0.05f) * ColorTransform.saturation(0.85f) * ColorTransform.brightness(0.05f), FilterGroup.VINTAGE),
 
         // Cinematic
         FilterPreset(
             "blockbuster", "Blockbuster",
             ColorTransform(floatArrayOf(1.1f, -0.05f, -0.05f, 0f, 0f, 1f, 0f, 0f, -0.1f, 0.05f, 1.05f, 0.03f)) * ColorTransform.contrast(1.15f),
-            FilterGroup.CINEMATIC,
-        ),
+            FilterGroup.CINEMATIC, vignette = 0.3f, grain = 0f),
         FilterPreset("noir_blue", "Blue Hour", ColorTransform.contrast(1.2f) * ColorTransform.scale(0.92f, 0.97f, 1.1f) * ColorTransform.saturation(0.35f), FilterGroup.CINEMATIC),
         FilterPreset("desert", "Desert", ColorTransform.scale(1.05f, 0.98f, 0.85f) * ColorTransform.contrast(1.1f) * ColorTransform.saturation(0.85f) * ColorTransform.warmth(1.3f), FilterGroup.CINEMATIC),
         FilterPreset("arctic", "Arctic", ColorTransform.saturation(0.8f) * ColorTransform.brightness(0.04f) * ColorTransform.warmth(-1.4f), FilterGroup.CINEMATIC),
@@ -183,12 +194,48 @@ object Filters {
 
         // Black & white
         FilterPreset("silver", "Silver", ColorTransform.brightness(0.02f) * ColorTransform.contrast(1.15f) * ColorTransform.saturation(0f), FilterGroup.BW),
-        FilterPreset("charcoal", "Charcoal", ColorTransform.brightness(-0.05f) * ColorTransform.contrast(1.4f) * ColorTransform.saturation(0f), FilterGroup.BW),
+        FilterPreset("charcoal", "Charcoal", ColorTransform.brightness(-0.05f) * ColorTransform.contrast(1.4f) * ColorTransform.saturation(0f), FilterGroup.BW, vignette = 0.5f, grain = 0.15f),
         FilterPreset("high_key", "High Key", ColorTransform.contrast(0.85f) * ColorTransform.brightness(0.1f) * ColorTransform.saturation(0f), FilterGroup.BW),
-        FilterPreset("low_key", "Low Key", ColorTransform.contrast(1.3f) * ColorTransform.brightness(-0.08f) * ColorTransform.saturation(0f), FilterGroup.BW),
+        FilterPreset("low_key", "Low Key", ColorTransform.contrast(1.3f) * ColorTransform.brightness(-0.08f) * ColorTransform.saturation(0f), FilterGroup.BW, vignette = 0.45f, grain = 0f),
         FilterPreset("platinum", "Platinum", ColorTransform.scale(1.04f, 1.0f, 0.94f) * ColorTransform.saturation(0f), FilterGroup.BW),
         FilterPreset("selenium", "Selenium", ColorTransform.scale(0.95f, 1.0f, 1.06f) * ColorTransform.saturation(0f), FilterGroup.BW),
+
+        // Portrait: flattering skin, gentle contrast.
+        FilterPreset("soft_skin", "Soft Skin", ColorTransform.brightness(0.03f) * ColorTransform.contrast(0.92f) * ColorTransform.scale(1.03f, 1.0f, 0.98f, 0.02f), FilterGroup.PORTRAIT),
+        FilterPreset("glow_up", "Glow Up", ColorTransform.saturation(1.08f) * ColorTransform.brightness(0.05f) * ColorTransform.scale(1.04f, 1.0f, 0.97f, 0.03f), FilterGroup.PORTRAIT, vignette = 0.15f),
+        FilterPreset("porcelain", "Porcelain", ColorTransform.saturation(0.85f) * ColorTransform.brightness(0.06f) * ColorTransform.scale(0.98f, 1.0f, 1.03f, 0.03f), FilterGroup.PORTRAIT),
+        FilterPreset("bronze", "Bronze", ColorTransform.contrast(1.08f) * ColorTransform.scale(1.06f, 1.0f, 0.88f) * ColorTransform.warmth(0.8f), FilterGroup.PORTRAIT, vignette = 0.2f),
+        FilterPreset("studio", "Studio", ColorTransform.saturation(1.02f) * ColorTransform.contrast(1.12f) * ColorTransform.brightness(0.02f), FilterGroup.PORTRAIT, vignette = 0.25f),
+        FilterPreset("rosy", "Rosy", ColorTransform.contrast(0.95f) * ColorTransform.scale(1.05f, 0.98f, 1.01f, 0.04f), FilterGroup.PORTRAIT),
+
+        // Nature & food
+        FilterPreset("evergreen", "Evergreen", ColorTransform.contrast(1.08f) * ColorTransform.scale(0.94f, 1.08f, 0.96f) * ColorTransform.saturation(1.15f), FilterGroup.NATURE),
+        FilterPreset("ocean", "Ocean", ColorTransform.saturation(1.15f) * ColorTransform.scale(0.92f, 1.03f, 1.12f), FilterGroup.NATURE),
+        FilterPreset("autumn", "Autumn", ColorTransform.saturation(1.1f) * ColorTransform.scale(1.08f, 0.98f, 0.82f) * ColorTransform.warmth(0.8f), FilterGroup.NATURE),
+        FilterPreset("bloom", "Bloom", ColorTransform.brightness(0.04f) * ColorTransform.saturation(1.25f) * ColorTransform.scale(1.04f, 0.98f, 1.04f), FilterGroup.NATURE),
+        FilterPreset("fresh", "Fresh", ColorTransform.contrast(1.1f) * ColorTransform.saturation(1.2f) * ColorTransform.brightness(0.03f), FilterGroup.NATURE),
+        FilterPreset("savory", "Savory", ColorTransform.contrast(1.12f) * ColorTransform.saturation(1.25f) * ColorTransform.warmth(0.7f), FilterGroup.NATURE),
+        FilterPreset("bakery", "Bakery", ColorTransform.saturation(1.05f) * ColorTransform.scale(1.05f, 1.0f, 0.88f, 0.03f) * ColorTransform.warmth(0.6f), FilterGroup.NATURE),
+
+        // Lo-fi & grain
+        FilterPreset("lofi", "Lo-Fi", ColorTransform.saturation(1.2f) * ColorTransform.contrast(1.25f), FilterGroup.LOFI, vignette = 0.6f, grain = 0.25f),
+        FilterPreset("analog", "Analog", ColorTransform.warmth(0.5f) * ColorTransform.saturation(0.85f) * ColorTransform.scale(0.9f, 0.9f, 0.88f, 0.06f), FilterGroup.LOFI, vignette = 0.35f, grain = 0.45f),
+        FilterPreset("vhs", "VHS", ColorTransform.offset(0.03f, 0f, 0.04f) * ColorTransform.saturation(1.25f) * ColorTransform.contrast(0.88f), FilterGroup.LOFI, vignette = 0.3f, grain = 0.6f),
+        FilterPreset("grunge", "Grunge", ColorTransform.brightness(-0.04f) * ColorTransform.contrast(1.3f) * ColorTransform.saturation(0.6f), FilterGroup.LOFI, vignette = 0.55f, grain = 0.5f),
+        FilterPreset("dusty", "Dusty", ColorTransform.warmth(0.4f) * ColorTransform.saturation(0.7f) * ColorTransform.scale(0.88f, 0.86f, 0.84f, 0.08f), FilterGroup.LOFI, vignette = 0.25f, grain = 0.35f),
+        FilterPreset("pinhole", "Pinhole", ColorTransform.contrast(1.15f) * ColorTransform.sepia().mix(0.3f), FilterGroup.LOFI, vignette = 0.85f, grain = 0.2f),
+        FilterPreset("grain_bw", "Grain B&W", ColorTransform.contrast(1.2f) * ColorTransform.saturation(0f), FilterGroup.LOFI, vignette = 0.3f, grain = 0.55f),
     )
+
+    /** Vignette and grain for a clip: the filter's own (scaled by intensity) plus manual adjustments. */
+    fun textureFor(filterId: String, intensity: Float, adjust: ColorAdjust): TextureLook {
+        val f = byId(filterId)
+        val t = intensity.coerceIn(0f, 1f)
+        return TextureLook(
+            vignette = (f.vignette * t + adjust.vignette).coerceIn(0f, 1f),
+            grain = (f.grain * t + adjust.grain).coerceIn(0f, 1f),
+        )
+    }
 
     fun inGroup(group: FilterGroup): List<FilterPreset> =
         all.filter { it.group == group || it.id == "none" }

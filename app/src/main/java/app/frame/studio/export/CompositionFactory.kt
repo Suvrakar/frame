@@ -32,6 +32,7 @@ import app.frame.studio.domain.AudioClip
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.effects.Filters
+import app.frame.studio.effects.TextureLookEffect
 import app.frame.studio.timeline.AudioLayout
 import app.frame.studio.timeline.TimelineMath
 import com.google.common.collect.ImmutableList
@@ -147,6 +148,9 @@ object CompositionFactory {
         }
         // Every clip is fitted into the same canvas so mixed shapes export cleanly.
         video += Presentation.createForWidthAndHeight(size.width, size.height, Presentation.LAYOUT_SCALE_TO_FIT)
+        // Vignette and grain work on the fitted frame so they follow the canvas shape.
+        val texture = Filters.textureFor(clip.filterId, clip.filterIntensity, clip.adjust)
+        if (!texture.isNone) video += TextureLookEffect(texture.vignette, texture.grain)
 
         return builder
             .setRemoveAudio(clip.isImage || clip.volume <= 0f)

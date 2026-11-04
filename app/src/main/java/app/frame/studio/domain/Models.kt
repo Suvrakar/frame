@@ -57,9 +57,16 @@ data class ColorAdjust(
     val saturation: Float = 0f,
     /** -1 (cool) .. 1 (warm) */
     val warmth: Float = 0f,
+    /** 0..1, darkened corners */
+    val vignette: Float = 0f,
+    /** 0..1, film grain */
+    val grain: Float = 0f,
 ) {
-    val isIdentity: Boolean
+    val isColorIdentity: Boolean
         get() = brightness == 0f && contrast == 0f && saturation == 0f && warmth == 0f
+
+    val isIdentity: Boolean
+        get() = isColorIdentity && vignette == 0f && grain == 0f
 }
 
 @Serializable

@@ -226,6 +226,7 @@ fun FiltersPanel(app: FrameApp, clip: VideoClip, onFilter: (String) -> Unit, onI
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.width(64.dp).clickable { onFilter(filter.id) },
                 ) {
+                    Box(Modifier.size(64.dp).clip(RoundedCornerShape(10.dp))) {
                     VideoThumbnail(
                         probe = app.mediaProbe,
                         uri = clip.sourceUri,
@@ -241,6 +242,17 @@ fun FiltersPanel(app: FrameApp, clip: VideoClip, onFilter: (String) -> Unit, onI
                                 else Modifier,
                             ),
                     )
+                    if (filter.vignette > 0f) {
+                        Box(
+                            Modifier.matchParentSize().background(
+                                androidx.compose.ui.graphics.Brush.radialGradient(
+                                    0.45f to Color.Transparent,
+                                    1f to Color.Black.copy(alpha = filter.vignette * 0.8f),
+                                ),
+                            ),
+                        )
+                    }
+                    }
                     Text(
                         filter.name,
                         style = MaterialTheme.typography.labelSmall,
@@ -257,30 +269,44 @@ fun FiltersPanel(app: FrameApp, clip: VideoClip, onFilter: (String) -> Unit, onI
     }
 }
 
-private enum class AdjustKind(val label: String) { BRIGHTNESS("Brightness"), CONTRAST("Contrast"), SATURATION("Saturation"), WARMTH("Warmth") }
+private enum class AdjustKind(val label: String, val bipolar: Boolean = true) {
+    BRIGHTNESS("Brightness"),
+    CONTRAST("Contrast"),
+    SATURATION("Saturation"),
+    WARMTH("Warmth"),
+    VIGNETTE("Vignette", bipolar = false),
+    GRAIN("Grain", bipolar = false),
+}
+
+private fun ColorAdjust.valueOf(kind: AdjustKind): Float = when (kind) {
+    AdjustKind.BRIGHTNESS -> brightness
+    AdjustKind.CONTRAST -> contrast
+    AdjustKind.SATURATION -> saturation
+    AdjustKind.WARMTH -> warmth
+    AdjustKind.VIGNETTE -> vignette
+    AdjustKind.GRAIN -> grain
+}
+
+private fun ColorAdjust.with(kind: AdjustKind, v: Float): ColorAdjust = when (kind) {
+    AdjustKind.BRIGHTNESS -> copy(brightness = v)
+    AdjustKind.CONTRAST -> copy(contrast = v)
+    AdjustKind.SATURATION -> copy(saturation = v)
+    AdjustKind.WARMTH -> copy(warmth = v)
+    AdjustKind.VIGNETTE -> copy(vignette = v)
+    AdjustKind.GRAIN -> copy(grain = v)
+}
 
 @Composable
 fun AdjustPanel(adjust: ColorAdjust, onAdjust: (ColorAdjust) -> Unit) {
     var kind by remember { mutableStateOf(AdjustKind.BRIGHTNESS) }
-    val value = when (kind) {
-        AdjustKind.BRIGHTNESS -> adjust.brightness
-        AdjustKind.CONTRAST -> adjust.contrast
-        AdjustKind.SATURATION -> adjust.saturation
-        AdjustKind.WARMTH -> adjust.warmth
-    }
+    val value = adjust.valueOf(kind)
     Column {
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AdjustKind.entries.forEach { k ->
-                val v = when (k) {
-                    AdjustKind.BRIGHTNESS -> adjust.brightness
-                    AdjustKind.CONTRAST -> adjust.contrast
-                    AdjustKind.SATURATION -> adjust.saturation
-                    AdjustKind.WARMTH -> adjust.warmth
-                }
                 FilterChip(
                     selected = kind == k,
                     onClick = { kind = k },
-                    label = { Text(if (v != 0f) "${k.label} •" else k.label) },
+                    label = { Text(if (adjust.valueOf(k) != 0f) "${k.label} •" else k.label) },
                 )
             }
         }
@@ -288,18 +314,8 @@ fun AdjustPanel(adjust: ColorAdjust, onAdjust: (ColorAdjust) -> Unit) {
             kind.label,
             "${(value * 100).roundToInt()}",
             value,
-            -1f..1f,
-            { raw ->
-                val v = (raw * 100).roundToInt() / 100f
-                onAdjust(
-                    when (kind) {
-                        AdjustKind.BRIGHTNESS -> adjust.copy(brightness = v)
-                        AdjustKind.CONTRAST -> adjust.copy(contrast = v)
-                        AdjustKind.SATURATION -> adjust.copy(saturation = v)
-                        AdjustKind.WARMTH -> adjust.copy(warmth = v)
-                    },
-                )
-            },
+            if (kind.bipolar) -1f..1f else 0f..1f,
+            { raw -> onAdjust(adjust.with(kind, (raw * 100).roundToInt() / 100f)) },
         )
         if (!adjust.isIdentity) {
             TextButton(onClick = { onAdjust(ColorAdjust()) }) { Text("Reset all") }
