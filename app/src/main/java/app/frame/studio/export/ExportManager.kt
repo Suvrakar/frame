@@ -7,6 +7,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.Composition
 import androidx.media3.common.util.Clock
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
+import androidx.media3.transformer.AudioEncoderSettings
 import androidx.media3.transformer.DefaultAssetLoaderFactory
 import androidx.media3.transformer.DefaultDecoderFactory
 import androidx.media3.transformer.DefaultEncoderFactory
@@ -65,8 +66,14 @@ class ExportManager(
     /** Must be called on the main thread. */
     fun start(requested: Project, saveToGallery: Boolean) {
         if (isBusy) return
-        // Never ask the encoder for a size it can't produce.
-        val project = requested.copy(exportHeight = device.clampExportHeight(requested.exportHeight))
+        // Never ask the encoder for a size, frame rate or audio bitrate it can't produce.
+        val height = device.clampExportHeight(requested.exportHeight)
+        val size = ExportPlan.outputSize(requested.videoClips, height, requested.aspect)
+        val project = requested.copy(
+            exportHeight = height,
+            exportFps = device.clampFrameRate(size.width, size.height, requested.exportFps),
+            audioBitrateKbps = device.clampAudioBitrate(requested.audioBitrateKbps),
+        )
         val composition = try {
             CompositionFactory.build(project)
         } catch (e: Exception) {
@@ -207,6 +214,9 @@ class ExportManager(
             .setEncoderFactory(
                 DefaultEncoderFactory.Builder(context)
                     .setEnableFallback(true)
+                    .setRequestedAudioEncoderSettings(
+                        AudioEncoderSettings.Builder().setBitrate(project.audioBitrateKbps * 1_000).build(),
+                    )
                     .setRequestedVideoEncoderSettings(
                         VideoEncoderSettings.Builder()
                             .setBitrate(

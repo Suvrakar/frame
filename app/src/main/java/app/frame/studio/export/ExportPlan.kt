@@ -154,8 +154,15 @@ object ExportPlan {
             .coerceIn(1_000_000L, 80_000_000L).toInt()
 
     /** Rough output size in bytes (video + 128 kbps audio), for the export sheet. */
-    fun estimateBytes(durationMs: Long, size: Size, fps: Int, quality: ExportQuality): Long =
-        (bitrate(size, fps, quality).toLong() + 128_000) * durationMs / 8_000
+    /** Frame rates offered at export. Sources below the chosen rate keep their own rate. */
+    val FRAME_RATES = listOf(24, 25, 30, 50, 60)
+
+    /** AAC bitrates offered at export, in kbps. */
+    val AUDIO_BITRATES_KBPS = listOf(96, 128, 192, 256, 320)
+
+    /** Rough output size in bytes (video + audio), for the export sheet. */
+    fun estimateBytes(durationMs: Long, size: Size, fps: Int, quality: ExportQuality, audioKbps: Int = 192): Long =
+        (bitrate(size, fps, quality).toLong() + audioKbps * 1_000L) * durationMs / 8_000
 
 }
 

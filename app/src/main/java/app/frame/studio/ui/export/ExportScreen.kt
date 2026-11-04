@@ -170,7 +170,7 @@ fun ExportScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                     Text(project.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
                     Text(
-                        "${formatDuration(durationMs)} · ${size.width}×${size.height} · ${project.exportFps} fps",
+                        "${formatDuration(durationMs)} · ${size.width}×${size.height} · ${project.exportFps} fps · ${project.audioBitrateKbps} kbps",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -189,6 +189,8 @@ fun ExportScreen(
                                 onHeight = { h -> update { it.copy(exportHeight = h) } },
                                 onFps = { f -> update { it.copy(exportFps = f) } },
                                 onQuality = { q -> update { it.copy(exportQuality = q) } },
+                            onAudioBitrate = { kbps -> update { it.copy(audioBitrateKbps = kbps) } },
+                            device = app.device,
                                 onPreset = { preset -> update { SocialPresets.apply(it, preset, app.device::clampExportHeight) } },
                                 onExport = ::startExport,
                             )
@@ -317,8 +319,10 @@ private fun Settings(
     onHeight: (ExportHeight) -> Unit,
     onFps: (Int) -> Unit,
     onQuality: (ExportQuality) -> Unit,
+    onAudioBitrate: (Int) -> Unit,
     onPreset: (SocialPreset) -> Unit,
     onExport: () -> Unit,
+    device: app.frame.studio.device.DeviceProfile,
 ) {
     Column(
         Modifier
@@ -331,9 +335,43 @@ private fun Settings(
     ) {
         Text("Post to", style = MaterialTheme.typography.titleSmall)
         SocialPresetPicker(project, onPreset)
-        Segmented("Resolution", heights, heights.firstOrNull { it == project.exportHeight } ?: heights.last(), { it.label }, onHeight)
-        Segmented("Frame rate", listOf(24, 30, 60), project.exportFps, { "$it" }, onFps)
+        Segmented(
+            "Resolution",
+            ExportHeight.entries,
+            project.exportHeight,
+            { it.label },
+            onHeight,
+            isEnabled = { it in heights },
+        )
+        if (heights.size < ExportHeight.entries.size) {
+            Note("Greyed-out resolutions are beyond this phone's video encoder.")
+        }
+        Segmented(
+            "Frame rate",
+            ExportPlan.FRAME_RATES,
+            project.exportFps,
+            { "$it" },
+            onFps,
+            isEnabled = { device.supportsFrameRate(size.width, size.height, it) },
+        )
+        val unsupportedFps = ExportPlan.FRAME_RATES.filterNot { device.supportsFrameRate(size.width, size.height, it) }
+        when {
+            !device.supportsFrameRate(size.width, size.height, project.exportFps) ->
+                Note("${project.exportFps} fps isn't supported at ${project.exportHeight.label} on this phone; Frame will use ${device.clampFrameRate(size.width, size.height, project.exportFps)} fps.", warning = true)
+            unsupportedFps.isNotEmpty() ->
+                Note("${unsupportedFps.joinToString(", ")} fps isn't available at ${project.exportHeight.label} on this phone.")
+            else -> Note("Clips filmed at a lower frame rate keep their own rate.")
+        }
         Segmented("Quality", ExportQuality.entries, project.exportQuality, { it.label }, onQuality)
+        Segmented(
+            "Audio",
+            ExportPlan.AUDIO_BITRATES_KBPS,
+            project.audioBitrateKbps,
+            { "$it" },
+            onAudioBitrate,
+            isEnabled = { device.supportsAudioBitrate(it) },
+        )
+        Note("AAC, kbps. 192 is great for most videos; 256–320 for music.")
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("Save to gallery", style = MaterialTheme.typography.titleSmall)
@@ -342,7 +380,7 @@ private fun Settings(
             Switch(checked = saveToGallery, onCheckedChange = onSaveToGallery)
         }
     }
-    val estimate = ExportPlan.estimateBytes(durationMs, size, project.exportFps, project.exportQuality)
+    val estimate = ExportPlan.estimateBytes(durationMs, size, project.exportFps, project.exportQuality, project.audioBitrateKbps)
     Button(
         onClick = onExport,
         enabled = project.videoClips.isNotEmpty(),
@@ -362,7 +400,14 @@ private fun Settings(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun <T> Segmented(label: String, options: List<T>, selected: T, text: (T) -> String, onSelect: (T) -> Unit) {
+private fun <T> Segmented(
+    label: String,
+    options: List<T>,
+    selected: T,
+    text: (T) -> String,
+    onSelect: (T) -> Unit,
+    isEnabled: (T) -> Boolean = { true },
+) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(label, style = MaterialTheme.typography.titleSmall)
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
@@ -370,10 +415,21 @@ private fun <T> Segmented(label: String, options: List<T>, selected: T, text: (T
                 SegmentedButton(
                     selected = option == selected,
                     onClick = { onSelect(option) },
+                    enabled = isEnabled(option),
                     shape = SegmentedButtonDefaults.itemShape(index, options.size),
                     icon = {},
                 ) { Text(text(option), maxLines = 1, style = MaterialTheme.typography.labelMedium) }
             }
         }
     }
+}
+
+@Composable
+private fun Note(text: String, warning: Boolean = false) {
+    Text(
+        text,
+        style = MaterialTheme.typography.bodySmall,
+        color = if (warning) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 0.dp),
+    )
 }

@@ -228,6 +228,8 @@ data class Project(
     val exportFps: Int = 30,
     val exportQuality: ExportQuality = ExportQuality.HIGH,
     val effects: List<SceneEffect> = emptyList(),
+    /** AAC audio bitrate of the export, in kbps. */
+    val audioBitrateKbps: Int = 192,
 )
 
 @Serializable

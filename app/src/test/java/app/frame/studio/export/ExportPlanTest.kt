@@ -138,4 +138,15 @@ class ExportPlanV2Test {
         assertEquals(true, best > std)
         assertEquals(true, ExportPlan.estimateBytes(10_000, size, 30, app.frame.studio.domain.ExportQuality.HIGH) > 1_000_000)
     }
+
+    @Test
+    fun exportOptionsAndAudioInEstimate() {
+        assertEquals(listOf(24, 25, 30, 50, 60), ExportPlan.FRAME_RATES)
+        assertEquals(listOf(96, 128, 192, 256, 320), ExportPlan.AUDIO_BITRATES_KBPS)
+        val size = ExportPlan.Size(3840, 2160)
+        val low = ExportPlan.estimateBytes(60_000, size, 60, app.frame.studio.domain.ExportQuality.HIGH, audioKbps = 96)
+        val high = ExportPlan.estimateBytes(60_000, size, 60, app.frame.studio.domain.ExportQuality.HIGH, audioKbps = 320)
+        // 224 kbps more audio for 60 s = 1.68 MB.
+        assertEquals(1_680_000L, high - low)
+    }
 }

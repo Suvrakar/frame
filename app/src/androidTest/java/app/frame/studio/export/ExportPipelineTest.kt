@@ -94,18 +94,17 @@ class ExportPipelineTest {
         var error: ExportException? = null
 
         Handler(Looper.getMainLooper()).post {
-            val transformer = Transformer.Builder(context)
-                .setVideoMimeType(ExportPolicy.videoMimeType)
-                .setAudioMimeType(ExportPolicy.audioMimeType)
-                .addListener(object : Transformer.Listener {
-                    override fun onCompleted(composition: Composition, exportResult: ExportResult) = done.countDown()
-                    override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
-                        error = exportException
-                        done.countDown()
-                    }
-                })
-                .build()
-            transformer.start(CompositionFactory.build(project), output.absolutePath)
+            // The app's exporter, with a custom audio bitrate.
+            val listener = object : Transformer.Listener {
+                override fun onCompleted(composition: Composition, exportResult: ExportResult) = done.countDown()
+                override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
+                    error = exportException
+                    done.countDown()
+                }
+            }
+            val device = (context.applicationContext as app.frame.studio.FrameApp).device
+            ExportManager.newTransformer(context, device, project.copy(audioBitrateKbps = 256), listener)
+                .start(CompositionFactory.build(project), output.absolutePath)
         }
 
         assertTrue("export timed out", done.await(5, TimeUnit.MINUTES))
