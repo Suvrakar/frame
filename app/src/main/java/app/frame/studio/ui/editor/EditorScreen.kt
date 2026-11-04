@@ -705,11 +705,17 @@ private fun boxOf(project: Project, selection: Selection, canvasW: Int, canvasH:
         OverlayGeometry.boxFraction(o.width, o.height, canvasW, canvasH, 1f)
     }
     is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }?.let { t ->
-        // Approximate the rendered text box: 100px glyphs per 1080px of short side.
+        // Measure with the overlay's real font: 100px glyphs per 1080px of short side.
         val fontPx = minOf(canvasW, canvasH) * 100f / 1080f * t.scale * (if (t.isSticker) 2f else 1f)
-        val longest = t.text.lines().maxOfOrNull { it.length } ?: 1
-        val w = (fontPx * 0.58f * (longest + if (t.background) 2 else 0)).coerceIn(fontPx, canvasW.toFloat())
-        val h = (fontPx * 1.25f * t.text.lines().size.coerceAtLeast(1)).coerceAtMost(canvasH.toFloat())
+        val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = fontPx
+            typeface = app.frame.studio.text.TextFonts.typeface(t.font)
+            isFakeBoldText = t.bold && !typeface.isBold
+        }
+        val lines = t.text.lines().ifEmpty { listOf("") }
+        val pad = if (t.background && !t.isSticker) paint.measureText("  ") else 0f
+        val w = ((lines.maxOf { paint.measureText(it) }) + pad).coerceIn(fontPx, canvasW.toFloat())
+        val h = (paint.fontSpacing * lines.size).coerceAtMost(canvasH.toFloat())
         (w / canvasW) to (h / canvasH)
     }
     else -> null
