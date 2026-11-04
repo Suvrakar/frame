@@ -31,6 +31,7 @@ import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.export.CompositionFactory
+import app.frame.studio.timeline.TimelineMath
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -176,7 +177,7 @@ class PerfStressTest {
         val exportMs = SystemClock.elapsedRealtime() - exportStart
         assertNull("export failed: ${exportError?.errorCodeName}", exportError)
         report("export.ms", exportMs)
-        report("export.timelineMs", app.frame.studio.timeline.TimelineMath.totalVideoMs(project.videoClips))
+        report("export.timelineMs", TimelineMath.totalVideoMs(project.videoClips))
         report("export.bytes", out.length())
         assertTrue(out.length() > 50_000)
 
