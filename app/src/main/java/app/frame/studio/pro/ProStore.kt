@@ -24,6 +24,8 @@ enum class ProFeature(val title: String, val pitch: String) {
     MAGIC_MOVIE("Magic Movie", "Pick photos and videos — Frame makes the movie for you."),
     ANIMATED_CAPTIONS("Animated captions", "Word-by-word captions that pop, like top Reels."),
     HIGH_RES_EXPORT("4K & 60 fps", "Export in the highest quality your phone supports."),
+    PREMIUM_TEMPLATES("Premium templates", "Every frame, invitation and collage design."),
+    PREMIUM_FILTERS("Premium filters", "The full filter library, including film and cinematic looks."),
 }
 
 /**

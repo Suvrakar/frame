@@ -156,8 +156,8 @@ private fun ProCard(isPro: Boolean, price: String?, onUpgrade: () -> Unit) {
                 color = Color.White,
             )
             Text(
-                if (isPro) "Magic Movie, animated captions, 4K & 60 fps, no ads. Thank you!"
-                else "Magic Movie, animated captions, 4K & 60 fps, no ads" + (price?.let { " · $it once" } ?: ""),
+                if (isPro) "Lifetime access to everything, no ads. Thank you!"
+                else "All templates & filters, Magic Movie, captions, 4K · no ads for life" + (price?.let { " · $it once" } ?: ""),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.85f),
             )

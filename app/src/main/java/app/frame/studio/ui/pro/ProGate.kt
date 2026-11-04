@@ -17,6 +17,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.ClosedCaption
 import androidx.compose.material.icons.outlined.HighQuality
+import androidx.compose.material.icons.outlined.Dashboard
+import androidx.compose.material.icons.outlined.FilterVintage
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.outlined.OndemandVideo
 import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.Button
@@ -106,7 +110,7 @@ private fun ProSheet(gate: ProGate) {
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
         Column(
-            Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp).padding(bottom = 16.dp),
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 24.dp).padding(bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
@@ -121,7 +125,7 @@ private fun ProSheet(gate: ProGate) {
             }
             Text("Frame Pro", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
             Text(
-                "${pending.feature.title} is part of Frame Pro. Pay once, keep it forever. Everything runs on your phone.",
+                "${pending.feature.title} is part of Frame Pro.\nOne-time payment · Lifetime access · No ads, ever.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -137,7 +141,7 @@ private fun ProSheet(gate: ProGate) {
                 ProFeature.entries.forEach { f ->
                     FeatureRow(iconFor(f), f.title, f.pitch, highlighted = f == pending.feature)
                 }
-                FeatureRow(Icons.Outlined.OndemandVideo, "No ads", "A clean, distraction-free editor.", highlighted = false)
+                FeatureRow(Icons.Outlined.OndemandVideo, "No ads for life", "One payment removes every ad. No subscription.", highlighted = false)
             }
             Button(
                 onClick = { activity?.let(store::purchase) },
@@ -146,7 +150,7 @@ private fun ProSheet(gate: ProGate) {
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    if (price != null) "Get Frame Pro · $price" else "Frame Pro isn't available right now",
+                    if (price != null) "Get lifetime Pro · $price once" else "Frame Pro isn't available right now",
                     fontWeight = FontWeight.SemiBold,
                 )
             }
@@ -185,6 +189,8 @@ private fun iconFor(feature: ProFeature): ImageVector = when (feature) {
     ProFeature.MAGIC_MOVIE -> Icons.Outlined.AutoAwesome
     ProFeature.ANIMATED_CAPTIONS -> Icons.Outlined.ClosedCaption
     ProFeature.HIGH_RES_EXPORT -> Icons.Outlined.HighQuality
+    ProFeature.PREMIUM_TEMPLATES -> Icons.Outlined.Dashboard
+    ProFeature.PREMIUM_FILTERS -> Icons.Outlined.FilterVintage
 }
 
 @Composable

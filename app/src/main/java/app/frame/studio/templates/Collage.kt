@@ -3,12 +3,21 @@ package app.frame.studio.templates
 import kotlin.math.min
 
 /** Multi-photo layouts rendered into a single frame. */
-enum class CollageStyle(val label: String, val cells: Int) {
+enum class CollageStyle(val label: String, val cells: Int, val ownTitle: Boolean = false) {
     GRID("Grid", 4),
     HERO("Hero", 4),
     STRIPS("Strips", 4),
     POLAROIDS("Polaroids", 4),
     FILMSTRIP("Film strip", 4),
+
+    // Decorated photo frames: the renderer draws the title as part of the design.
+    TAPED("Taped polaroid", 1, ownTitle = true),
+    CIRCLE("Circle frame", 1, ownTitle = true),
+    RANSOM("Cut-out letters", 1, ownTitle = true),
+    INVITE("Invitation", 1, ownTitle = true),
+    BUNTING("Bunting", 1, ownTitle = true),
+    SCRAPBOOK("Scrapbook", 5, ownTitle = true),
+    BOOTH("Photo booth", 4, ownTitle = true),
 }
 
 /** A photo slot in frame pixels (or any unit); [rotation] is clockwise degrees. */
@@ -35,6 +44,7 @@ object CollageLayout {
 
     /** Photo slots for [style] in a [w]×[h] frame, leaving room for a title when [withHeader]. */
     fun cells(style: CollageStyle, w: Float, h: Float, withHeader: Boolean = true): List<Cell> {
+        if (style.ownTitle) return frameCells(style, w, h)
         val pad = padding(w, h)
         val gap = gap(w, h)
         val top = if (withHeader) h * HEADER_FRACTION else pad
@@ -109,7 +119,78 @@ object CollageLayout {
                     Cell(x, sy + inset, x + fw, sy + stripH - inset)
                 }
             }
+            else -> frameCells(style, w, h)
         }
+    }
+}
+
+/** Photo slots of the decorated frame styles (they lay out their own titles). */
+private fun frameCells(style: CollageStyle, w: Float, h: Float): List<Cell> {
+    val m = min(w, h)
+    return when (style) {
+        CollageStyle.TAPED -> {
+            // One large print, slightly tilted, below the title.
+            val pw = min(w * 0.78f, h * 0.62f / 1.18f)
+            val ph = pw * 1.18f
+            val cx = w / 2
+            val cy = h * 0.56f
+            listOf(Cell(cx - pw / 2, cy - ph / 2, cx + pw / 2, cy + ph / 2, -4f))
+        }
+        CollageStyle.CIRCLE -> {
+            val d = min(w * 0.7f, h * 0.48f)
+            val cy = h * 0.5f
+            listOf(Cell(w / 2 - d / 2, cy - d / 2, w / 2 + d / 2, cy + d / 2))
+        }
+        CollageStyle.RANSOM -> {
+            val pw = min(w * 0.76f, h * 0.56f / 1.15f)
+            val ph = pw * 1.15f
+            val cy = h * 0.5f
+            listOf(Cell(w / 2 - pw / 2, cy - ph / 2, w / 2 + pw / 2, cy + ph / 2, 2.5f))
+        }
+        CollageStyle.INVITE -> {
+            // Arch-topped photo in the upper half; text sits below.
+            val pw = min(w * 0.52f, h * 0.36f / 1.25f)
+            val ph = pw * 1.25f
+            val top = h * 0.11f
+            listOf(Cell(w / 2 - pw / 2, top, w / 2 + pw / 2, top + ph))
+        }
+        CollageStyle.BUNTING -> {
+            val pw = min(w * 0.74f, h * 0.55f / 1.1f)
+            val ph = pw * 1.1f
+            val top = h * 0.2f
+            listOf(Cell(w / 2 - pw / 2, top, w / 2 + pw / 2, top + ph, 1.5f))
+        }
+        CollageStyle.SCRAPBOOK -> {
+            // Five tilted prints around a central title.
+            val pw = min(w * 0.4f, h * 0.27f)
+            val ph = pw * 1.12f
+            val spots = listOf(
+                Triple(0.27f, 0.2f, -7f), Triple(0.74f, 0.17f, 6f),
+                Triple(0.22f, 0.79f, 5f), Triple(0.72f, 0.8f, -6f),
+                Triple(0.5f, 0.5f, -2f),
+            )
+            spots.map { (fx, fy, r) ->
+                val cx = w * fx
+                val cy = h * fy
+                Cell(cx - pw / 2, cy - ph / 2, cx + pw / 2, cy + ph / 2, r)
+            }
+        }
+        CollageStyle.BOOTH -> {
+            // Big print on the left, a three-frame booth strip on the right.
+            val pad = m * 0.06f
+            val top = h * 0.24f
+            val bottom = h - pad * 1.4f
+            val stripW = w * 0.3f
+            val stripX = w - pad - stripW
+            val inset = stripW * 0.08f
+            val fh = (bottom - top - inset * 4) / 3
+            val big = Cell(pad, top + m * 0.04f, stripX - pad * 0.6f, bottom - m * 0.06f, -2f)
+            listOf(big) + List(3) { i ->
+                val y = top + inset + i * (fh + inset)
+                Cell(stripX + inset, y, stripX + stripW - inset, y + fh)
+            }
+        }
+        else -> emptyList()
     }
 }
 

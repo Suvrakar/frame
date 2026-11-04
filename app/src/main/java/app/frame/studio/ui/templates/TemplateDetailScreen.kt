@@ -51,6 +51,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.asImageBitmap
+import app.frame.studio.pro.ProFeature
+import app.frame.studio.ui.pro.rememberProGate
 import app.frame.studio.FrameApp
 import app.frame.studio.ui.common.GlassBackground
 import app.frame.studio.templates.TemplateField
@@ -76,6 +79,7 @@ fun TemplateDetailScreen(
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    val gate = rememberProGate(app.pro)
     val pick = rememberLauncherForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia(maxItems = template.slots.coerceAtLeast(2)),
     ) { uris ->
@@ -84,6 +88,7 @@ fun TemplateDetailScreen(
         scope.launch {
             try {
                 val project = app.templateBuilder.create(template, values.toMap(), uris)
+                if (template.pro) app.pro.consumePass(ProFeature.PREMIUM_TEMPLATES)
                 onCreated(project.id)
             } catch (e: Exception) {
                 snackbar.showSnackbar(e.message ?: "Couldn't create the video")
@@ -109,7 +114,10 @@ fun TemplateDetailScreen(
             bottomBar = {
                 Box(Modifier.fillMaxWidth().navigationBarsPadding().imePadding().padding(16.dp)) {
                     Button(
-                        onClick = { pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
+                        onClick = {
+                            val launch = { pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }
+                            if (template.pro) gate.require(ProFeature.PREMIUM_TEMPLATES, launch) else launch()
+                        },
                         enabled = !creating,
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth().height(60.dp),
@@ -147,12 +155,35 @@ fun TemplateDetailScreen(
                             .aspectRatio(ratio, matchHeightConstraintsFirst = ratio < 1f)
                             .clip(RoundedCornerShape(24.dp)),
                     ) {
-                        TemplateArt(
-                            template,
-                            Modifier.fillMaxSize(),
-                            values = Templates.previewValues + values.filterValues { it.isNotBlank() },
-                            animated = app.device.animationsEnabled,
-                        )
+                        val typed = Templates.previewValues + values.filterValues { it.isNotBlank() }
+                        if (template.collage != null) {
+                            // The real renderer, live with what the user types.
+                            val rendered by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(null, typed) {
+                                kotlinx.coroutines.delay(200)
+                                value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+                                    runCatching { app.templatePreviews.render(template, 540, typed) }.getOrNull()
+                                }
+                            }
+                            val shown = rendered
+                            if (shown != null) {
+                                androidx.compose.foundation.Image(
+                                    shown.asImageBitmap(),
+                                    contentDescription = template.name,
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            } else {
+                                TemplateArt(template, Modifier.fillMaxSize(), values = typed, showSlots = false)
+                            }
+                        } else {
+                            TemplateArt(
+                                template,
+                                Modifier.fillMaxSize(),
+                                values = typed,
+                                animated = app.device.animationsEnabled,
+                            )
+                        }
+                        if (template.pro) ProBadge(Modifier.align(Alignment.BottomEnd).padding(10.dp))
                     }
                 }
                 Column {

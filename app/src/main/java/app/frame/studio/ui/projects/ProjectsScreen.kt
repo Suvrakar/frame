@@ -71,7 +71,7 @@ import app.frame.studio.ui.common.TextInputDialog
 import app.frame.studio.ui.common.VideoThumbnail
 import app.frame.studio.ui.common.formatDate
 import app.frame.studio.ui.common.formatDuration
-import app.frame.studio.ui.templates.TemplateCard
+import app.frame.studio.ui.templates.TemplateTile
 import app.frame.studio.ui.theme.LocalGlass
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -123,7 +123,7 @@ fun ProjectsScreen(
                 SectionHeader("Templates", action = "See all", onAction = { onOpenTemplates(null) })
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(vertical = 4.dp)) {
                     rowItems(Templates.featured, key = { it.id }) { t ->
-                        TemplateCard(t, Modifier.width(132.dp)) { onOpenTemplate(t.id) }
+                        TemplateTile(app.templatePreviews, t, Modifier.width(118.dp)) { onOpenTemplate(t.id) }
                     }
                 }
             }

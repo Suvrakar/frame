@@ -99,7 +99,7 @@ fun FrameNavHost(app: FrameApp) {
                 ?.takeIf { it.isNotBlank() }
                 ?.let { runCatching { TemplateCategory.valueOf(it) }.getOrNull() }
             TabShell(nav, Routes.TEMPLATES) {
-                TemplatesScreen(onBack = null, onOpen = { nav.navigate(Routes.template(it)) }, initialCategory = category)
+                TemplatesScreen(previews = app.templatePreviews, onBack = null, onOpen = { nav.navigate(Routes.template(it)) }, initialCategory = category)
             }
         }
         composable(Routes.EXPORTS) {

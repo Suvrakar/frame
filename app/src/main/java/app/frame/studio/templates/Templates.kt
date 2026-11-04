@@ -11,7 +11,7 @@ enum class TemplateCategory(val label: String) {
     SEASONAL("Seasonal"),
 
     /** Filter only: every template that has a photo collage. */
-    COLLAGE("Collage"),
+    COLLAGE("Collage & frames"),
 }
 
 /** Personalization the user can type in; [key] appears in template text as a placeholder. */
@@ -19,6 +19,8 @@ enum class TemplateField(val label: String, val hint: String, val key: String) {
     NAME("Name", "e.g. Mia", "{name}"),
     AGE("Age", "e.g. 7", "{age}"),
     TITLE("Title", "e.g. Summer 2026", "{title}"),
+    DATE("Date & time", "e.g. Sat 9 March · 6 PM", "{date}"),
+    PLACE("Place", "e.g. Mia's house", "{place}"),
 }
 
 /** Full-screen title card (rendered to an image) at the start or end of the video. */
@@ -61,6 +63,8 @@ data class VideoTemplate(
     val header: CardSpec? = null,
     /** Per-photo labels inside the collage (polaroid captions); placeholders allowed. */
     val photoLabels: List<String> = emptyList(),
+    /** Part of Frame Pro (or unlocked once with a rewarded ad). */
+    val pro: Boolean = false,
 ) {
     val introMs: Long get() = if (intro != null) 2_500 else 0
     val outroMs: Long get() = if (outro != null) 2_200 else 0
@@ -73,6 +77,12 @@ object Templates {
 
     private const val PINK = 0xFFFF4F9A
     private const val GOLD = 0xFFFFC94D
+
+    /** Existing designs that are part of Frame Pro; the rest stay free. */
+    private val PRO_IDS = setOf(
+        "birthday_glow", "birthday_throwback", "wedding", "love_story", "birthday_filmstrip",
+        "our_years", "graduation_film", "road_trip", "new_year",
+    )
 
     val all: List<VideoTemplate> = listOf(
         // ---- Birthday ----
@@ -311,6 +321,123 @@ object Templates {
             captionColor = 0xFFFFD1DC, fields = listOf(TemplateField.NAME, TemplateField.TITLE),
         ),
 
+        // ---- Decorated photo frames ----
+        VideoTemplate(
+            id = "taped_birthday", name = "Taped Polaroid", category = TemplateCategory.BIRTHDAY,
+            tagline = "A big instant print, taped down with a handwritten note.",
+            colors = listOf(0xFFFFF4EC, 0xFFFFE3E8, 0xFFFDEBD3), accent = 0xFFFF8FB1, emoji = "📌",
+            aspect = CanvasAspect.R9_16, slots = 3, slotMs = 2_800, filterId = "peach",
+            transition = TransitionType.FADE_WHITE, transitionMs = 400,
+            collage = CollageStyle.TAPED,
+            header = CardSpec("Happy Birthday", "{name} turns {age}"),
+            photoLabels = listOf("Make a wish", "Cheers to you", "So loved"),
+            fields = listOf(TemplateField.NAME, TemplateField.AGE), badge = "New",
+        ),
+        VideoTemplate(
+            id = "circle_birthday", name = "Circle Frame", category = TemplateCategory.BIRTHDAY,
+            tagline = "A round portrait in a beaded ring with a name tag.",
+            colors = listOf(0xFFFFF8E7, 0xFFFFEFD0, 0xFFFFE0B2), accent = 0xFFFF9F43, emoji = "🟠",
+            aspect = CanvasAspect.R4_5, slots = 3, slotMs = 2_600, filterId = "sunkissed",
+            transition = TransitionType.FADE_WHITE, transitionMs = 350,
+            collage = CollageStyle.CIRCLE,
+            header = CardSpec("Happy Birthday", ""),
+            photoLabels = listOf("{name}", "{name}", "{name}"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "circle_baby", name = "Little One", category = TemplateCategory.BIRTHDAY,
+            tagline = "Soft blues for a first birthday.",
+            colors = listOf(0xFFE3F2FD, 0xFFD6ECFF, 0xFFF0F8FF), accent = 0xFF64B5F6, emoji = "🍼",
+            aspect = CanvasAspect.R4_5, slots = 3, slotMs = 2_600, filterId = "dream",
+            transition = TransitionType.FADE_WHITE, transitionMs = 350,
+            collage = CollageStyle.CIRCLE,
+            header = CardSpec("Happy {age} Birthday", "", fallbackTitle = "Happy Birthday"),
+            photoLabels = listOf("{name}", "{name}", "{name}"),
+            fields = listOf(TemplateField.NAME, TemplateField.AGE),
+        ),
+        VideoTemplate(
+            id = "ransom_birthday", name = "Cut-out Letters", category = TemplateCategory.BIRTHDAY,
+            tagline = "Magazine cut-out letters around your photo.",
+            colors = listOf(0xFFFFB6C8, 0xFFFF9DB8, 0xFFFFC6D6), accent = 0xFF7E57C2, emoji = "✂️",
+            aspect = CanvasAspect.R9_16, slots = 3, slotMs = 2_600, filterId = "blush",
+            transition = TransitionType.FADE_WHITE, transitionMs = 300,
+            collage = CollageStyle.RANSOM,
+            header = CardSpec("Happy Birthday", "{name}"),
+            fields = listOf(TemplateField.NAME), pro = true, badge = "Trending",
+        ),
+        VideoTemplate(
+            id = "night_ransom", name = "Black & White Party", category = TemplateCategory.BIRTHDAY,
+            tagline = "Monochrome photos, loud colourful letters.",
+            colors = listOf(0xFF111111, 0xFF1F1F1F, 0xFF2B2B2B), accent = 0xFFFFD54F, emoji = "🖤",
+            aspect = CanvasAspect.R9_16, slots = 3, slotMs = 2_400, filterId = "noir",
+            transition = TransitionType.FADE_WHITE, transitionMs = 250,
+            collage = CollageStyle.RANSOM,
+            header = CardSpec("Happy Birthday", "{name}"),
+            fields = listOf(TemplateField.NAME), pro = true,
+        ),
+        VideoTemplate(
+            id = "gold_invite", name = "Gold Invitation", category = TemplateCategory.BIRTHDAY,
+            tagline = "An elegant save-the-date with date and place.",
+            colors = listOf(0xFF1A1A1A, 0xFF262320, 0xFF141210), accent = 0xFFE6C46C, emoji = "💌",
+            aspect = CanvasAspect.R9_16, slots = 1, slotMs = 5_000, filterId = "warm",
+            transition = TransitionType.FADE_BLACK, transitionMs = 500,
+            collage = CollageStyle.INVITE,
+            header = CardSpec("{name}'s Birthday", "Save the date", fallbackTitle = "Birthday Party"),
+            photoLabels = listOf("{date}", "{place}"),
+            fields = listOf(TemplateField.NAME, TemplateField.DATE, TemplateField.PLACE), pro = true, badge = "Invite",
+        ),
+        VideoTemplate(
+            id = "bunting_party", name = "Bunting Party", category = TemplateCategory.BIRTHDAY,
+            tagline = "Party flags, confetti and a handwritten hello.",
+            colors = listOf(0xFFE8F4FF, 0xFFFFF1F6, 0xFFFFF9E6), accent = 0xFF4FC3F7, emoji = "🎏",
+            aspect = CanvasAspect.R9_16, slots = 3, slotMs = 2_600, filterId = "pastel",
+            transition = TransitionType.FADE_WHITE, transitionMs = 350,
+            collage = CollageStyle.BUNTING,
+            header = CardSpec("Happy Birthday", "{name}"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "scrapbook_birthday", name = "Scrapbook", category = TemplateCategory.BIRTHDAY,
+            tagline = "Five prints and cut-out letters on a scrapbook page.",
+            colors = listOf(0xFFFFF3E0, 0xFFFDE7D7, 0xFFFFF8EE), accent = 0xFFFF7043, emoji = "📒",
+            aspect = CanvasAspect.R9_16, slots = 5, slotMs = 3_500, filterId = "instant",
+            transition = TransitionType.FADE_WHITE, transitionMs = 400,
+            collage = CollageStyle.SCRAPBOOK,
+            header = CardSpec("Happy Birthday", ""),
+            fields = emptyList(), pro = true,
+        ),
+        VideoTemplate(
+            id = "booth_birthday", name = "Photo Booth", category = TemplateCategory.BIRTHDAY,
+            tagline = "One big print and a three-shot booth strip.",
+            colors = listOf(0xFFB8C9A9, 0xFFA3B795, 0xFFCAD8BE), accent = 0xFFFFFFFF, emoji = "📷",
+            aspect = CanvasAspect.R9_16, slots = 4, slotMs = 3_500, filterId = "fresh",
+            transition = TransitionType.FADE_WHITE, transitionMs = 400,
+            collage = CollageStyle.BOOTH,
+            header = CardSpec("Happy Birthday", "{name}"),
+            fields = listOf(TemplateField.NAME), pro = true,
+        ),
+        VideoTemplate(
+            id = "taped_love", name = "Taped Love Note", category = TemplateCategory.CELEBRATE,
+            tagline = "Your favourite photo of the two of you, taped with love.",
+            colors = listOf(0xFFFCE4EC, 0xFFF8D7E0, 0xFFFFF0F3), accent = 0xFFE57373, emoji = "💗",
+            aspect = CanvasAspect.R9_16, slots = 3, slotMs = 2_800, filterId = "rosy",
+            transition = TransitionType.FADE_WHITE, transitionMs = 400,
+            collage = CollageStyle.TAPED,
+            header = CardSpec("Happy Anniversary", "{name}"),
+            photoLabels = listOf("Us", "Forever", "Always"),
+            fields = listOf(TemplateField.NAME),
+        ),
+        VideoTemplate(
+            id = "bunting_baby", name = "Welcome Baby", category = TemplateCategory.CELEBRATE,
+            tagline = "Flags up for the newest family member.",
+            colors = listOf(0xFFFFF8F0, 0xFFF3ECFF, 0xFFE8F8F2), accent = 0xFFB39DDB, emoji = "👶",
+            aspect = CanvasAspect.R4_5, slots = 3, slotMs = 2_600, filterId = "dream",
+            transition = TransitionType.FADE_WHITE, transitionMs = 350,
+            collage = CollageStyle.BUNTING,
+            header = CardSpec("Welcome {name}", "", fallbackTitle = "Welcome baby"),
+            fields = listOf(TemplateField.NAME), pro = true,
+        ),
+
         // ---- 4-photo collages ----
         VideoTemplate(
             id = "birthday_collage", name = "Birthday Collage", category = TemplateCategory.BIRTHDAY,
@@ -465,7 +592,7 @@ object Templates {
             header = CardSpec("{name}'s first year", "", "🍼", fallbackTitle = "Little milestones"),
             fields = listOf(TemplateField.NAME),
         ),
-    )
+    ).map { if (it.id in PRO_IDS) it.copy(pro = true) else it }
 
     /** Readable text color (ARGB) on top of the template's gradient. */
     fun onColor(template: VideoTemplate): Long {
@@ -490,6 +617,8 @@ object Templates {
         TemplateField.NAME to "Mia",
         TemplateField.AGE to "7",
         TemplateField.TITLE to "Summer",
+        TemplateField.DATE to "Sat 9 March · 6 PM",
+        TemplateField.PLACE to "Mia's house",
     )
 
     fun byId(id: String): VideoTemplate? = all.firstOrNull { it.id == id }
@@ -497,8 +626,9 @@ object Templates {
     /** Shown on the home screen: a mix of video and collage templates. */
     val featured: List<VideoTemplate> by lazy {
         listOf(
-            "birthday_bash", "birthday_collage", "party_polaroids", "anniversary_collage", "love_polaroids",
-            "kids_party", "birthday_sparkle", "love_story", "getaway", "friends_forever", "quick_reel", "family_album",
+            "taped_birthday", "ransom_birthday", "gold_invite", "circle_birthday", "booth_birthday",
+            "birthday_collage", "scrapbook_birthday", "bunting_party", "party_polaroids", "anniversary_collage",
+            "birthday_bash", "love_polaroids", "kids_party", "getaway", "friends_forever", "quick_reel",
         ).mapNotNull { byId(it) }
     }
 

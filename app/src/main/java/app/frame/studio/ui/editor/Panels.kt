@@ -2,6 +2,8 @@
 
 package app.frame.studio.ui.editor
 
+import androidx.compose.material.icons.filled.WorkspacePremium
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -218,10 +220,22 @@ fun FadePanel(fadeInMs: Long, fadeOutMs: Long, durationMs: Long, onFadeIn: (Long
 }
 
 @Composable
-fun FiltersPanel(app: FrameApp, clip: VideoClip, onFilter: (String) -> Unit, onIntensity: (Float) -> Unit) {
+fun FiltersPanel(
+    app: FrameApp,
+    clip: VideoClip,
+    isPro: Boolean,
+    onFilter: (String) -> Unit,
+    onIntensity: (Float) -> Unit,
+    onBrowse: () -> Unit,
+) {
     var group by remember(clip.id) { mutableStateOf(Filters.byId(clip.filterId).group) }
     Column {
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            androidx.compose.material3.AssistChip(
+                onClick = onBrowse,
+                label = { Text("All ${Filters.all.size - 1}") },
+                leadingIcon = { Icon(Icons.Filled.GridView, contentDescription = null, modifier = Modifier.size(18.dp)) },
+            )
             FilterGroup.entries.forEach { g ->
                 FilterChip(selected = group == g, onClick = { group = g }, label = { Text(g.label) })
             }
@@ -258,6 +272,15 @@ fun FiltersPanel(app: FrameApp, clip: VideoClip, onFilter: (String) -> Unit, onI
                                     1f to Color.Black.copy(alpha = filter.vignette * 0.8f),
                                 ),
                             ),
+                        )
+                    }
+                    if (filter.pro && !isPro) {
+                        Icon(
+                            Icons.Filled.WorkspacePremium,
+                            contentDescription = "Pro",
+                            tint = Color(0xFFFFC94D),
+                            modifier = Modifier.align(Alignment.BottomEnd).padding(3.dp).size(16.dp)
+                                .clip(RoundedCornerShape(8.dp)).background(Color.Black.copy(alpha = 0.55f)).padding(2.dp),
                         )
                     }
                     }

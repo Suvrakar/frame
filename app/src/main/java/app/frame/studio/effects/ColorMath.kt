@@ -141,7 +141,10 @@ data class FilterPreset(
     val vignette: Float = 0f,
     /** 0..1 film grain baked into the look. */
     val grain: Float = 0f,
-)
+) {
+    /** Part of Frame Pro. */
+    val pro: Boolean get() = Filters.isPro(id)
+}
 
 /**
  * Everything the tone shader applies to a clip: tone-dependent grading (highlights, shadows,
@@ -337,6 +340,19 @@ object Filters {
     }
 
     fun textureFor(filterId: String, intensity: Float, adjust: ColorAdjust): TextureLook = gradeFor(filterId, intensity, adjust)
+
+    /** Premium looks; the rest of the library stays free. */
+    private val PRO_IDS = setOf(
+        "golden_hour", "lagoon", "city_night", "lavender", "honey",
+        "seventies", "old_reel", "daydream", "postcard",
+        "noir_blue", "desert", "arctic", "neon_nights", "velvet",
+        "platinum", "selenium", "low_key",
+        "porcelain", "bronze", "glow_up",
+        "bloom", "bakery",
+        "vhs", "grunge", "pinhole",
+    )
+
+    fun isPro(id: String): Boolean = id in PRO_IDS
 
     fun inGroup(group: FilterGroup): List<FilterPreset> =
         all.filter { it.group == group || it.id == "none" }

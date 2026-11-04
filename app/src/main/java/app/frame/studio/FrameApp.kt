@@ -11,6 +11,7 @@ import app.frame.studio.export.ExportManager
 import app.frame.studio.pro.ProStore
 import app.frame.studio.magic.MagicMovieBuilder
 import app.frame.studio.templates.TemplateBuilder
+import app.frame.studio.templates.TemplatePreviews
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,6 +37,7 @@ class FrameApp : Application() {
         private set
     lateinit var magicMovie: MagicMovieBuilder
         private set
+    val templatePreviews: TemplatePreviews by lazy { TemplatePreviews(this, device.isLowEnd) }
 
     /** Outlives screens; used for last-moment saves when an editor closes. */
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)

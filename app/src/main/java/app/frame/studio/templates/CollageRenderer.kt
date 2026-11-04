@@ -71,6 +71,14 @@ object CollageRenderer {
         CardRenderer.drawBackground(canvas, template, w, h)
         val onColor = Templates.onColor(template).toInt()
         val dark = onColor != 0xFFFFFFFF.toInt()
+        if (style.ownTitle) {
+            val filter = Filters.transformFor(template.filterId, 1f, ColorAdjust())
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG).apply {
+                if (!filter.isIdentity) colorFilter = ColorMatrixColorFilter(ColorMatrix(filter.toAndroid()))
+            }
+            FrameRenderer.draw(canvas, template, style, photos, visible, title, subtitle, labels, w, h, paint)
+            return
+        }
         drawHeader(canvas, title, subtitle, onColor, dark, w, h)
 
         val cells = CollageLayout.cells(style, w, h)
@@ -204,7 +212,7 @@ object CollageRenderer {
     }
 
     /** Center-crops [bitmap] into [dst] with rounded corners. */
-    private fun drawCropped(canvas: Canvas, bitmap: Bitmap, dst: RectF, radius: Float, paint: Paint) {
+    internal fun drawCropped(canvas: Canvas, bitmap: Bitmap, dst: RectF, radius: Float, paint: Paint) {
         val scale = maxOf(dst.width() / bitmap.width, dst.height() / bitmap.height)
         val matrix = Matrix().apply {
             postScale(scale, scale)

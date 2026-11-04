@@ -2,6 +2,7 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.effects.Filters
 import app.frame.studio.domain.CaptionStyle
 import app.frame.studio.pro.ProFeature
 import app.frame.studio.ui.pro.rememberProGate
@@ -828,7 +829,18 @@ private fun ActivePanel(
                 clip != null -> FadePanel(clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs(), { vm.setVideoFadeIn(clip.id, it) }, { vm.setVideoFadeOut(clip.id, it) })
                 audio != null -> FadePanel(audio.fadeInMs, audio.fadeOutMs, audio.outputDurationMs(), { vm.setAudioFadeIn(audio.id, it) }, { vm.setAudioFadeOut(audio.id, it) })
             }
-            Tool.FILTERS -> clip?.let { c -> FiltersPanel(app, c, { vm.setFilter(c.id, it) }, { vm.setFilterIntensity(c.id, it) }) }
+            Tool.FILTERS -> clip?.let { c ->
+                val isPro by app.pro.isPro.collectAsStateWithLifecycle()
+                var browsing by remember { mutableStateOf(false) }
+                // Premium looks open the Pro sheet; an ad unlocks them for the rest of this session.
+                val pick: (String) -> Unit = { id ->
+                    if (Filters.isPro(id)) proGate.require(ProFeature.PREMIUM_FILTERS) { vm.setFilter(c.id, id) } else vm.setFilter(c.id, id)
+                }
+                FiltersPanel(app, c, isPro, pick, { vm.setFilterIntensity(c.id, it) }, onBrowse = { browsing = true })
+                if (browsing) {
+                    FilterBrowser(app, c, pick, { vm.setFilterIntensity(c.id, it) }, onClose = { browsing = false })
+                }
+            }
             Tool.ADJUST -> clip?.let { c -> AdjustPanel(c.adjust) { vm.setAdjust(c.id, it) } }
             Tool.CROP -> clip?.let { c -> CropPanel(c) { vm.setCrop(c.id, it) } }
             Tool.TRANSITION -> clip?.let { c ->

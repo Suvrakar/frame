@@ -14,7 +14,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 
-private val SHOWCASE = setOf("birthday_collage", "party_polaroids", "birthday_filmstrip", "anniversary_collage", "our_years")
+private val SHOWCASE = setOf(
+    "birthday_collage", "party_polaroids", "taped_birthday", "circle_birthday", "ransom_birthday", "night_ransom",
+    "gold_invite", "bunting_party", "scrapbook_birthday", "booth_birthday",
+)
 
 /** Builds every collage template on a real device from sample media and checks the frames. */
 @RunWith(AndroidJUnit4::class)
@@ -34,7 +37,10 @@ class CollageTemplateTest {
     fun everyCollageTemplateBuilds() = runBlocking {
         val photo = sample("sample.png")
         val video = sample("sample.mp4")
-        val values = mapOf(TemplateField.NAME to "Mia", TemplateField.AGE to "7", TemplateField.TITLE to "10")
+        val values = mapOf(
+            TemplateField.NAME to "Mia", TemplateField.AGE to "7", TemplateField.TITLE to "10",
+            TemplateField.DATE to "Sat 9 March · 6 PM", TemplateField.PLACE to "Mia's house",
+        )
         Templates.inCategory(TemplateCategory.COLLAGE).forEach { template ->
             val media = List(template.slots) { i -> if (i % 3 == 2) video else photo }
             val project = app.templateBuilder.create(template, values, media)

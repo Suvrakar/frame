@@ -23,7 +23,18 @@ class SettingsStore(context: Context) {
         prefs.edit().putString(KEY_THEME, mode.name).apply()
     }
 
+    private val _favoriteFilters = MutableStateFlow(prefs.getStringSet(KEY_FAV_FILTERS, emptySet()).orEmpty().toSet())
+    /** Filter ids the user starred in the filter browser. */
+    val favoriteFilters: StateFlow<Set<String>> = _favoriteFilters.asStateFlow()
+
+    fun toggleFavoriteFilter(id: String) {
+        val next = _favoriteFilters.value.let { if (id in it) it - id else it + id }
+        _favoriteFilters.value = next
+        prefs.edit().putStringSet(KEY_FAV_FILTERS, next).apply()
+    }
+
     companion object {
         private const val KEY_THEME = "theme_mode"
+        private const val KEY_FAV_FILTERS = "favorite_filters"
     }
 }
