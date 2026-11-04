@@ -230,6 +230,18 @@ class ScreenshotTour {
             }
         }
 
+        // Scene effects.
+        if (openProject(collageName)) {
+            if (tap("Effects")) {
+                Thread.sleep(600)
+                shot("18_effects_panel")
+                if (tap("Snow")) {
+                    Thread.sleep(2_500)
+                    shot("19_effect_snow")
+                }
+            }
+        }
+
         // Settings and dark mode.
         restartHome()
         if (tap("Settings")) {

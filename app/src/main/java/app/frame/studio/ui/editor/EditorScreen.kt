@@ -50,6 +50,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -373,6 +374,7 @@ private fun EditorContent(
                 onImageDuration = vm::setImageDuration,
                 onPlaceAudio = vm::placeAudio,
                 onTextRange = vm::setTextRange,
+                onEffectRange = vm::setEffectRange,
                 onTransition = { id ->
                     vm.select(Selection.Video(id))
                     tool = Tool.TRANSITION
@@ -504,7 +506,7 @@ private fun TimeLabel(controller: PreviewController, modifier: Modifier) {
 
 private fun timelineHeight(project: Project) = run {
     val audioLanes = app.frame.studio.timeline.AudioLayout.lanes(project.audioClips).values.maxOrNull()?.plus(1) ?: 0
-    val textLanes = if (project.textOverlays.isEmpty()) 0 else 1
+    val textLanes = (if (project.textOverlays.isEmpty()) 0 else 1) + (if (project.effects.isEmpty()) 0 else 1)
     (22 + 56 + 12 + (audioLanes + textLanes).coerceAtMost(3) * 36 + 8).dp
 }
 
@@ -706,6 +708,7 @@ private fun Toolbar(
             ToolbarItem(Icons.Filled.ContentCut, "Edit", enabled = hasClips) { vm.selectClipAtPlayhead() }
             ToolbarItem(Icons.Filled.MusicNote, "Audio", enabled = hasClips) { onTool(Tool.AUDIO) }
             ToolbarItem(Icons.Filled.TextFields, "Text", enabled = hasClips) { onAddText() }
+            ToolbarItem(Icons.Filled.AcUnit, "Effects", enabled = hasClips) { onTool(Tool.EFFECTS) }
             ToolbarItem(Icons.Filled.EmojiEmotions, "Stickers", enabled = hasClips) { onTool(Tool.STICKERS) }
             ToolbarItem(Icons.Filled.AutoAwesome, "Filters", enabled = hasClips) {
                 if (vm.selectClipAtPlayhead() != null) onTool(Tool.FILTERS)
@@ -749,6 +752,12 @@ private fun Toolbar(
             ToolbarItem(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateAudio(selection.id) }
             ToolbarItem(Icons.Filled.Delete, "Delete") { vm.deleteAudio(selection.id) }
         }
+        is Selection.Effect -> ToolbarRow(onBack = { vm.select(Selection.None) }) {
+            ToolbarItem(Icons.Filled.AcUnit, "Edit") { onTool(Tool.EFFECT_EDIT) }
+            ToolbarItem(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
+            ToolbarItem(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateEffect(selection.id) }
+            ToolbarItem(Icons.Filled.Delete, "Delete") { vm.deleteEffect(selection.id) }
+        }
         is Selection.Text -> ToolbarRow(onBack = { vm.select(Selection.None) }) {
             ToolbarItem(Icons.Filled.Edit, "Edit") { onTool(Tool.TEXT_EDIT) }
             ToolbarItem(Icons.Filled.Palette, "Style") { onTool(Tool.TEXT_STYLE) }
@@ -776,6 +785,7 @@ private fun ActivePanel(
     val clip = (selection as? Selection.Video)?.let { s -> project.videoClips.firstOrNull { it.id == s.id } }
     val audio = (selection as? Selection.Audio)?.let { s -> project.audioClips.firstOrNull { it.id == s.id } }
     val text = (selection as? Selection.Text)?.let { s -> project.textOverlays.firstOrNull { it.id == s.id } }
+    val effect = (selection as? Selection.Effect)?.let { s -> project.effects.firstOrNull { it.id == s.id } }
 
     val action: (@Composable () -> Unit)? = when {
         clip != null && (tool == Tool.FILTERS || tool == Tool.ADJUST) -> {
@@ -814,6 +824,13 @@ private fun ActivePanel(
             Tool.STICKERS -> StickersPanel { vm.addText(it, sticker = true) }
             Tool.TEXT_EDIT -> text?.let { o -> TextEditPanel(o) { vm.setText(o.id, it) } }
             Tool.TEXT_STYLE -> text?.let { o -> TextStylePanel(o) { transform -> vm.styleText(o.id, transform) } }
+            Tool.EFFECTS -> EffectsPanel(current = null) { type ->
+                vm.addEffect(type)
+                onClose()
+            }
+            Tool.EFFECT_EDIT -> effect?.let { e ->
+                EffectEditPanel(e, { vm.setEffectType(e.id, it) }, { vm.setEffectIntensity(e.id, it) })
+            }
         }
     }
 }

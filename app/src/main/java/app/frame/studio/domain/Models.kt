@@ -182,6 +182,37 @@ data class TextOverlay(
 )
 
 @Serializable
+enum class EffectGroup(val label: String) { WEATHER("Weather"), PARTY("Party"), FILM("Film"), MOTION("Motion") }
+
+/** Animated, procedurally drawn scene effects (rendered by a GPU shader, no assets). */
+@Serializable
+enum class SceneEffectType(val label: String, val emoji: String, val group: EffectGroup) {
+    RAIN("Rain", "🌧️", EffectGroup.WEATHER),
+    SNOW("Snow", "❄️", EffectGroup.WEATHER),
+    FOG("Fog", "🌫️", EffectGroup.WEATHER),
+    CONFETTI("Confetti", "🎊", EffectGroup.PARTY),
+    SPARKLE("Sparkle", "✨", EffectGroup.PARTY),
+    HEARTS("Hearts", "💗", EffectGroup.PARTY),
+    BOKEH("Bokeh", "🔆", EffectGroup.PARTY),
+    LIGHT_LEAK("Light leak", "🌅", EffectGroup.FILM),
+    OLD_FILM("Old film", "🎞️", EffectGroup.FILM),
+    GLITCH("Glitch", "📺", EffectGroup.FILM),
+    SHAKE("Shake", "📳", EffectGroup.MOTION),
+    PULSE("Beat pulse", "💓", EffectGroup.MOTION),
+}
+
+/** A scene effect placed on the timeline. */
+@Serializable
+data class SceneEffect(
+    val id: String,
+    val type: SceneEffectType,
+    val startMs: Long,
+    val endMs: Long,
+    /** 0..1 */
+    val intensity: Float = 0.8f,
+)
+
+@Serializable
 data class Project(
     val id: String,
     val name: String,
@@ -196,6 +227,7 @@ data class Project(
     val aspect: CanvasAspect = CanvasAspect.ORIGINAL,
     val exportFps: Int = 30,
     val exportQuality: ExportQuality = ExportQuality.HIGH,
+    val effects: List<SceneEffect> = emptyList(),
 )
 
 @Serializable

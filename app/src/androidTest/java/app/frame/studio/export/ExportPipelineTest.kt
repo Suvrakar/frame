@@ -81,6 +81,11 @@ class ExportPipelineTest {
                 TextOverlay(id = "s", text = "🔥", startMs = 1_000, endMs = 4_000, isSticker = true, background = false),
             ),
             exportFps = 24,
+            effects = listOf(
+                app.frame.studio.domain.SceneEffect("fx1", app.frame.studio.domain.SceneEffectType.RAIN, 0, 2_000),
+                app.frame.studio.domain.SceneEffect("fx2", app.frame.studio.domain.SceneEffectType.HEARTS, 1_500, 4_000),
+                app.frame.studio.domain.SceneEffect("fx3", app.frame.studio.domain.SceneEffectType.GLITCH, 3_000, 5_500),
+            ),
             crossfadeMs = 400,
             exportHeight = ExportHeight.HD_720,
         )
@@ -138,6 +143,7 @@ class ExportPipelineTest {
             audioClips = listOf(AudioClip(id = "m", sourceUri = android.net.Uri.fromFile(music).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, startMs = 500)),
             textOverlays = listOf(TextOverlay(id = "t", text = "Preview", startMs = 0, endMs = 1_000)),
             aspect = app.frame.studio.domain.CanvasAspect.R9_16,
+            effects = listOf(app.frame.studio.domain.SceneEffect("fx", app.frame.studio.domain.SceneEffectType.SNOW, 0, 3_000)),
         )
         val ready = CountDownLatch(1)
         var playerError: androidx.media3.common.PlaybackException? = null
@@ -172,5 +178,40 @@ class ExportPipelineTest {
         read.await(10, TimeUnit.SECONDS)
         assertNull("preview failed: ${errorDuringPlayback?.errorCodeName}", errorDuringPlayback)
         assertTrue("preview did not advance (${position.get()} ms)", position.get() > 300)
+    }
+
+    @Test
+    fun everySceneEffectRenders() {
+        val video = sample("sample.mp4")
+        val types = app.frame.studio.domain.SceneEffectType.entries
+        val project = Project(
+            id = "fx",
+            name = "Effects",
+            createdAtEpochMs = 0,
+            videoClips = listOf(
+                VideoClip(id = "a", sourceUri = android.net.Uri.fromFile(video).toString(), sourceDurationMs = 4_000, trimEndMs = 3_600, width = 1280, height = 720),
+            ),
+            exportHeight = ExportHeight.SD_480,
+            // Each effect gets its own 300 ms slot, so every shader compiles and draws.
+            effects = types.mapIndexed { i, t -> app.frame.studio.domain.SceneEffect("e$i", t, i * 300L, i * 300L + 300) },
+        )
+        val output = File(context.cacheDir, "fx.mp4").apply { delete() }
+        val done = CountDownLatch(1)
+        var error: ExportException? = null
+        Handler(Looper.getMainLooper()).post {
+            Transformer.Builder(context)
+                .addListener(object : Transformer.Listener {
+                    override fun onCompleted(composition: Composition, exportResult: ExportResult) = done.countDown()
+                    override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
+                        error = exportException
+                        done.countDown()
+                    }
+                })
+                .build()
+                .start(CompositionFactory.build(project), output.absolutePath)
+        }
+        assertTrue("effects export timed out", done.await(5, TimeUnit.MINUTES))
+        assertNull("effects export failed: ${error?.errorCodeName} ${error?.cause}", error)
+        assertTrue(output.length() > 5_000)
     }
 }

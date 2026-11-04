@@ -23,6 +23,13 @@ Exports never carry a watermark.
   Portrait, Nature & food, Vintage, Lo-fi & grain, Cinematic, Black & white) with intensity,
   vignette and film grain (a custom GPU effect), brightness / contrast /
   saturation / warmth / vignette / grain, fade or flash transitions, "apply to all".
+- **Color grading** – exposure, brightness, contrast, highlights, shadows, saturation, vibrance,
+  temperature, tint, fade, vignette, grain and split toning (shadow/highlight hues), with a
+  press-and-hold Before compare. Linear controls fold into the clip's colour matrix; the rest run
+  in one GPU pass (`GradeEffect`).
+- **Scene effects** – 12 procedural GPU effects on their own timeline lane: Rain, Snow, Fog,
+  Confetti, Sparkle, Hearts, Bokeh, Light leak, Old film, Glitch, Shake and Beat pulse, each with
+  strength and soft fade in/out. No assets: everything is drawn by shaders (`SceneShaderEffect`).
 - **Audio** – music, sound effects and recorded voiceovers on overlapping lanes with volume,
   fades, split, move and trim.
 - **Text & stickers** – colours, size, bold, background, fade animation, text style presets,

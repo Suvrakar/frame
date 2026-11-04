@@ -9,7 +9,10 @@ import app.frame.studio.domain.AudioKind
 import app.frame.studio.domain.CanvasAspect
 import app.frame.studio.domain.ColorAdjust
 import app.frame.studio.domain.Project
+import app.frame.studio.domain.SceneEffect
+import app.frame.studio.domain.SceneEffectType
 import app.frame.studio.domain.TextOverlay
+import app.frame.studio.effects.SceneEffects
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.export.SocialPreset
@@ -36,6 +39,7 @@ sealed interface Selection {
     data class Video(val id: String) : Selection
     data class Audio(val id: String) : Selection
     data class Text(val id: String) : Selection
+    data class Effect(val id: String) : Selection
 }
 
 class EditorViewModel(private val app: FrameApp, private val projectId: String) : ViewModel() {
@@ -158,6 +162,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                 is Selection.Video -> p.videoClips.any { it.id == sel.id }
                 is Selection.Audio -> p.audioClips.any { it.id == sel.id }
                 is Selection.Text -> p.textOverlays.any { it.id == sel.id }
+                is Selection.Effect -> p.effects.any { it.id == sel.id }
                 Selection.None -> true
             }
             if (!exists) _selection.value = Selection.None
@@ -443,6 +448,18 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                 }
                 _selection.value = Selection.Audio(right.id)
             }
+            is Selection.Effect -> {
+                val effect = p.effects.firstOrNull { it.id == sel.id } ?: return
+                if (playhead - effect.startMs < 100 || effect.endMs - playhead < 100) {
+                    messageChannel.trySend("Move the playhead over the selected effect to split it")
+                    return
+                }
+                val right = effect.copy(id = newId(), startMs = playhead)
+                edit { cur ->
+                    cur.copy(effects = cur.effects.flatMap { if (it.id == effect.id) listOf(it.copy(endMs = playhead), right) else listOf(it) })
+                }
+                _selection.value = Selection.Effect(right.id)
+            }
             is Selection.Text -> {
                 val overlay = p.textOverlays.firstOrNull { it.id == sel.id } ?: return
                 if (playhead - overlay.startMs < 100 || overlay.endMs - playhead < 100) {
@@ -548,6 +565,35 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
 
     fun deleteText(id: String) = edit { p -> p.copy(textOverlays = p.textOverlays.filter { it.id != id }) }
 
+    // ---- Scene effects -----------------------------------------------------------------
+
+    fun addEffect(type: SceneEffectType) {
+        val (start, end) = SceneEffects.placement(_playheadMs.value, totalMs()) ?: return
+        val effect = SceneEffect(id = newId(), type = type, startMs = start, endMs = end)
+        edit { p -> p.copy(effects = p.effects + effect) }
+        _selection.value = Selection.Effect(effect.id)
+    }
+
+    private fun editEffect(id: String, key: String? = null, transform: (SceneEffect) -> SceneEffect) =
+        edit(key?.let { "$it:$id" }) { p -> p.copy(effects = p.effects.map { if (it.id == id) transform(it) else it }) }
+
+    fun setEffectType(id: String, type: SceneEffectType) = editEffect(id) { it.copy(type = type) }
+    fun setEffectIntensity(id: String, value: Float) = editEffect(id, "intensity") { it.copy(intensity = value.coerceIn(0.05f, 1f)) }
+
+    fun setEffectRange(id: String, startMs: Long, endMs: Long) = editEffect(id) {
+        val total = totalMs()
+        val start = startMs.coerceIn(0, (total - 100).coerceAtLeast(0))
+        it.copy(startMs = start, endMs = endMs.coerceIn(start + 100, total.coerceAtLeast(start + 100)))
+    }
+
+    fun duplicateEffect(id: String) = edit { p ->
+        val e = p.effects.firstOrNull { it.id == id } ?: return@edit p
+        val length = e.endMs - e.startMs
+        p.copy(effects = p.effects + e.copy(id = newId(), startMs = e.endMs, endMs = e.endMs + length))
+    }
+
+    fun deleteEffect(id: String) = edit { p -> p.copy(effects = p.effects.filter { it.id != id }) }
+
     // ---- Project -----------------------------------------------------------------------
 
     fun setAspect(aspect: CanvasAspect) = edit { it.copy(aspect = aspect) }
@@ -560,6 +606,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             is Selection.Video -> deleteVideo(sel.id)
             is Selection.Audio -> deleteAudio(sel.id)
             is Selection.Text -> deleteText(sel.id)
+            is Selection.Effect -> deleteEffect(sel.id)
             Selection.None -> Unit
         }
     }

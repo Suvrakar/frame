@@ -221,15 +221,20 @@ class PerfStressTest {
         }
         Thread.sleep(800)
         reportGfx("home", device.executeShellCommand("dumpsys gfxinfo $pkg"))
+        // Open the project; verify the editor actually appeared and retry if a tap was lost mid-scroll.
         var opened = false
-        repeat(4) {
-            if (!opened) {
-                device.wait(Until.findObject(By.text("Stress test")), 2_500)?.let { it.click(); opened = true }
-                    ?: device.swipe(device.displayWidth / 2, device.displayHeight * 3 / 4, device.displayWidth / 2, device.displayHeight / 4, 20)
+        repeat(6) {
+            if (opened) return@repeat
+            val card = device.wait(Until.findObject(By.text("Stress test")), 2_500)
+            if (card == null) {
+                device.swipe(device.displayWidth / 2, device.displayHeight * 2 / 3, device.displayWidth / 2, device.displayHeight / 3, 25)
+            } else {
+                device.waitForIdle()
+                runCatching { card.click() }
+                opened = device.wait(Until.hasObject(By.text("Export")), 8_000) == true
             }
         }
         assertTrue("could not open the project", opened)
-        device.wait(Until.hasObject(By.text("Export")), 15_000)
         Thread.sleep(3_000)
         device.executeShellCommand("dumpsys gfxinfo $pkg reset")
         device.wait(Until.findObject(By.desc("Play")), 5_000)?.click()
@@ -247,7 +252,7 @@ class PerfStressTest {
             ?.trim()?.split(Regex("\\s+"))?.firstNotNullOfOrNull { it.toIntOrNull() }
         report("ui.totalPssMb", (totalPssKb ?: 0) / 1024)
         // The app must still be alive and responsive after the stress run.
-        assertTrue(device.wait(Until.hasObject(By.text("Export")), 5_000))
-        assertEquals(true, totalPssKb == null || totalPssKb / 1024 < 450)
+        assertTrue("editor no longer responsive", device.wait(Until.hasObject(By.text("Export")), 5_000))
+        assertTrue("memory too high: ${totalPssKb?.div(1024)} MB", totalPssKb == null || totalPssKb / 1024 < 450)
     }
 }

@@ -60,6 +60,9 @@ import androidx.compose.ui.unit.sp
 import app.frame.studio.FrameApp
 import app.frame.studio.domain.CanvasAspect
 import app.frame.studio.domain.ColorAdjust
+import app.frame.studio.domain.EffectGroup
+import app.frame.studio.domain.SceneEffect
+import app.frame.studio.domain.SceneEffectType
 import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
@@ -92,6 +95,8 @@ enum class Tool(val title: String) {
     STICKERS("Stickers"),
     TEXT_EDIT("Edit text"),
     TEXT_STYLE("Text style"),
+    EFFECTS("Effects"),
+    EFFECT_EDIT("Effect"),
 }
 
 @Composable
@@ -384,6 +389,69 @@ private fun SplitToneRow(label: String, hue: Float, amount: Float, onHue: (Float
             )
         }
         Slider(value = amount, onValueChange = { onAmount((it * 100).roundToInt() / 100f) }, valueRange = 0f..1f)
+    }
+}
+
+private fun effectColors(group: EffectGroup): List<Color> = when (group) {
+    EffectGroup.WEATHER -> listOf(Color(0xFF3A6EA5), Color(0xFF8FB8DE))
+    EffectGroup.PARTY -> listOf(Color(0xFFE0518C), Color(0xFFF6A84B))
+    EffectGroup.FILM -> listOf(Color(0xFF6B4A2B), Color(0xFFE0A15A))
+    EffectGroup.MOTION -> listOf(Color(0xFF5B63F0), Color(0xFF9B6BFF))
+}
+
+@Composable
+private fun EffectTile(type: SceneEffectType, selected: Boolean, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(70.dp).clickable(onClick = onClick)) {
+        Box(
+            Modifier
+                .size(62.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(androidx.compose.ui.graphics.Brush.linearGradient(effectColors(type.group)))
+                .then(if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp)) else Modifier),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(type.emoji, fontSize = 26.sp)
+        }
+        Text(
+            type.label,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+    }
+}
+
+/** Browse and add scene effects; the new effect starts at the playhead. */
+@Composable
+fun EffectsPanel(current: SceneEffectType?, onPick: (SceneEffectType) -> Unit) {
+    var group by remember { mutableStateOf(current?.group ?: EffectGroup.WEATHER) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            EffectGroup.entries.forEach { g ->
+                FilterChip(selected = group == g, onClick = { group = g }, label = { Text(g.label) })
+            }
+        }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(SceneEffectType.entries.filter { it.group == group }) { type ->
+                EffectTile(type, selected = type == current) { onPick(type) }
+            }
+        }
+        if (current == null) {
+            Text(
+                "Effects start at the playhead. Drag the amber bar on the timeline to move or trim them.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+fun EffectEditPanel(effect: SceneEffect, onType: (SceneEffectType) -> Unit, onIntensity: (Float) -> Unit) {
+    Column {
+        ValueSlider("Strength", "${(effect.intensity * 100).roundToInt()}", effect.intensity, 0.05f..1f, onIntensity)
+        EffectsPanel(current = effect.type, onPick = onType)
     }
 }
 

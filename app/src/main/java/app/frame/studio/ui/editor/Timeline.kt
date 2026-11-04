@@ -69,6 +69,7 @@ import app.frame.studio.FrameApp
 import app.frame.studio.domain.AudioClip
 import app.frame.studio.domain.AudioKind
 import app.frame.studio.domain.Project
+import app.frame.studio.domain.SceneEffect
 import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
@@ -108,6 +109,7 @@ fun Timeline(
     onImageDuration: (id: String, ms: Long) -> Unit,
     onPlaceAudio: (id: String, startMs: Long, trimStartMs: Long, trimEndMs: Long) -> Unit,
     onTextRange: (id: String, startMs: Long, endMs: Long) -> Unit,
+    onEffectRange: (id: String, startMs: Long, endMs: Long) -> Unit,
     onTransition: (clipId: String) -> Unit,
     onAddMedia: () -> Unit,
     modifier: Modifier = Modifier,
@@ -175,6 +177,12 @@ fun Timeline(
     val audioLaneCount = (audioLanes.values.maxOrNull() ?: -1) + 1
     val textLanes = remember(texts) { textLanes(texts) }
     val textLaneCount = (textLanes.values.maxOrNull() ?: -1) + 1
+    val effects = project.effects.map { e ->
+        val d = drag
+        if (d != null && d.id == e.id) previewEffect(e, d) else e
+    }
+    val effectLanes = remember(effects) { rangeLanes(effects.map { Triple(it.id, it.startMs, it.endMs) }) }
+    val effectLaneCount = (effectLanes.values.maxOrNull() ?: -1) + 1
 
     BoxWithConstraints(
         modifier
@@ -327,6 +335,39 @@ fun Timeline(
                             }
                         }
                     }
+
+                    // ---- Effect lanes ----
+                    for (lane in 0 until if (compact) 0 else effectLaneCount) {
+                        Box(Modifier.padding(top = LANE_GAP).width(contentWidth).height(LANE_HEIGHT)) {
+                            effects.filter { effectLanes[it.id] == lane }.forEach { e ->
+                                val selected = selection is Selection.Effect && selection.id == e.id
+                                LaneItem(
+                                    label = "${e.type.emoji} ${e.type.label}",
+                                    icon = null,
+                                    color = TrackColors.effect,
+                                    width = dp((e.endMs - e.startMs).toFloat()),
+                                    selected = selected,
+                                    dimmedAfter = null,
+                                    modifier = Modifier.offset(x = half + dp(e.startMs.toFloat())),
+                                    onClick = { onSelect(if (selected) Selection.None else Selection.Effect(e.id)) },
+                                    onDragStart = { controller.pause() },
+                                    onDrag = { edge, deltaPx ->
+                                        val current = drag?.takeIf { it.id == e.id && it.edge == edge }
+                                        drag = TrimDrag(e.id, edge, (current?.deltaMs ?: 0f) + deltaPx / pxPerMs)
+                                    },
+                                    onDragEnd = {
+                                        val d = drag
+                                        if (d != null) {
+                                            val original = project.effects.first { it.id == e.id }
+                                            val r = previewEffect(original, d)
+                                            onEffectRange(e.id, r.startMs, r.endMs)
+                                        }
+                                        drag = null
+                                    },
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -409,6 +450,35 @@ private fun previewText(o: TextOverlay, d: TrimDrag): TextOverlay {
         Edge.START -> o.copy(startMs = (o.startMs + delta).coerceIn(0, o.endMs - 100))
         Edge.END -> o.copy(endMs = (o.endMs + delta).coerceAtLeast(o.startMs + 100))
     }
+}
+
+private fun previewEffect(e: SceneEffect, d: TrimDrag): SceneEffect {
+    val delta = d.deltaMs.toLong()
+    return when (d.edge) {
+        Edge.BODY -> {
+            val length = e.endMs - e.startMs
+            val start = (e.startMs + delta).coerceAtLeast(0)
+            e.copy(startMs = start, endMs = start + length)
+        }
+        Edge.START -> e.copy(startMs = (e.startMs + delta).coerceIn(0, e.endMs - 100))
+        Edge.END -> e.copy(endMs = (e.endMs + delta).coerceAtLeast(e.startMs + 100))
+    }
+}
+
+/** Greedy lane assignment for (id, start, end) ranges. */
+private fun rangeLanes(items: List<Triple<String, Long, Long>>): Map<String, Int> {
+    val laneEnds = mutableListOf<Long>()
+    val result = mutableMapOf<String, Int>()
+    items.sortedBy { it.second }.forEach { (id, start, end) ->
+        var lane = laneEnds.indexOfFirst { it <= start }
+        if (lane < 0) {
+            lane = laneEnds.size
+            laneEnds += 0L
+        }
+        laneEnds[lane] = end
+        result[id] = lane
+    }
+    return result
 }
 
 private fun textLanes(overlays: List<TextOverlay>): Map<String, Int> {

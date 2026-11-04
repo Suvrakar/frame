@@ -35,6 +35,8 @@ import app.frame.studio.domain.Project
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.effects.Filters
 import app.frame.studio.effects.GradeEffect
+import app.frame.studio.effects.SceneEffects
+import app.frame.studio.effects.SceneShaderEffect
 import app.frame.studio.timeline.AudioLayout
 import app.frame.studio.timeline.TimelineMath
 import com.google.common.collect.ImmutableList
@@ -79,6 +81,8 @@ object CompositionFactory {
         if (windows.any { it.fadeInMs > 0 || it.fadeOutMs > 0 }) {
             compositionVideoEffects += fadeEffect(windows)
         }
+        // Scene effects (rain, snow, confetti…) sit above the picture but below text and stickers.
+        SceneEffects.clamp(project.effects, totalMs).forEach { compositionVideoEffects += SceneShaderEffect(it) }
         val overlays = project.textOverlays
             .filter { it.text.isNotBlank() && it.endMs > it.startMs }
             .map { timedTextOverlay(it, size) }
