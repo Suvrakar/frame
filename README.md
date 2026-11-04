@@ -22,6 +22,10 @@ Exports never carry a watermark.
 - **Text & stickers** – colours, size, bold, background, fade animation, text style presets,
   drag to position on the preview; emoji stickers.
 - **Canvas** – Original, 9:16, 16:9, 1:1, 4:5, 3:4, 4:3, 21:9.
+- **Instagram presets** – one-tap Reel, Story, Feed post (4:5, 1080×1350), Square and Landscape
+  formats (in the Canvas panel and on the export screen) that set the frame shape, resolution,
+  frame rate and quality, with a length warning for Stories (60 s) and Reels (3 min); plus 13
+  Instagram-style colour looks in a "Social looks" filter tab.
 - **Export** – 480p–4K (only resolutions the phone's encoder supports are offered), 24/30/60 fps,
   Standard/High/Best quality with a size estimate, optional copy to `Movies/Frame`, share and
   history. No watermark.
