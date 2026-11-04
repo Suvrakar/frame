@@ -45,6 +45,7 @@ class FrameApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        app.frame.studio.text.TextFonts.init(this)
         device = DeviceProfile(this)
         settings = SettingsStore(this)
         repository = ProjectRepository(this, device.defaultExportHeight)
