@@ -104,6 +104,22 @@ class ScreenshotTour {
         device.waitForIdle()
     }
 
+    private fun restartHome() {
+        context.startActivity(
+            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
+        )
+        device.wait(Until.hasObject(By.text("New project")), 15_000)
+        Thread.sleep(800)
+    }
+
+    private fun openProject(name: String): Boolean {
+        restartHome()
+        if (!tap(name, scrollVertically = true)) return false
+        val opened = device.wait(Until.hasObject(By.text("Export")), 10_000) == true
+        Thread.sleep(2_000)
+        return opened
+    }
+
     /** Closes the open tool panel with its ✓ button. */
     private fun done() {
         device.wait(Until.findObject(By.desc("Done")), 3_000)?.click()
@@ -149,10 +165,8 @@ class ScreenshotTour {
             )
         }
         val collageName = collage.name
-        context.startActivity(
-            Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
-        )
-        device.wait(Until.hasObject(By.text("New project")), 15_000)
+        // Each section starts from a fresh Home so one missed tap can't derail the rest.
+        restartHome()
         shot("1_home")
 
         tap("See all")
@@ -162,87 +176,79 @@ class ScreenshotTour {
             Thread.sleep(1_000)
             shot("1b2_collage_gallery")
         }
-        device.pressBack()
-        device.wait(Until.hasObject(By.text("New project")), 5_000)
+
+        restartHome()
         tap("See all")
         device.wait(Until.hasObject(By.text("Birthday collection")), 5_000)
-        tap("Birthday Bash")
-        device.wait(Until.hasObject(By.textStartsWith("Use template")), 5_000)
-        shot("1c_template_detail")
-        device.pressBack()
-        device.wait(Until.hasObject(By.text("Birthday collection")), 5_000)
-        device.pressBack()
-        device.wait(Until.hasObject(By.text("New project")), 5_000)
-
-        tap("Summer trip", scrollVertically = true)
-        device.wait(Until.hasObject(By.text("Export")), 10_000)
-        Thread.sleep(2_000)
-        shot("2_editor")
-
-        tap("Edit")
-        shot("3_clip_tools")
-        tap("Speed")
-        shot("3b_speed")
-        done()
-
-        tap("Filters")
-        Thread.sleep(1_500)
-        shot("4_filters")
-        tap("Social looks")
-        Thread.sleep(1_500)
-        shot("4b_social_looks")
-        if (tap("Cinematic")) {
-            Thread.sleep(1_500)
-            shot("4c_cinematic")
+        if (tap("Birthday Bash")) {
+            device.wait(Until.hasObject(By.textStartsWith("Use template")), 5_000)
+            shot("1c_template_detail")
         }
-        done()
-        deselect()
 
-        tap("Audio")
-        shot("5_audio")
-        done()
+        if (openProject("Summer trip")) {
+            shot("2_editor")
+            tap("Edit")
+            shot("3_clip_tools")
+            tap("Speed")
+            shot("3b_speed")
+            done()
+            tap("Filters")
+            Thread.sleep(1_500)
+            shot("4_filters")
+            if (tapInRow("Social looks", anchor = "Classic")) {
+                Thread.sleep(1_500)
+                shot("4b_social_looks")
+            }
+            done()
+        }
 
-        tap("Canvas")
-        shot("6_canvas")
-        done()
+        if (openProject("Summer trip")) {
+            tap("Audio")
+            shot("5_audio")
+            done()
+            if (tap("Canvas")) shot("6_canvas")
+        }
 
-        tap("Export")
-        device.wait(Until.hasObject(By.text("Resolution")), 10_000)
-        shot("7_export")
+        if (openProject("Summer trip")) {
+            tap("Export")
+            device.wait(Until.hasObject(By.text("Resolution")), 10_000)
+            shot("7_export")
+            if (tapInRow("YouTube", anchor = "Instagram")) shot("8_export_youtube")
+        }
 
         // Collage project: play past the build-up and capture the finished collage.
-        device.pressBack()
-        device.wait(Until.hasObject(By.text("Export")), 5_000)
-        device.pressBack()
-        device.wait(Until.hasObject(By.text("New project")), 5_000)
-        scrollToTop()
-        if (tap(collageName, scrollVertically = true)) {
-            device.wait(Until.hasObject(By.text("Export")), 10_000)
-            Thread.sleep(2_000)
+        if (openProject(collageName)) {
+            Thread.sleep(1_500)
             device.wait(Until.findObject(By.desc("Play")), 3_000)?.click()
             Thread.sleep(2_600)
             device.wait(Until.findObject(By.desc("Pause")), 2_000)?.click()
             shot("9_collage_editor")
         }
-        if (tap("YouTube")) shot("8_export_youtube")
 
-        // Dark mode: Settings → Dark, then the home screen and an editor.
-        repeat(3) { device.pressBack() }
-        device.wait(Until.hasObject(By.text("New project")), 5_000)
+        // Settings and dark mode.
+        restartHome()
         if (tap("Settings")) {
             shot("10_settings_light")
             tap("Dark")
             Thread.sleep(800)
             shot("11_settings_dark")
-            tap("Home")
-            device.wait(Until.hasObject(By.text("New project")), 5_000)
-            scrollToTop()
-            shot("12_home_dark")
-            if (tap("Summer trip", scrollVertically = true)) {
-                device.wait(Until.hasObject(By.text("Export")), 10_000)
-                Thread.sleep(2_000)
-                shot("13_editor_dark")
-            }
+        }
+        restartHome()
+        shot("12_home_dark")
+        tap("See all")
+        device.wait(Until.hasObject(By.text("Birthday collection")), 5_000)
+        shot("12b_templates_dark")
+        if (openProject("Summer trip")) {
+            shot("13_editor_dark")
+            tap("Edit")
+            tap("Filters")
+            Thread.sleep(1_500)
+            shot("14_filters_dark")
+        }
+        if (openProject("Summer trip")) {
+            tap("Export")
+            device.wait(Until.hasObject(By.text("Resolution")), 10_000)
+            shot("15_export_dark")
         }
     }
 }

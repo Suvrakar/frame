@@ -107,7 +107,7 @@ fun GlassTile(
 ) {
     GlassCard(modifier = modifier, shape = RoundedCornerShape(20.dp), elevation = 6.dp, onClick = onClick) {
         Column(
-            Modifier.fillMaxWidth().padding(vertical = 16.dp, horizontal = 8.dp),
+            Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 2.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
@@ -117,7 +117,14 @@ fun GlassTile(
                 Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))
             }
             Spacer(Modifier.height(10.dp))
-            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
+            Text(
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                softWrap = false,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Visible,
+            )
         }
     }
 }
