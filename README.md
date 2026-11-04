@@ -5,19 +5,32 @@ Exports never carry a watermark.
 
 ## Features
 
-- **Projects** – create, rename, duplicate and delete; autosaved as JSON in app storage.
-- **Video track** – import multiple clips, trim, split at the playhead, reorder, duplicate,
-  delete, speed (0.5×–2×), clip volume, fade in/out, rotate, crop presets (1:1, 4:5, 9:16, 16:9).
-- **Music track** – add audio files, trim, split, reorder, volume, fades. Music is automatically
-  cut to the length of the video.
-- **Text overlays** – timed captions with position control.
-- **Transitions** – "fade between clips" (dip to black, does not change duration).
-- **Preview** – synced video + music playback with a scrubbable, snapping timeline.
+- **Templates** – 18 ready-made templates (6 birthday: Birthday Bash, Golden Birthday, Kids Party,
+  Countdown, Through the Years, Birthday Card; plus anniversary, wedding, graduation, baby, travel,
+  social and seasonal). Type a name/age, pick photos or videos, and Frame builds the video with
+  personalized title cards (rendered on device — no bundled images), captions, stickers, a colour
+  look and transitions. Everything stays editable.
+- **What-you-see-is-what-you-export preview** – the editor plays the same Media3 composition the
+  exporter renders (speed, filters, crop, transitions, text, mixed audio).
+- **Timeline** – ruler, thumbnail filmstrips, drag-to-trim handles, pinch-to-zoom, snapping,
+  free-placed audio and text lanes, transition buttons at every cut.
+- **Clips** – videos and photos; split, trim, reorder, duplicate, speed 0.25×–4×, volume up to
+  200%, fades, rotate, mirror, crop presets, 12 filters with intensity, brightness / contrast /
+  saturation / warmth, fade or flash transitions, "apply to all".
+- **Audio** – music, sound effects and recorded voiceovers on overlapping lanes with volume,
+  fades, split, move and trim.
+- **Text & stickers** – colours, size, bold, background, fade animation, text style presets,
+  drag to position on the preview; emoji stickers.
+- **Canvas** – Original, 9:16, 16:9, 1:1, 4:5, 3:4, 4:3, 21:9.
+- **Export** – 480p–4K (only resolutions the phone's encoder supports are offered), 24/30/60 fps,
+  Standard/High/Best quality with a size estimate, optional copy to `Movies/Frame`, share and
+  history. No watermark.
+- **Built for low-end phones** – `DeviceProfile` detects the device tier and lowers preview
+  resolution, thumbnail cache and decoder parallelism, delays preview rebuilds while sliders move,
+  skips decorative animation, and the editor avoids per-frame recomposition (only the time label
+  and scroll offset follow playback; filmstrips decode only visible frames).
+- **Ads** – anchored adaptive AdMob banner after Google UMP consent; "Privacy choices" in settings.
 - **Undo / redo** for every edit.
-- **Export** – H.264/AAC MP4 at 720p or 1080p (short side), progress + cancel, optional copy to
-  `Movies/Frame`, share and export history.
-- **Ads** – anchored adaptive AdMob banner, shown only after Google UMP consent
-  (GDPR / US state privacy). "Privacy choices" appears in the menu when required.
 
 ## Requirements
 
@@ -67,8 +80,9 @@ add these repository secrets: `FRAME_KEYSTORE_BASE64` (`base64 -w0 release.jks`)
 
 A second job boots an Android 14 emulator, launches the app (`scripts/smoke-test.sh`) and runs
 `ExportPipelineTest`, which renders a project using every editing feature through Media3 and
-checks the output's duration, resolution and audio. Logs from both jobs are mirrored to the
-`ci-results` and `ci-smoke` branches.
+checks the output's duration, resolution and audio, plus `ScreenshotTour`, which captures the main
+screens. Logs and screenshots from both jobs are mirrored to the `ci-results` and `ci-smoke`
+branches.
 
 ## Play Store checklist
 
@@ -97,5 +111,8 @@ app/src/main/java/app/frame/studio
 Notes:
 - Imported media is referenced by URI with a persisted read grant; nothing is copied. If a source
   is deleted, the editor flags it and offers to remove the affected clips.
-- Output resolution follows the first clip's aspect ratio; other clips are letterboxed.
+- The canvas follows the chosen aspect ratio (or the first clip); other shapes are letterboxed.
+- The preview uses Media3's `CompositionPlayer`, which is still library-internal in Media3 1.8.
+  Media3 is pinned to 1.8.0 and `ExportPipelineTest` checks the preview on a device in CI; re-check
+  it when upgrading Media3.
 - Exports run in the foreground; the screen is kept awake while encoding.
