@@ -77,7 +77,7 @@ class ExportPlanTest {
 
     @Test
     fun brightness_fadesClipEdgesAndTransitions() {
-        val windows = ExportPlan.fadeWindows(listOf(video("a", fadeIn = 1_000), video("b")), transitionMs = 1_000)
+        val windows = ExportPlan.fadeWindows(listOf(video("a", fadeIn = 1_000), video("b")), legacyTransitionMs = 1_000)
         assertEquals(0f, ExportPlan.brightnessAt(windows, 0), 0.001f)
         assertEquals(0.5f, ExportPlan.brightnessAt(windows, 500), 0.001f)
         assertEquals(1f, ExportPlan.brightnessAt(windows, 5_000), 0.001f)
@@ -101,5 +101,41 @@ class ExportPlanTest {
         val fitted = ExportPlan.fitAudio(listOf(a, b, a.copy(id = "c")), videoDurationMs = 12_000)
         assertEquals(listOf("a", "b"), fitted.map { it.id })
         assertEquals(4_000, fitted[1].outputDurationMs())
+    }
+}
+
+class ExportPlanV2Test {
+
+    private fun video(id: String, ms: Long = 10_000, transition: app.frame.studio.domain.TransitionType = app.frame.studio.domain.TransitionType.NONE) =
+        VideoClip(id = id, sourceUri = "x", sourceDurationMs = ms, trimEndMs = ms, width = 1920, height = 1080, transition = transition, transitionMs = 1_000)
+
+    @Test
+    fun canvasAspectOverridesClipShape() {
+        assertEquals(ExportPlan.Size(1080, 1920), ExportPlan.outputSize(listOf(video("a")), ExportHeight.HD_1080, app.frame.studio.domain.CanvasAspect.R9_16))
+        assertEquals(ExportPlan.Size(3840, 2160), ExportPlan.outputSize(listOf(video("a")), ExportHeight.UHD_2160))
+    }
+
+    @Test
+    fun flashTransitionFadesToWhite() {
+        val windows = ExportPlan.fadeWindows(listOf(video("a", transition = app.frame.studio.domain.TransitionType.FADE_WHITE), video("b")), 0)
+        val tone = ExportPlan.toneAt(windows, 9_750)
+        assertEquals(0.5f, tone.factor, 0.001f)
+        assertEquals(true, tone.white)
+        assertEquals(1f, ExportPlan.toneAt(windows, 5_000).factor, 0.001f)
+    }
+
+    @Test
+    fun imageDurationIgnoresSpeed() {
+        val image = VideoClip(id = "i", sourceUri = "x", sourceDurationMs = 60_000, trimEndMs = 3_000, speed = 2f, isImage = true)
+        assertEquals(3_000, image.outputDurationMs())
+    }
+
+    @Test
+    fun bitrateScalesWithQuality() {
+        val size = ExportPlan.Size(1920, 1080)
+        val std = ExportPlan.bitrate(size, 30, app.frame.studio.domain.ExportQuality.STANDARD)
+        val best = ExportPlan.bitrate(size, 30, app.frame.studio.domain.ExportQuality.BEST)
+        assertEquals(true, best > std)
+        assertEquals(true, ExportPlan.estimateBytes(10_000, size, 30, app.frame.studio.domain.ExportQuality.HIGH) > 1_000_000)
     }
 }

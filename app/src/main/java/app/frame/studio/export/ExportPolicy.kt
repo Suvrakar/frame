@@ -9,8 +9,5 @@ object ExportPolicy {
 
     fun watermarkOverlay(): Any? = null
 
-    fun outputHeight(height: ExportHeight): Int = when (height) {
-        ExportHeight.HD_720 -> 720
-        ExportHeight.HD_1080 -> 1080
-    }
+    fun outputHeight(height: ExportHeight): Int = height.pixels
 }

@@ -4,6 +4,9 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
@@ -11,6 +14,8 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.util.LruCache
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 
 /** Reads duration, size and thumbnails from user-picked media. */
@@ -25,7 +30,61 @@ class MediaProbe(private val context: Context) {
 
     data class AudioInfo(val durationMs: Long, val displayName: String)
 
-    private val thumbnails = object : LruCache<String, Bitmap>(16 * 1024 * 1024) {
+    data class ImageInfo(val width: Int, val height: Int, val displayName: String)
+
+    fun isImage(uri: Uri): Boolean =
+        context.contentResolver.getType(uri)?.startsWith("image/") == true ||
+            uri.lastPathSegment?.substringAfterLast('.', "")?.lowercase() in setOf("jpg", "jpeg", "png", "webp", "heic", "heif", "gif")
+
+    suspend fun probeImage(uri: Uri): ImageInfo? = withContext(Dispatchers.IO) {
+        runCatching {
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+            if (options.outWidth <= 0 || options.outHeight <= 0) return@runCatching null
+            val rotated = exifRotation(uri) % 180 != 0
+            ImageInfo(
+                width = if (rotated) options.outHeight else options.outWidth,
+                height = if (rotated) options.outWidth else options.outHeight,
+                displayName = displayName(uri),
+            )
+        }.onFailure { Log.w(TAG, "Failed to read image $uri", it) }.getOrNull()
+    }
+
+    private fun exifRotation(uri: Uri): Int = runCatching {
+        context.contentResolver.openInputStream(uri)?.use { stream ->
+            when (ExifInterface(stream).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                ExifInterface.ORIENTATION_ROTATE_90, ExifInterface.ORIENTATION_TRANSPOSE -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270, ExifInterface.ORIENTATION_TRANSVERSE -> 270
+                else -> 0
+            }
+        } ?: 0
+    }.getOrDefault(0)
+
+    /** Thumbnail of a photo, honoring EXIF orientation. */
+    suspend fun imageThumbnail(uri: String, maxSize: Int = 320): Bitmap? {
+        val key = "img:$uri@$maxSize"
+        thumbnails.get(key)?.let { return it }
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                val parsed = Uri.parse(uri)
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                context.contentResolver.openInputStream(parsed)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+                var sample = 1
+                while (bounds.outWidth / (sample * 2) >= maxSize && bounds.outHeight / (sample * 2) >= maxSize) sample *= 2
+                val decoded = context.contentResolver.openInputStream(parsed)?.use {
+                    BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = sample })
+                } ?: return@runCatching null
+                val rotation = exifRotation(parsed)
+                if (rotation == 0) decoded else {
+                    val matrix = Matrix().apply { postRotate(rotation.toFloat()) }
+                    Bitmap.createBitmap(decoded, 0, 0, decoded.width, decoded.height, matrix, true)
+                }
+            }.getOrNull()
+        }?.also { thumbnails.put(key, it) }
+    }
+
+    private val thumbnails = object : LruCache<String, Bitmap>(32 * 1024 * 1024) {
         override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
     }
 
@@ -79,6 +138,13 @@ class MediaProbe(private val context: Context) {
     suspend fun thumbnail(uri: String, atMs: Long, maxSize: Int = 320): Bitmap? {
         val key = "$uri@$atMs@$maxSize"
         thumbnails.get(key)?.let { return it }
+        return frameLimiter.withPermit { thumbnails.get(key) ?: extractFrame(uri, atMs, maxSize) }?.also { thumbnails.put(key, it) }
+    }
+
+    /** Limits concurrent decoders; filmstrips request many frames at once. */
+    private val frameLimiter = Semaphore(3)
+
+    private suspend fun extractFrame(uri: String, atMs: Long, maxSize: Int): Bitmap? {
         return withContext(Dispatchers.IO) {
             withRetriever(Uri.parse(uri)) { r ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -99,7 +165,7 @@ class MediaProbe(private val context: Context) {
                     }
                 }
             }
-        }?.also { thumbnails.put(key, it) }
+        }
     }
 
     private fun displayName(uri: Uri): String = runCatching {

@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Voiceover recording. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <!-- Only needed to save exports to the shared Movies folder on Android 8–9. -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"

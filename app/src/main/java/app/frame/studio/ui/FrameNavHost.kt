@@ -20,11 +20,11 @@ import app.frame.studio.ui.projects.ProjectsScreen
 
 object Routes {
     const val PROJECTS = "projects"
-    const val EDITOR = "editor/{projectId}"
+    const val EDITOR = "editor/{projectId}?import={import}"
     const val EXPORT = "export/{projectId}"
     const val EXPORTS = "exports"
 
-    fun editor(id: String) = "editor/$id"
+    fun editor(id: String, autoImport: Boolean = false) = "editor/$id?import=$autoImport"
     fun export(id: String) = "export/$id"
 }
 
@@ -46,17 +46,25 @@ fun FrameNavHost(app: FrameApp) {
             ProjectsScreen(
                 app = app,
                 onOpenProject = { nav.navigate(Routes.editor(it)) },
+                onNewProject = { nav.navigate(Routes.editor(it, autoImport = true)) },
                 onOpenExports = { nav.navigate(Routes.EXPORTS) },
             )
         }
         composable(
             Routes.EDITOR,
-            arguments = listOf(navArgument("projectId") { type = NavType.StringType }),
+            arguments = listOf(
+                navArgument("projectId") { type = NavType.StringType },
+                navArgument("import") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+            ),
         ) { entry ->
             val id = entry.arguments?.getString("projectId").orEmpty()
             EditorScreen(
                 app = app,
                 projectId = id,
+                autoImport = entry.arguments?.getBoolean("import") ?: false,
                 onBack = { nav.popBackStack() },
                 onExport = { nav.navigate(Routes.export(id)) },
             )

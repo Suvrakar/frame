@@ -2,18 +2,26 @@
 
 package app.frame.studio.ui.editor
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.OptIn as AndroidOptIn
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.ScrollScope
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -21,78 +29,86 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Redo
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.filled.Redo
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.AspectRatio
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.Flip
+import androidx.compose.material.icons.filled.Gradient
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Rotate90DegreesCw
-import androidx.compose.material.icons.outlined.MusicNote
-import androidx.compose.material.icons.outlined.TextFields
-import androidx.compose.material.icons.outlined.VideoLibrary
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RangeSlider
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -104,28 +120,21 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import app.frame.studio.FrameApp
-import app.frame.studio.domain.AudioClip
+import app.frame.studio.data.VoiceRecorder
+import app.frame.studio.domain.AudioKind
+import app.frame.studio.domain.ExportHeight
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.TextOverlay
-import app.frame.studio.domain.VideoClip
 import app.frame.studio.export.ExportPlan
-import app.frame.studio.export.centerCrop
-import app.frame.studio.timeline.TimelineMath
-import app.frame.studio.timeline.TimelineOps
 import app.frame.studio.ui.common.TextInputDialog
-import app.frame.studio.ui.common.VideoThumbnail
 import app.frame.studio.ui.common.formatDuration
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.roundToInt
-
-private const val DP_PER_SECOND = 48f
-private val TRACK_HEIGHT = 52.dp
 
 @Composable
 fun EditorScreen(
     app: FrameApp,
     projectId: String,
+    autoImport: Boolean,
     onBack: () -> Unit,
     onExport: () -> Unit,
 ) {
@@ -148,7 +157,7 @@ fun EditorScreen(
         }
         return
     }
-    EditorContent(app, vm, current, onBack, onExport)
+    EditorContent(app, vm, current, autoImport, onBack, onExport)
 }
 
 @Composable
@@ -156,6 +165,7 @@ private fun EditorContent(
     app: FrameApp,
     vm: EditorViewModel,
     project: Project,
+    autoImport: Boolean,
     onBack: () -> Unit,
     onExport: () -> Unit,
 ) {
@@ -166,10 +176,17 @@ private fun EditorContent(
     val canUndo by vm.canUndo.collectAsStateWithLifecycle()
     val canRedo by vm.canRedo.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
+    var tool by remember { mutableStateOf<Tool?>(null) }
+    var dpPerSecond by rememberSaveable { mutableFloatStateOf(48f) }
 
+    // ---- Preview ----------------------------------------------------------------------------
     val controller = remember { PreviewController(context.applicationContext) }
     DisposableEffect(controller) { onDispose { controller.release() } }
-    LaunchedEffect(project) { controller.setProject(project) }
+    // Rebuild shortly after edits settle so slider drags stay smooth.
+    LaunchedEffect(project) {
+        if (controller.player != null) kotlinx.coroutines.delay(120)
+        controller.setProject(project)
+    }
     LaunchedEffect(controller) {
         while (true) {
             withFrameMillis { }
@@ -191,79 +208,214 @@ private fun EditorContent(
     LaunchedEffect(vm) { vm.messages.collect { snackbar.showSnackbar(it) } }
     LaunchedEffect(controller.error) { controller.error?.let { snackbar.showSnackbar(it) } }
 
-    val pickVideos = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) {
-        vm.addVideos(it)
+    // ---- Pickers ----------------------------------------------------------------------------
+    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) {
+        vm.addMedia(it)
     }
+    fun launchMediaPicker() =
+        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+
+    var pendingAudioKind by remember { mutableStateOf(AudioKind.MUSIC) }
     val pickAudio = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) {
-        vm.addAudio(it)
+        vm.addAudio(it, pendingAudioKind)
+        tool = null
     }
+    var autoImportDone by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(autoImport) {
+        if (autoImport && !autoImportDone && project.videoClips.isEmpty()) {
+            autoImportDone = true
+            launchMediaPicker()
+        }
+    }
+
+    // ---- Voiceover --------------------------------------------------------------------------
+    val recorder = remember { VoiceRecorder(context.applicationContext) }
+    var recording by remember { mutableStateOf(false) }
+    var recordStartMs by remember { mutableLongStateOf(0L) }
+    var recordElapsed by remember { mutableLongStateOf(0L) }
+    fun startRecording() {
+        recordStartMs = controller.positionMs
+        if (recorder.start()) {
+            recording = true
+            controller.setMuted(true)
+            controller.player?.play()
+        } else {
+            android.widget.Toast.makeText(context, "Microphone is unavailable", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+    fun stopRecording() {
+        if (!recording) return
+        recording = false
+        controller.pause()
+        controller.setMuted(false)
+        recorder.stop()?.let { vm.addVoiceover(it, recordStartMs) }
+    }
+    val micPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) startRecording()
+    }
+    LaunchedEffect(recording) {
+        while (recording) {
+            recordElapsed = recorder.elapsedMs()
+            withFrameMillis { }
+        }
+    }
+    DisposableEffect(recorder) { onDispose { recorder.cancel() } }
+
     var showRename by remember { mutableStateOf(false) }
     var showAddText by remember { mutableStateOf(false) }
 
     BackHandler {
-        vm.flush()
-        onBack()
+        when {
+            recording -> stopRecording()
+            tool != null -> tool = null
+            selection != Selection.None -> vm.select(Selection.None)
+            else -> {
+                vm.flush()
+                onBack()
+            }
+        }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbar) },
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { vm.flush(); onBack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                title = {
-                    Text(
-                        project.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.clickable { showRename = true },
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            // ---- Top bar ----
+            Row(
+                Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = { vm.flush(); onBack() }) {
+                    Icon(Icons.Filled.Close, contentDescription = "Close")
+                }
+                Text(
+                    project.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f).clickable { showRename = true }.padding(horizontal = 4.dp),
+                )
+                TextButton(onClick = { controller.pause(); vm.flush(); onExport() }, enabled = project.videoClips.isNotEmpty()) {
+                    Text(project.exportHeight.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Button(
+                    onClick = {
+                        controller.pause()
+                        vm.flush()
+                        onExport()
+                    },
+                    enabled = project.videoClips.isNotEmpty() && missing.isEmpty(),
+                    modifier = Modifier.padding(end = 8.dp),
+                ) { Text("Export", fontWeight = FontWeight.SemiBold) }
+            }
+            if (importing) LinearProgressIndicator(Modifier.fillMaxWidth())
+            if (missing.isNotEmpty()) MissingBanner(count = missing.size, onRemove = vm::removeMissing)
+
+            // ---- Preview ----
+            Box(Modifier.fillMaxWidth().weight(1f).background(Color.Black)) {
+                if (project.videoClips.isEmpty()) {
+                    EmptyPreview(onAdd = ::launchMediaPicker)
+                } else {
+                    PreviewArea(controller, project, selection, onMoveText = vm::setTextPosition)
+                }
+            }
+
+            // ---- Transport ----
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    "${formatDuration(controller.positionMs)} / ${formatDuration(controller.totalMs)}",
+                    style = MaterialTheme.typography.labelMedium.copy(fontFamily = FontFamily.Monospace),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f).padding(start = 8.dp),
+                )
+                FilledTonalIconButton(onClick = controller::togglePlay, enabled = controller.totalMs > 0 && !recording) {
+                    Icon(
+                        if (controller.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                        contentDescription = if (controller.isPlaying) "Pause" else "Play",
                     )
-                },
-                actions = {
+                }
+                Row(Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
                     IconButton(onClick = vm::undo, enabled = canUndo) {
                         Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = "Undo")
                     }
                     IconButton(onClick = vm::redo, enabled = canRedo) {
                         Icon(Icons.AutoMirrored.Filled.Redo, contentDescription = "Redo")
                     }
-                    Button(
-                        onClick = {
-                            controller.pause()
-                            vm.flush()
-                            onExport()
-                        },
-                        enabled = project.videoClips.isNotEmpty() && missing.isEmpty(),
-                        modifier = Modifier.padding(end = 8.dp),
-                    ) { Text("Export") }
-                },
-            )
-        },
-    ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).navigationBarsPadding()) {
-            if (importing) LinearProgressIndicator(Modifier.fillMaxWidth())
-            if (missing.isNotEmpty()) {
-                MissingBanner(count = missing.size, onRemove = vm::removeMissing)
-            }
-            Box(Modifier.fillMaxWidth().weight(1f).background(Color.Black)) {
-                if (project.videoClips.isEmpty()) {
-                    EmptyPreview(onAdd = { pickVideos.launch(arrayOf("video/*")) })
-                } else {
-                    PreviewArea(controller, project, selection, onSelectText = { vm.select(Selection.Text(it)) })
                 }
             }
-            Transport(controller)
-            AddRow(
-                onAddVideo = { pickVideos.launch(arrayOf("video/*")) },
-                onAddMusic = { pickAudio.launch(arrayOf("audio/*")) },
-                onAddText = { showAddText = true },
-                textEnabled = project.videoClips.isNotEmpty(),
+
+            // ---- Timeline ----
+            Timeline(
+                app = app,
+                project = project,
+                controller = controller,
+                selection = selection,
+                missing = missing,
+                dpPerSecond = dpPerSecond,
+                onZoom = { dpPerSecond = (dpPerSecond * it).coerceIn(6f, 320f) },
+                onSelect = {
+                    tool = null
+                    vm.select(it)
+                },
+                onTrimVideo = vm::trimVideo,
+                onImageDuration = vm::setImageDuration,
+                onPlaceAudio = vm::placeAudio,
+                onTextRange = vm::setTextRange,
+                onTransition = { id ->
+                    vm.select(Selection.Video(id))
+                    tool = Tool.TRANSITION
+                },
+                onAddMedia = ::launchMediaPicker,
+                modifier = Modifier.height(timelineHeight(project)),
             )
-            Timeline(app, project, controller, selection, missing, onSelect = vm::select)
-            ToolPanel(vm, project, selection, controller)
+
+            // ---- Bottom: tool panel or toolbar ----
+            AnimatedContent(
+                targetState = tool to selection,
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                label = "bottom",
+            ) { (activeTool, sel) ->
+                if (activeTool != null) {
+                    ActivePanel(
+                        app = app,
+                        vm = vm,
+                        project = project,
+                        tool = activeTool,
+                        selection = sel,
+                        recording = recording,
+                        recordElapsed = recordElapsed,
+                        onClose = {
+                            if (recording) stopRecording()
+                            tool = null
+                        },
+                        onOpenTool = { tool = it },
+                        onPickAudio = { kind ->
+                            pendingAudioKind = kind
+                            pickAudio.launch(arrayOf("audio/*"))
+                        },
+                        onToggleRecord = {
+                            when {
+                                recording -> stopRecording()
+                                ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+                                    PackageManager.PERMISSION_GRANTED -> startRecording()
+                                else -> micPermission.launch(Manifest.permission.RECORD_AUDIO)
+                            }
+                        },
+                    )
+                } else {
+                    Toolbar(
+                        project = project,
+                        selection = sel,
+                        vm = vm,
+                        onTool = { tool = it },
+                        onAddMedia = ::launchMediaPicker,
+                        onAddText = { showAddText = true },
+                    )
+                }
+            }
         }
+        SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).padding(bottom = 140.dp))
     }
 
     if (showRename) {
@@ -294,10 +446,16 @@ private fun EditorContent(
     }
 }
 
+private fun timelineHeight(project: Project) = run {
+    val audioLanes = app.frame.studio.timeline.AudioLayout.lanes(project.audioClips).values.maxOrNull()?.plus(1) ?: 0
+    val textLanes = if (project.textOverlays.isEmpty()) 0 else 1
+    (22 + 56 + 12 + (audioLanes + textLanes).coerceAtMost(3) * 36 + 8).dp
+}
+
 @Composable
 private fun MissingBanner(count: Int, onRemove: () -> Unit) {
     Surface(color = MaterialTheme.colorScheme.errorContainer) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 "$count source file${if (count > 1) "s were" else " was"} moved or deleted.",
                 modifier = Modifier.weight(1f),
@@ -316,11 +474,19 @@ private fun EmptyPreview(onAdd: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(Icons.Outlined.VideoLibrary, contentDescription = null, tint = Color.White, modifier = Modifier.size(56.dp))
-        Spacer(Modifier.height(12.dp))
-        Text("Start by adding your videos", color = Color.White)
-        Spacer(Modifier.height(12.dp))
-        Button(onClick = onAdd) { Text("Add videos") }
+        Box(
+            Modifier
+                .size(72.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .clickable(onClick = onAdd),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(Icons.Filled.AddPhotoAlternate, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(32.dp))
+        }
+        Spacer(Modifier.height(16.dp))
+        Text("Add videos and photos", style = MaterialTheme.typography.titleMedium, color = Color.White)
+        Text("They'll appear on the timeline below", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.7f))
     }
 }
 
@@ -330,15 +496,19 @@ private fun PreviewArea(
     controller: PreviewController,
     project: Project,
     selection: Selection,
-    onSelectText: (String) -> Unit,
+    onMoveText: (id: String, x: Float, y: Float) -> Unit,
 ) {
-    val outputSize = ExportPlan.outputSize(project.videoClips, project.exportHeight)
+    val outputSize = ExportPlan.outputSize(project.videoClips, ExportHeight.HD_720, project.aspect)
     val aspect = outputSize.width.toFloat() / outputSize.height
-    val clip = project.videoClips.getOrNull(controller.currentClipIndex)
-    val rotation = clip?.rotationDegrees ?: 0
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxSize().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
         BoxWithConstraints(
-            Modifier.aspectRatio(aspect, matchHeightConstraintsFirst = aspect < 1f).clip(RoundedCornerShape(2.dp)),
+            Modifier
+                .aspectRatio(aspect, matchHeightConstraintsFirst = aspect < 1f)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = controller::togglePlay,
+                ),
         ) {
             val frameW = constraints.maxWidth.toFloat()
             val frameH = constraints.maxHeight.toFloat()
@@ -348,577 +518,238 @@ private fun PreviewArea(
                         useController = false
                         resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
                         setShutterBackgroundColor(android.graphics.Color.BLACK)
+                        setKeepContentOnPlayerReset(true)
                         layoutParams = FrameLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT,
                         )
-                        player = controller.videoPlayer
                     }
                 },
+                update = { view -> if (view.player !== controller.player) view.player = controller.player },
                 onRelease = { it.player = null },
-                modifier = Modifier.fillMaxSize().graphicsLayer {
-                    rotationZ = rotation.toFloat()
-                    if (rotation % 180 != 0 && size.width > 0 && size.height > 0) {
-                        val s = min(size.width / size.height, size.height / size.width)
-                        scaleX = s
-                        scaleY = s
-                    }
-                },
+                modifier = Modifier.fillMaxSize(),
             )
-            // Crop guide (exact for un-rotated or 180° clips; crop is always applied on export).
-            if (clip?.crop != null && rotation % 180 == 0 && clip.width > 0 && clip.height > 0) {
-                CropGuide(clip, frameW, frameH)
-            }
-            // Fade preview.
-            val dim = 1f - controller.brightness()
-            if (dim > 0.001f) {
-                Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = dim)))
-            }
-            // Text overlays, sized like the export (100px per 1080px of short side).
-            val density = LocalDensity.current
-            val shortSide = min(frameW, frameH)
-            val fontSize = with(density) { (shortSide * 100f / 1080f).toSp() }
-            project.textOverlays.forEach { overlay ->
-                val visible = controller.positionMs in overlay.startMs until overlay.endMs
-                val selected = selection is Selection.Text && selection.id == overlay.id
-                if (visible || selected) {
-                    OverlayText(overlay, frameW, frameH, fontSize, selected, onClick = { onSelectText(overlay.id) })
+            AnimatedVisibility(
+                visible = !controller.isPlaying,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.Center),
+            ) {
+                Box(
+                    Modifier.size(52.dp).clip(CircleShape).background(Color.Black.copy(alpha = 0.45f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.Filled.PlayArrow, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
                 }
+            }
+            // Selected text: a frame you can drag to reposition (the text itself is rendered by Media3).
+            val overlay = (selection as? Selection.Text)?.let { sel -> project.textOverlays.firstOrNull { it.id == sel.id } }
+            if (overlay != null) {
+                TextDragFrame(overlay, frameW, frameH, onMoveText)
             }
         }
     }
 }
 
 @Composable
-private fun CropGuide(clip: VideoClip, frameW: Float, frameH: Float) {
-    val crop = clip.crop ?: return
-    val contentAspect = clip.width.toFloat() / clip.height
-    val (cw, ch) = if (frameW / frameH > contentAspect) frameH * contentAspect to frameH else frameW to frameW / contentAspect
-    val left = (frameW - cw) / 2 + crop.left * cw
-    val top = (frameH - ch) / 2 + crop.top * ch
-    val w = (crop.right - crop.left) * cw
-    val h = (crop.bottom - crop.top) * ch
-    val density = LocalDensity.current
-    with(density) {
-        Box(
-            Modifier
-                .offset { IntOffset(left.roundToInt(), top.roundToInt()) }
-                .size(w.toDp(), h.toDp())
-                .border(2.dp, Color.White.copy(alpha = 0.85f)),
-        )
-    }
-}
-
-@Composable
-private fun OverlayText(
+private fun TextDragFrame(
     overlay: TextOverlay,
     frameW: Float,
     frameH: Float,
-    fontSize: androidx.compose.ui.unit.TextUnit,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    Layout(
-        content = {
-            Text(
-                overlay.text,
-                color = Color.White,
-                fontSize = fontSize,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .background(Color.Black.copy(alpha = 0.6f))
-                    .then(if (selected) Modifier.border(1.dp, MaterialTheme.colorScheme.primary) else Modifier)
-                    .clickable(onClick = onClick)
-                    .padding(horizontal = 4.dp),
-            )
-        },
-        modifier = Modifier.fillMaxSize(),
-    ) { measurables, constraints ->
-        val placeable = measurables.first().measure(constraints.copy(minWidth = 0, minHeight = 0))
-        layout(constraints.maxWidth, constraints.maxHeight) {
-            val x = (overlay.x * frameW - placeable.width / 2f).roundToInt()
-                .coerceIn(0, max(0, constraints.maxWidth - placeable.width))
-            val y = (overlay.y * frameH - placeable.height / 2f).roundToInt()
-                .coerceIn(0, max(0, constraints.maxHeight - placeable.height))
-            placeable.place(x, y)
-        }
-    }
-}
-
-@Composable
-private fun Transport(controller: PreviewController) {
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(onClick = controller::togglePlay, enabled = controller.totalMs > 0) {
-            Icon(
-                if (controller.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                contentDescription = if (controller.isPlaying) "Pause" else "Play",
-            )
-        }
-        Text(
-            "${formatDuration(controller.positionMs)} / ${formatDuration(controller.totalMs)}",
-            style = MaterialTheme.typography.labelLarge,
-        )
-    }
-}
-
-@Composable
-private fun AddRow(onAddVideo: () -> Unit, onAddMusic: () -> Unit, onAddText: () -> Unit, textEnabled: Boolean) {
-    Row(
-        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        TextButton(onClick = onAddVideo) {
-            Icon(Icons.Filled.Add, contentDescription = null)
-            Text("Video")
-        }
-        TextButton(onClick = onAddMusic) {
-            Icon(Icons.Outlined.MusicNote, contentDescription = null)
-            Text("Music")
-        }
-        TextButton(onClick = onAddText, enabled = textEnabled) {
-            Icon(Icons.Outlined.TextFields, contentDescription = null)
-            Text("Text")
-        }
-    }
-}
-
-/** Scrubbing without fling keeps the playhead exactly under the finger. */
-private object NoFling : FlingBehavior {
-    override suspend fun ScrollScope.performFling(initialVelocity: Float): Float = initialVelocity
-}
-
-@Composable
-private fun Timeline(
-    app: FrameApp,
-    project: Project,
-    controller: PreviewController,
-    selection: Selection,
-    missing: Set<String>,
-    onSelect: (Selection) -> Unit,
+    onMove: (id: String, x: Float, y: Float) -> Unit,
 ) {
     val density = LocalDensity.current
-    val pxPerMs = with(density) { DP_PER_SECOND.dp.toPx() } / 1000f
-    val scroll = rememberScrollState()
-    val dragged by scroll.interactionSource.collectIsDraggedAsState()
-    val draggedState = rememberUpdatedState(dragged)
-    val edgesState = rememberUpdatedState(TimelineMath.videoEdges(project.videoClips))
-
-    // Follow playback / programmatic seeks.
-    LaunchedEffect(controller.positionMs, dragged) {
-        if (!dragged) scroll.scrollTo((controller.positionMs * pxPerMs).roundToInt())
-    }
-    // User scrubbing seeks the preview.
-    LaunchedEffect(scroll) {
-        snapshotFlow { scroll.value }.collect { value ->
-            if (draggedState.value) {
-                controller.pause()
-                val raw = (value / pxPerMs).toLong()
-                // Snap to clip edges within ~8dp.
-                val thresholdMs = (8f * density.density / pxPerMs).toLong()
-                controller.seekTo(TimelineOps.snap(raw, edgesState.value, thresholdMs))
-            }
-        }
-    }
-
-    fun widthOf(ms: Long): Dp = with(density) { max(ms * pxPerMs, 4f).toDp() }
-
-    BoxWithConstraints(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer)) {
-        val half = maxWidth / 2
-        Column(
-            Modifier
-                .horizontalScroll(scroll, flingBehavior = NoFling)
-                .padding(vertical = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            // Video track
-            Row {
-                Spacer(Modifier.width(half))
-                project.videoClips.forEach { clip ->
-                    val selected = selection is Selection.Video && selection.id == clip.id
-                    VideoTile(app, clip, widthOf(clip.outputDurationMs()), selected, clip.sourceUri in missing) {
-                        onSelect(if (selected) Selection.None else Selection.Video(clip.id))
-                    }
-                }
-                Spacer(Modifier.width(half))
-            }
-            // Music track
-            Row(Modifier.height(32.dp)) {
-                Spacer(Modifier.width(half))
-                if (project.audioClips.isEmpty()) {
-                    Text(
-                        "No music",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.CenterVertically),
-                    )
-                }
-                project.audioClips.forEach { clip ->
-                    val selected = selection is Selection.Audio && selection.id == clip.id
-                    AudioTile(clip, widthOf(clip.outputDurationMs()), selected, clip.sourceUri in missing) {
-                        onSelect(if (selected) Selection.None else Selection.Audio(clip.id))
-                    }
-                }
-                Spacer(Modifier.width(half))
-            }
-            // Text track (lanes for overlapping overlays)
-            val lanes = remember(project.textOverlays) { assignLanes(project.textOverlays) }
-            val laneCount = (lanes.values.maxOrNull() ?: -1) + 1
-            if (laneCount > 0) {
-                val totalWidth = widthOf(TimelineMath.totalVideoMs(project.videoClips)) + half * 2
-                Box(Modifier.width(totalWidth).height(28.dp * laneCount)) {
-                    project.textOverlays.forEach { overlay ->
-                        val selected = selection is Selection.Text && selection.id == overlay.id
-                        val lane = lanes[overlay.id] ?: 0
-                        Box(
-                            Modifier
-                                .offset(x = half + widthOf(overlay.startMs), y = 28.dp * lane)
-                                .width(widthOf(overlay.endMs - overlay.startMs))
-                                .height(24.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.secondaryContainer)
-                                .then(if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp)) else Modifier)
-                                .clickable { onSelect(if (selected) Selection.None else Selection.Text(overlay.id)) }
-                                .padding(horizontal = 4.dp),
-                            contentAlignment = Alignment.CenterStart,
-                        ) {
-                            Text(
-                                overlay.text,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        // Centered playhead
+    var dragOffset by remember(overlay.id, overlay.x, overlay.y) { mutableStateOf(Offset.Zero) }
+    // Approximate the rendered text box: 100px glyphs per 1080px of short side.
+    val fontPx = minOf(frameW, frameH) * 100f / 1080f * overlay.scale * (if (overlay.isSticker) 2f else 1f)
+    val longestLine = overlay.text.lines().maxOfOrNull { it.length } ?: 1
+    val boxW = (fontPx * 0.58f * (longestLine + if (overlay.background) 2 else 0)).coerceIn(fontPx, frameW)
+    val boxH = (fontPx * 1.25f * overlay.text.lines().size.coerceAtLeast(1)).coerceAtMost(frameH)
+    val cx = overlay.x * frameW + dragOffset.x
+    val cy = overlay.y * frameH + dragOffset.y
+    val latest = androidx.compose.runtime.rememberUpdatedState(Triple(overlay, frameW, frameH))
+    with(density) {
         Box(
             Modifier
-                .align(Alignment.Center)
-                .width(2.dp)
-                .fillMaxHeight()
-                .background(Color.White),
+                .offset { IntOffset((cx - boxW / 2).roundToInt(), (cy - boxH / 2).roundToInt()) }
+                .size(boxW.toDp(), boxH.toDp())
+                .border(1.5.dp, Color.White, RoundedCornerShape(4.dp))
+                .pointerInput(overlay.id) {
+                    detectDragGestures(
+                        onDragEnd = {
+                            val (o, w, h) = latest.value
+                            onMove(o.id, (o.x * w + dragOffset.x) / w, (o.y * h + dragOffset.y) / h)
+                        },
+                    ) { change, amount ->
+                        change.consume()
+                        dragOffset += amount
+                    }
+                },
         )
     }
 }
 
-private fun assignLanes(overlays: List<TextOverlay>): Map<String, Int> {
-    val laneEnds = mutableListOf<Long>()
-    val result = mutableMapOf<String, Int>()
-    overlays.sortedBy { it.startMs }.forEach { o ->
-        val lane = laneEnds.indexOfFirst { it <= o.startMs }.let { if (it < 0) laneEnds.size.also { laneEnds += 0L } else it }
-        laneEnds[lane] = o.endMs
-        result[o.id] = lane
-    }
-    return result
-}
+// ---- Toolbars -------------------------------------------------------------------------------
 
 @Composable
-private fun VideoTile(
-    app: FrameApp,
-    clip: VideoClip,
-    width: Dp,
-    selected: Boolean,
-    isMissing: Boolean,
-    onClick: () -> Unit,
-) {
-    val shape = RoundedCornerShape(6.dp)
-    Box(
-        Modifier
-            .padding(horizontal = 1.dp)
-            .width(width)
-            .height(TRACK_HEIGHT)
-            .clip(shape)
-            .then(
-                if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, shape)
-                else Modifier,
-            )
-            .clickable(onClick = onClick),
-    ) {
-        VideoThumbnail(
-            probe = app.mediaProbe,
-            uri = if (isMissing) null else clip.sourceUri,
-            atMs = clip.trimStartMs,
-            rotationDegrees = clip.rotationDegrees,
-            modifier = Modifier.fillMaxSize(),
-        )
-        if (isMissing) Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.error.copy(alpha = 0.5f)))
-        Text(
-            buildString {
-                append(formatDuration(clip.outputDurationMs()))
-                if (clip.speed != 1f) append(" · ${clip.speed}x")
-            },
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White,
-            maxLines = 1,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .background(Color.Black.copy(alpha = 0.55f))
-                .padding(horizontal = 3.dp),
-        )
-    }
-}
-
-@Composable
-private fun AudioTile(clip: AudioClip, width: Dp, selected: Boolean, isMissing: Boolean, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(6.dp)
-    Box(
-        Modifier
-            .padding(horizontal = 1.dp)
-            .width(width)
-            .fillMaxHeight()
-            .clip(shape)
-            .background(if (isMissing) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.tertiaryContainer)
-            .then(if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, shape) else Modifier)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 6.dp),
-        contentAlignment = Alignment.CenterStart,
-    ) {
-        Text(
-            clip.displayName.ifBlank { "Music" },
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onTertiaryContainer,
-        )
-    }
-}
-
-// ---- Tool panel -------------------------------------------------------------------------
-
-@Composable
-private fun ToolPanel(vm: EditorViewModel, project: Project, selection: Selection, controller: PreviewController) {
-    Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .heightIn(max = 260.dp)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-        ) {
-            when (selection) {
-                is Selection.Video -> project.videoClips.firstOrNull { it.id == selection.id }?.let {
-                    VideoTools(vm, it, project.videoClips.indexOf(it), project.videoClips.size, controller)
-                }
-                is Selection.Audio -> project.audioClips.firstOrNull { it.id == selection.id }?.let {
-                    AudioTools(vm, it, project.audioClips.indexOf(it), project.audioClips.size)
-                }
-                is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }?.let {
-                    TextTools(vm, it, TimelineMath.totalVideoMs(project.videoClips))
-                }
-                Selection.None -> ProjectTools(vm, project)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, enabled: Boolean = true, onClick: () -> Unit) {
+private fun ToolbarItem(icon: ImageVector, label: String, enabled: Boolean = true, onClick: () -> Unit) {
+    val tint = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f)
     Column(
         Modifier
-            .clip(RoundedCornerShape(8.dp))
+            .width(68.dp)
+            .clip(RoundedCornerShape(12.dp))
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+            .padding(vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val tint = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-        Icon(icon, contentDescription = null, tint = tint)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = tint)
+        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))
+        Spacer(Modifier.height(4.dp))
+        Text(label, style = MaterialTheme.typography.labelSmall, color = tint, maxLines = 1)
     }
 }
 
 @Composable
-private fun ActionRow(content: @Composable () -> Unit) {
-    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) { content() }
-}
-
-@Composable
-private fun ToolTabs(tabs: List<String>, selected: String, onSelect: (String) -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        tabs.forEach { tab ->
-            FilterChip(selected = tab == selected, onClick = { onSelect(tab) }, label = { Text(tab) })
+private fun ToolbarRow(onBack: (() -> Unit)?, content: @Composable () -> Unit) {
+    Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
+        Row(Modifier.fillMaxWidth().height(76.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (onBack != null) {
+                Box(
+                    Modifier
+                        .padding(start = 4.dp)
+                        .size(width = 40.dp, height = 56.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                        .clickable(onClick = onBack),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", modifier = Modifier.size(20.dp))
+                }
+            }
+            Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 4.dp)) { content() }
         }
     }
 }
 
 @Composable
-private fun LabeledSlider(
-    label: String,
-    valueText: String,
-    value: Float,
-    range: ClosedFloatingPointRange<Float>,
-    onChange: (Float) -> Unit,
-    enabled: Boolean = true,
+private fun Toolbar(
+    project: Project,
+    selection: Selection,
+    vm: EditorViewModel,
+    onTool: (Tool) -> Unit,
+    onAddMedia: () -> Unit,
+    onAddText: () -> Unit,
 ) {
-    Column {
-        Row(Modifier.fillMaxWidth()) {
-            Text(label, style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
-            Text(valueText, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Slider(value = value.coerceIn(range), onValueChange = onChange, valueRange = range, enabled = enabled)
-    }
-}
-
-@Composable
-private fun TrimSlider(sourceDurationMs: Long, startMs: Long, endMs: Long, onCommit: (Long, Long) -> Unit) {
-    var range by remember(startMs, endMs, sourceDurationMs) { mutableStateOf(startMs.toFloat()..endMs.toFloat()) }
-    Column {
-        Row(Modifier.fillMaxWidth()) {
-            Text("Trim", style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
-            Text(
-                "${formatDuration(range.start.toLong())} – ${formatDuration(range.endInclusive.toLong())}",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        RangeSlider(
-            value = range,
-            onValueChange = { new ->
-                if (new.endInclusive - new.start >= TimelineOps.MIN_SPLIT_MS) range = new
-            },
-            valueRange = 0f..sourceDurationMs.toFloat().coerceAtLeast(1f),
-            onValueChangeFinished = { onCommit(range.start.toLong(), range.endInclusive.toLong()) },
-        )
-    }
-}
-
-@Composable
-private fun VideoTools(vm: EditorViewModel, clip: VideoClip, index: Int, count: Int, controller: PreviewController) {
-    ActionRow {
-        ActionButton(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
-        ActionButton(Icons.Filled.Rotate90DegreesCw, "Rotate") { vm.rotate(clip.id) }
-        ActionButton(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateVideo(clip.id) }
-        ActionButton(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move", enabled = index > 0) { vm.moveVideo(clip.id, -1) }
-        ActionButton(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move", enabled = index < count - 1) { vm.moveVideo(clip.id, 1) }
-        ActionButton(Icons.Filled.Delete, "Delete") { vm.deleteVideo(clip.id) }
-    }
-    var tab by remember { mutableStateOf("Trim") }
-    ToolTabs(listOf("Trim", "Speed", "Volume", "Fade", "Crop"), tab) { tab = it }
-    Spacer(Modifier.height(4.dp))
-    when (tab) {
-        "Trim" -> TrimSlider(clip.sourceDurationMs, clip.trimStartMs, clip.trimEndMs) { s, e -> vm.trimVideo(clip.id, s, e) }
-        "Speed" -> Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f).forEach { s ->
-                FilterChip(selected = clip.speed == s, onClick = { vm.setSpeed(clip.id, s) }, label = { Text("${s}x") })
+    val hasClips = project.videoClips.isNotEmpty()
+    when (selection) {
+        Selection.None -> ToolbarRow(onBack = null) {
+            ToolbarItem(Icons.Filled.ContentCut, "Edit", enabled = hasClips) { vm.selectClipAtPlayhead() }
+            ToolbarItem(Icons.Filled.MusicNote, "Audio", enabled = hasClips) { onTool(Tool.AUDIO) }
+            ToolbarItem(Icons.Filled.TextFields, "Text", enabled = hasClips) { onAddText() }
+            ToolbarItem(Icons.Filled.EmojiEmotions, "Stickers", enabled = hasClips) { onTool(Tool.STICKERS) }
+            ToolbarItem(Icons.Filled.AutoAwesome, "Filters", enabled = hasClips) {
+                if (vm.selectClipAtPlayhead() != null) onTool(Tool.FILTERS)
             }
+            ToolbarItem(Icons.Filled.Tune, "Adjust", enabled = hasClips) {
+                if (vm.selectClipAtPlayhead() != null) onTool(Tool.ADJUST)
+            }
+            ToolbarItem(Icons.Filled.AspectRatio, "Canvas", enabled = hasClips) { onTool(Tool.CANVAS) }
+            ToolbarItem(Icons.Filled.AddPhotoAlternate, "Media") { onAddMedia() }
         }
-        "Volume" -> LabeledSlider("Clip volume", "${(clip.volume * 100).roundToInt()}%", clip.volume, 0f..1f, { vm.setVideoVolume(clip.id, it) })
-        "Fade" -> {
-            val maxFade = (clip.outputDurationMs() / 2).coerceAtMost(5_000).toFloat().coerceAtLeast(1f)
-            LabeledSlider("Fade in", formatDuration(clip.fadeInMs), clip.fadeInMs.toFloat(), 0f..maxFade, { vm.setVideoFadeIn(clip.id, it.toLong()) })
-            LabeledSlider("Fade out", formatDuration(clip.fadeOutMs), clip.fadeOutMs.toFloat(), 0f..maxFade, { vm.setVideoFadeOut(clip.id, it.toLong()) })
-        }
-        "Crop" -> {
-            val options = listOf<Pair<String, Float?>>("Original" to null, "1:1" to 1f, "4:5" to 0.8f, "9:16" to 9f / 16f, "16:9" to 16f / 9f)
-            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                options.forEach { (label, ratio) ->
-                    val selected = if (ratio == null) clip.crop == null else clip.crop == centerCrop(clip.width, clip.height, ratio)
-                    FilterChip(selected = selected, onClick = { vm.setCrop(clip.id, ratio) }, label = { Text(label) })
+        is Selection.Video -> {
+            val index = project.videoClips.indexOfFirst { it.id == selection.id }
+            val clip = project.videoClips.getOrNull(index) ?: return
+            ToolbarRow(onBack = { vm.select(Selection.None) }) {
+                ToolbarItem(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
+                if (clip.isImage) {
+                    ToolbarItem(Icons.Filled.Timer, "Duration") { onTool(Tool.DURATION) }
+                } else {
+                    ToolbarItem(Icons.Filled.Speed, "Speed") { onTool(Tool.SPEED) }
+                    ToolbarItem(Icons.AutoMirrored.Filled.VolumeUp, "Volume") { onTool(Tool.VOLUME) }
                 }
-            }
-            if (clip.width <= 0 || clip.height <= 0) {
-                Text("Crop isn't available for this clip.", style = MaterialTheme.typography.bodySmall)
-            }
-        }
-    }
-}
-
-@Composable
-private fun AudioTools(vm: EditorViewModel, clip: AudioClip, index: Int, count: Int) {
-    Text(clip.displayName.ifBlank { "Music" }, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    ActionRow {
-        ActionButton(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
-        ActionButton(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move", enabled = index > 0) { vm.moveAudio(clip.id, -1) }
-        ActionButton(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move", enabled = index < count - 1) { vm.moveAudio(clip.id, 1) }
-        ActionButton(Icons.Filled.Delete, "Delete") { vm.deleteAudio(clip.id) }
-    }
-    TrimSlider(clip.sourceDurationMs, clip.trimStartMs, clip.trimEndMs) { s, e -> vm.trimAudio(clip.id, s, e) }
-    LabeledSlider("Volume", "${(clip.volume * 100).roundToInt()}%", clip.volume, 0f..1f, { vm.setAudioVolume(clip.id, it) })
-    val maxFade = (clip.outputDurationMs() / 2).coerceAtMost(10_000).toFloat().coerceAtLeast(1f)
-    LabeledSlider("Fade in", formatDuration(clip.fadeInMs), clip.fadeInMs.toFloat(), 0f..maxFade, { vm.setAudioFadeIn(clip.id, it.toLong()) })
-    LabeledSlider("Fade out", formatDuration(clip.fadeOutMs), clip.fadeOutMs.toFloat(), 0f..maxFade, { vm.setAudioFadeOut(clip.id, it.toLong()) })
-    Text(
-        "Music is trimmed automatically to the length of the video.",
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-}
-
-@Composable
-private fun TextTools(vm: EditorViewModel, overlay: TextOverlay, totalMs: Long) {
-    var text by remember(overlay.id) { mutableStateOf(overlay.text) }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        OutlinedTextField(
-            value = text,
-            onValueChange = {
-                if (it.length <= 200) {
-                    text = it
-                    if (it.isNotBlank()) vm.setText(overlay.id, it)
+                ToolbarItem(Icons.Filled.AutoAwesome, "Filters") { onTool(Tool.FILTERS) }
+                ToolbarItem(Icons.Filled.Tune, "Adjust") { onTool(Tool.ADJUST) }
+                ToolbarItem(Icons.Filled.Gradient, "Fade") { onTool(Tool.FADE) }
+                ToolbarItem(Icons.Filled.Crop, "Crop") { onTool(Tool.CROP) }
+                ToolbarItem(Icons.Filled.Rotate90DegreesCw, "Rotate") { vm.rotate(clip.id) }
+                ToolbarItem(Icons.Filled.Flip, "Mirror") { vm.flip(clip.id) }
+                if (index < project.videoClips.lastIndex) {
+                    ToolbarItem(Icons.Filled.SwapHoriz, "Transition") { onTool(Tool.TRANSITION) }
                 }
-            },
-            label = { Text("Text") },
-            modifier = Modifier.weight(1f),
-        )
-        IconButton(onClick = { vm.deleteText(overlay.id) }) {
-            Icon(Icons.Filled.Delete, contentDescription = "Delete text")
+                ToolbarItem(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateVideo(clip.id) }
+                ToolbarItem(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move left", enabled = index > 0) { vm.moveVideo(clip.id, -1) }
+                ToolbarItem(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move right", enabled = index < project.videoClips.lastIndex) { vm.moveVideo(clip.id, 1) }
+                ToolbarItem(Icons.Filled.Delete, "Delete") { vm.deleteVideo(clip.id) }
+            }
+        }
+        is Selection.Audio -> ToolbarRow(onBack = { vm.select(Selection.None) }) {
+            ToolbarItem(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
+            ToolbarItem(Icons.AutoMirrored.Filled.VolumeUp, "Volume") { onTool(Tool.VOLUME) }
+            ToolbarItem(Icons.Filled.Gradient, "Fade") { onTool(Tool.FADE) }
+            ToolbarItem(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateAudio(selection.id) }
+            ToolbarItem(Icons.Filled.Delete, "Delete") { vm.deleteAudio(selection.id) }
+        }
+        is Selection.Text -> ToolbarRow(onBack = { vm.select(Selection.None) }) {
+            ToolbarItem(Icons.Filled.Edit, "Edit") { onTool(Tool.TEXT_EDIT) }
+            ToolbarItem(Icons.Filled.Palette, "Style") { onTool(Tool.TEXT_STYLE) }
+            ToolbarItem(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
+            ToolbarItem(Icons.Filled.ContentCopy, "Duplicate") { vm.duplicateText(selection.id) }
+            ToolbarItem(Icons.Filled.Delete, "Delete") { vm.deleteText(selection.id) }
         }
     }
-    var range by remember(overlay.id, overlay.startMs, overlay.endMs) {
-        mutableStateOf(overlay.startMs.toFloat()..overlay.endMs.toFloat())
-    }
-    Row(Modifier.fillMaxWidth().padding(top = 4.dp)) {
-        Text("Shown", style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
-        Text(
-            "${formatDuration(range.start.toLong())} – ${formatDuration(range.endInclusive.toLong())}",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-    RangeSlider(
-        value = range,
-        onValueChange = { if (it.endInclusive - it.start >= 100f) range = it },
-        valueRange = 0f..totalMs.toFloat().coerceAtLeast(1f),
-        onValueChangeFinished = { vm.setTextRange(overlay.id, range.start.toLong(), range.endInclusive.toLong()) },
-    )
-    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf("Top" to 0.12f, "Middle" to 0.5f, "Bottom" to 0.85f).forEach { (label, y) ->
-            FilterChip(
-                selected = kotlin.math.abs(overlay.y - y) < 0.01f && kotlin.math.abs(overlay.x - 0.5f) < 0.01f,
-                onClick = { vm.setTextPosition(overlay.id, 0.5f, y) },
-                label = { Text(label) },
-            )
-        }
-    }
-    LabeledSlider("Horizontal", "${(overlay.x * 100).roundToInt()}%", overlay.x, 0.05f..0.95f, { vm.setTextPosition(overlay.id, it, overlay.y) })
-    LabeledSlider("Vertical", "${(overlay.y * 100).roundToInt()}%", overlay.y, 0.05f..0.95f, { vm.setTextPosition(overlay.id, overlay.x, it) })
 }
 
 @Composable
-private fun ProjectTools(vm: EditorViewModel, project: Project) {
-    if (project.videoClips.isEmpty()) {
-        Text(
-            "Add videos to get started. Tap a clip on the timeline to edit it.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        return
+private fun ActivePanel(
+    app: FrameApp,
+    vm: EditorViewModel,
+    project: Project,
+    tool: Tool,
+    selection: Selection,
+    recording: Boolean,
+    recordElapsed: Long,
+    onClose: () -> Unit,
+    onOpenTool: (Tool) -> Unit,
+    onPickAudio: (AudioKind) -> Unit,
+    onToggleRecord: () -> Unit,
+) {
+    val clip = (selection as? Selection.Video)?.let { s -> project.videoClips.firstOrNull { it.id == s.id } }
+    val audio = (selection as? Selection.Audio)?.let { s -> project.audioClips.firstOrNull { it.id == s.id } }
+    val text = (selection as? Selection.Text)?.let { s -> project.textOverlays.firstOrNull { it.id == s.id } }
+
+    val action: (@Composable () -> Unit)? = when {
+        clip != null && (tool == Tool.FILTERS || tool == Tool.ADJUST) -> {
+            { TextButton(onClick = { vm.applyLookToAll(clip.id) }) { Text("Apply to all") } }
+        }
+        else -> null
     }
-    Text("Tap a clip, music or text on the timeline to edit it.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    Spacer(Modifier.height(8.dp))
-    LabeledSlider(
-        label = "Fade between clips",
-        valueText = if (project.crossfadeMs == 0L) "Off" else formatDuration(project.crossfadeMs),
-        value = project.crossfadeMs.toFloat(),
-        range = 0f..2_000f,
-        onChange = { vm.setTransition((it / 100).roundToInt() * 100L) },
-        enabled = project.videoClips.size > 1,
-    )
+    ToolPanel(title = tool.title, onDone = onClose, action = action) {
+        when (tool) {
+            Tool.SPEED -> clip?.let { c -> SpeedPanel(c) { vm.setSpeed(c.id, it) } }
+            Tool.DURATION -> clip?.let { c -> DurationPanel(c) { vm.setImageDuration(c.id, it) } }
+            Tool.VOLUME -> when {
+                clip != null -> VolumePanel(clip.volume) { vm.setVideoVolume(clip.id, it) }
+                audio != null -> VolumePanel(audio.volume) { vm.setAudioVolume(audio.id, it) }
+            }
+            Tool.FADE -> when {
+                clip != null -> FadePanel(clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs(), { vm.setVideoFadeIn(clip.id, it) }, { vm.setVideoFadeOut(clip.id, it) })
+                audio != null -> FadePanel(audio.fadeInMs, audio.fadeOutMs, audio.outputDurationMs(), { vm.setAudioFadeIn(audio.id, it) }, { vm.setAudioFadeOut(audio.id, it) })
+            }
+            Tool.FILTERS -> clip?.let { c -> FiltersPanel(app, c, { vm.setFilter(c.id, it) }, { vm.setFilterIntensity(c.id, it) }) }
+            Tool.ADJUST -> clip?.let { c -> AdjustPanel(c.adjust) { vm.setAdjust(c.id, it) } }
+            Tool.CROP -> clip?.let { c -> CropPanel(c) { vm.setCrop(c.id, it) } }
+            Tool.TRANSITION -> clip?.let { c ->
+                TransitionPanel(c, { type, ms -> vm.setTransition(c.id, type, ms) }, { vm.applyTransitionToAll(c.id) })
+            }
+            Tool.CANVAS -> CanvasPanel(project.aspect, vm::setAspect)
+            Tool.AUDIO -> AddAudioPanel(
+                onMusic = { onPickAudio(AudioKind.MUSIC) },
+                onSound = { onPickAudio(AudioKind.SOUND) },
+                onVoice = { onOpenTool(Tool.VOICE) },
+            )
+            Tool.VOICE -> VoicePanel(recording, recordElapsed, onToggleRecord)
+            Tool.STICKERS -> StickersPanel { vm.addText(it, sticker = true) }
+            Tool.TEXT_EDIT -> text?.let { o -> TextEditPanel(o) { vm.setText(o.id, it) } }
+            Tool.TEXT_STYLE -> text?.let { o -> TextStylePanel(o) { transform -> vm.styleText(o.id, transform) } }
+        }
+    }
 }

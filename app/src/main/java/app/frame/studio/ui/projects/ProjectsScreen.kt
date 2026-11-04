@@ -1,6 +1,7 @@
 package app.frame.studio.ui.projects
 
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,26 +16,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.VideoLibrary
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +49,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,31 +76,34 @@ import kotlinx.coroutines.launch
 fun ProjectsScreen(
     app: FrameApp,
     onOpenProject: (String) -> Unit,
+    onNewProject: (String) -> Unit,
     onOpenExports: () -> Unit,
 ) {
     val projects by app.repository.projects.collectAsStateWithLifecycle()
+    val history by app.repository.history.collectAsStateWithLifecycle()
     val privacyRequired by AdsService.privacyOptionsRequired.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val activity = LocalActivity.current
 
-    var showCreate by remember { mutableStateOf(false) }
     var renameTarget by remember { mutableStateOf<Project?>(null) }
     var deleteTarget by remember { mutableStateOf<Project?>(null) }
     var menuOpen by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
 
+    fun newProject() {
+        scope.launch { onNewProject(app.repository.create("Project ${projects.size + 1}").id) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Frame", fontWeight = FontWeight.SemiBold) },
+                title = { Text("Frame", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineSmall) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 actions = {
-                    IconButton(onClick = onOpenExports) {
-                        Icon(Icons.Outlined.VideoLibrary, contentDescription = "Exports")
-                    }
                     Box {
                         IconButton(onClick = { menuOpen = true }) {
-                            Icon(Icons.Filled.MoreVert, contentDescription = "More")
+                            Icon(Icons.Outlined.Settings, contentDescription = "Settings")
                         }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                             DropdownMenuItem(
@@ -124,49 +134,44 @@ fun ProjectsScreen(
                 },
             )
         },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showCreate = true },
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("New project") },
-            )
-        },
         bottomBar = { BannerAd() },
     ) { padding ->
-        if (projects.isEmpty()) {
-            EmptyState(Modifier.padding(padding))
-        } else {
-            LazyColumn(
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize().padding(padding),
-            ) {
-                items(projects, key = { it.id }) { project ->
-                    ProjectCard(
-                        app = app,
-                        project = project,
-                        onOpen = { onOpenProject(project.id) },
-                        onRename = { renameTarget = project },
-                        onDuplicate = { scope.launch { app.repository.duplicate(project.id) } },
-                        onDelete = { deleteTarget = project },
-                    )
-                }
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 160.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxSize().padding(padding),
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                HeroCard(onClick = ::newProject)
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                QuickRow(exportCount = history.size, onOpenExports = onOpenExports)
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Text(
+                    if (projects.isEmpty()) "Projects" else "Projects · ${projects.size}",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            if (projects.isEmpty()) {
+                item(span = { GridItemSpan(maxLineSpan) }) { EmptyProjects() }
+            }
+            items(projects, key = { it.id }) { project ->
+                ProjectCard(
+                    app = app,
+                    project = project,
+                    onOpen = { onOpenProject(project.id) },
+                    onRename = { renameTarget = project },
+                    onDuplicate = { scope.launch { app.repository.duplicate(project.id) } },
+                    onDelete = { deleteTarget = project },
+                )
             }
         }
     }
 
-    if (showCreate) {
-        TextInputDialog(
-            title = "New project",
-            initial = "Project ${projects.size + 1}",
-            confirmLabel = "Create",
-            onDismiss = { showCreate = false },
-            onConfirm = { name ->
-                showCreate = false
-                scope.launch { onOpenProject(app.repository.create(name).id) }
-            },
-        )
-    }
     renameTarget?.let { project ->
         TextInputDialog(
             title = "Rename project",
@@ -192,40 +197,79 @@ fun ProjectsScreen(
         )
     }
     if (showAbout) {
-        androidx.compose.material3.AlertDialog(
+        AlertDialog(
             onDismissRequest = { showAbout = false },
             title = { Text("Frame") },
             text = {
-                Text("Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n\nA simple video editor. Exports never carry a watermark.")
+                Text("Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n\nA fast video editor. Exports never carry a watermark.")
             },
-            confirmButton = {
-                androidx.compose.material3.TextButton(onClick = { showAbout = false }) { Text("OK") }
-            },
+            confirmButton = { TextButton(onClick = { showAbout = false }) { Text("OK") } },
         )
     }
 }
 
 @Composable
-private fun EmptyState(modifier: Modifier = Modifier) {
+private fun HeroCard(onClick: () -> Unit) {
+    val gradient = Brush.linearGradient(listOf(Color(0xFF1A73E8), Color(0xFF7B4DFF), Color(0xFFE5398F)))
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(140.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(gradient)
+            .clickable(onClick = onClick)
+            .padding(20.dp),
+    ) {
+        Column(Modifier.align(Alignment.BottomStart)) {
+            Text("New project", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color.White)
+            Text("Videos, photos, music and text", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.85f))
+        }
+        Box(
+            Modifier
+                .align(Alignment.TopEnd)
+                .size(52.dp)
+                .clip(CircleShape)
+                .background(Color.White),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = null, tint = Color(0xFF1A73E8), modifier = Modifier.size(30.dp))
+        }
+    }
+}
+
+@Composable
+private fun QuickRow(exportCount: Int, onOpenExports: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .clickable(onClick = onOpenExports)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Outlined.VideoLibrary, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text("My exports", style = MaterialTheme.typography.titleSmall)
+            Text(
+                if (exportCount == 0) "Finished videos show up here" else "$exportCount video${if (exportCount == 1) "" else "s"}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyProjects() {
     Column(
-        modifier = modifier.fillMaxSize().padding(32.dp),
-        verticalArrangement = Arrangement.Center,
+        Modifier.fillMaxWidth().padding(vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Icon(
-            Icons.Outlined.Movie,
-            contentDescription = null,
-            modifier = Modifier.size(72.dp),
-            tint = MaterialTheme.colorScheme.primary,
-        )
-        Spacer(Modifier.height(16.dp))
-        Text("No projects yet", style = MaterialTheme.typography.titleLarge)
+        Icon(Icons.Outlined.Movie, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(48.dp))
         Spacer(Modifier.height(8.dp))
-        Text(
-            "Tap New project to combine clips, trim, add music and text, then export in HD.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Text("Your projects will appear here", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -240,35 +284,37 @@ private fun ProjectCard(
 ) {
     var menu by remember { mutableStateOf(false) }
     val first = project.videoClips.firstOrNull()
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-    ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable(onClick = onOpen)) {
+        Box(Modifier.fillMaxWidth().aspectRatio(4f / 3f).clip(RoundedCornerShape(16.dp))) {
             VideoThumbnail(
                 probe = app.mediaProbe,
                 uri = first?.sourceUri,
                 atMs = first?.trimStartMs ?: 0,
-                modifier = Modifier.width(112.dp).aspectRatio(16f / 9f).clip(RoundedCornerShape(8.dp)),
+                isImage = first?.isImage == true,
+                modifier = Modifier.fillMaxSize(),
             )
-            Spacer(Modifier.width(12.dp))
+            if (project.videoClips.isNotEmpty()) {
+                Text(
+                    formatDuration(TimelineMath.totalVideoMs(project.videoClips)),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color.Black.copy(alpha = 0.6f))
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                )
+            }
+        }
+        Row(Modifier.padding(start = 4.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
+                Text(project.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
-                    project.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    formatDate(project.updatedAtEpochMs),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                val clips = project.videoClips.size
-                Text(
-                    "$clips clip${if (clips == 1) "" else "s"} · ${formatDuration(TimelineMath.totalVideoMs(project.videoClips))}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    "Edited ${formatDate(project.updatedAtEpochMs)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Box {

@@ -24,6 +24,7 @@ echo "SMOKE: LAUNCH OK" >> "$LOG"
 # End-to-end export through the real Media3 pipeline.
 adb push /tmp/sample.mp4 /data/local/tmp/sample.mp4 >> "$LOG" 2>&1
 adb push /tmp/sample.m4a /data/local/tmp/sample.m4a >> "$LOG" 2>&1
+adb push /tmp/sample.png /data/local/tmp/sample.png >> "$LOG" 2>&1
 if ./gradlew connectedDebugAndroidTest >> "$LOG" 2>&1; then
   echo "SMOKE: EXPORT OK" >> "$LOG"
 else

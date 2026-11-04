@@ -5,10 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.frame.studio.FrameApp
 import app.frame.studio.domain.AudioClip
+import app.frame.studio.domain.AudioKind
+import app.frame.studio.domain.CanvasAspect
+import app.frame.studio.domain.ColorAdjust
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.TextOverlay
+import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
 import app.frame.studio.export.centerCrop
+import app.frame.studio.timeline.AudioLayout
 import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.timeline.TimelineOps
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.UUID
 
 sealed interface Selection {
@@ -30,12 +36,14 @@ sealed interface Selection {
     data class Text(val id: String) : Selection
 }
 
-class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel() {
+class EditorViewModel(private val app: FrameApp, private val projectId: String) : ViewModel() {
 
     private val repository = app.repository
     private val probe = app.mediaProbe
 
-    private val _project = MutableStateFlow(repository.get(projectId))
+    private val _project = MutableStateFlow(
+        repository.get(projectId)?.let { it.copy(audioClips = AudioLayout.normalize(it.audioClips)) },
+    )
     val project: StateFlow<Project?> = _project.asStateFlow()
 
     private val _selection = MutableStateFlow<Selection>(Selection.None)
@@ -72,8 +80,15 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
             repository.projects.collect { list ->
                 val stored = list.firstOrNull { it.id == projectId } ?: return@collect
                 val current = _project.value ?: return@collect
-                if (stored.exportHeight != current.exportHeight) {
-                    _project.value = current.copy(exportHeight = stored.exportHeight)
+                if (stored.exportHeight != current.exportHeight ||
+                    stored.exportFps != current.exportFps ||
+                    stored.exportQuality != current.exportQuality
+                ) {
+                    _project.value = current.copy(
+                        exportHeight = stored.exportHeight,
+                        exportFps = stored.exportFps,
+                        exportQuality = stored.exportQuality,
+                    )
                 }
             }
         }
@@ -88,6 +103,16 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
     fun select(selection: Selection) {
         _selection.value = selection
         lastCoalesceKey = null
+    }
+
+    /** Selects the video clip under the playhead (CapCut's "Edit" entry point). */
+    fun selectClipAtPlayhead(): VideoClip? {
+        val p = _project.value ?: return null
+        val pos = TimelineMath.locateVideo(p.videoClips, _playheadMs.value)
+            ?: if (p.videoClips.isNotEmpty()) TimelineMath.Position(p.videoClips.lastIndex, 0) else return null
+        val clip = p.videoClips[pos.index]
+        select(Selection.Video(clip.id))
+        return clip
     }
 
     // ---- Editing core -------------------------------------------------------------------
@@ -170,7 +195,8 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
 
     // ---- Import -------------------------------------------------------------------------
 
-    fun addVideos(uris: List<Uri>) {
+    /** Adds videos and photos after the selected clip (or at the end). */
+    fun addMedia(uris: List<Uri>) {
         if (uris.isEmpty()) return
         viewModelScope.launch {
             _importing.value = true
@@ -178,23 +204,36 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
             var failed = 0
             for (uri in uris) {
                 probe.persistPermission(uri)
-                val info = probe.probeVideo(uri)
-                if (info == null || info.durationMs < 100) {
-                    failed++
-                    continue
+                val clip = if (probe.isImage(uri)) {
+                    probe.probeImage(uri)?.let { info ->
+                        VideoClip(
+                            id = newId(),
+                            sourceUri = uri.toString(),
+                            sourceDurationMs = VideoClip.MAX_IMAGE_MS,
+                            trimEndMs = VideoClip.DEFAULT_IMAGE_MS,
+                            width = info.width,
+                            height = info.height,
+                            displayName = info.displayName,
+                            isImage = true,
+                        )
+                    }
+                } else {
+                    probe.probeVideo(uri)?.takeIf { it.durationMs >= 100 }?.let { info ->
+                        VideoClip(
+                            id = newId(),
+                            sourceUri = uri.toString(),
+                            sourceDurationMs = info.durationMs,
+                            trimEndMs = info.durationMs,
+                            width = info.width,
+                            height = info.height,
+                            displayName = info.displayName,
+                        )
+                    }
                 }
-                clips += VideoClip(
-                    id = newId(),
-                    sourceUri = uri.toString(),
-                    sourceDurationMs = info.durationMs,
-                    trimEndMs = info.durationMs,
-                    width = info.width,
-                    height = info.height,
-                    displayName = info.displayName,
-                )
+                if (clip == null) failed++ else clips += clip
             }
             _importing.value = false
-            if (failed > 0) messageChannel.send("$failed file${if (failed > 1) "s" else ""} couldn't be opened as video")
+            if (failed > 0) messageChannel.send("$failed item${if (failed > 1) "s" else ""} couldn't be opened")
             if (clips.isEmpty()) return@launch
             edit { p ->
                 val sel = _selection.value
@@ -205,16 +244,17 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
                 }
                 p.copy(videoClips = p.videoClips.toMutableList().apply { addAll(insertAt, clips) })
             }
-            _selection.value = Selection.Video(clips.first().id)
+            _selection.value = Selection.None
         }
     }
 
-    fun addAudio(uris: List<Uri>) {
+    fun addAudio(uris: List<Uri>, kind: AudioKind) {
         if (uris.isEmpty()) return
         viewModelScope.launch {
             _importing.value = true
             val clips = mutableListOf<AudioClip>()
             var failed = 0
+            var cursor = audioInsertPosition()
             for (uri in uris) {
                 probe.persistPermission(uri)
                 val info = probe.probeAudio(uri)
@@ -228,7 +268,10 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
                     sourceDurationMs = info.durationMs,
                     trimEndMs = info.durationMs,
                     displayName = info.displayName,
+                    startMs = cursor,
+                    kind = kind,
                 )
+                cursor += info.durationMs
             }
             _importing.value = false
             if (failed > 0) messageChannel.send("$failed file${if (failed > 1) "s" else ""} couldn't be opened as audio")
@@ -238,14 +281,48 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
         }
     }
 
-    fun addText(text: String) {
+    /** Audio starts at the playhead, or at 0 when the playhead is at the end. */
+    private fun audioInsertPosition(): Long {
         val total = totalMs()
+        val playhead = _playheadMs.value
+        return if (playhead >= total - 100) 0 else playhead
+    }
+
+    fun addVoiceover(file: File, startMs: Long) {
+        viewModelScope.launch {
+            val info = probe.probeAudio(Uri.fromFile(file))
+            if (info == null || info.durationMs < 200) {
+                file.delete()
+                messageChannel.send("Recording was too short")
+                return@launch
+            }
+            val clip = AudioClip(
+                id = newId(),
+                sourceUri = Uri.fromFile(file).toString(),
+                sourceDurationMs = info.durationMs,
+                trimEndMs = info.durationMs,
+                displayName = "Voiceover",
+                startMs = startMs,
+                kind = AudioKind.VOICE,
+            )
+            edit { p -> p.copy(audioClips = p.audioClips + clip) }
+            _selection.value = Selection.Audio(clip.id)
+        }
+    }
+
+    fun addText(text: String, sticker: Boolean = false) {
+        val total = totalMs()
+        if (total <= 0) return
         val start = _playheadMs.value.coerceIn(0, (total - 500).coerceAtLeast(0))
         val overlay = TextOverlay(
             id = newId(),
             text = text,
             startMs = start,
             endMs = (start + 3_000).coerceAtMost(total.coerceAtLeast(start + 500)),
+            y = if (sticker) 0.4f else 0.8f,
+            background = !sticker,
+            isSticker = sticker,
+            bold = !sticker,
         )
         edit { p -> p.copy(textOverlays = p.textOverlays + overlay) }
         _selection.value = Selection.Text(overlay.id)
@@ -283,20 +360,54 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
             p.copy(videoClips = p.videoClips.map { if (it.id == id) transform(it) else it })
         }
 
-    fun trimVideo(id: String, startMs: Long, endMs: Long) =
-        editVideo(id, "trim") { clip ->
-            val trimmed = TimelineOps.trim(clip, startMs, endMs)
-            val half = trimmed.outputDurationMs() / 2
-            trimmed.copy(fadeInMs = trimmed.fadeInMs.coerceAtMost(half), fadeOutMs = trimmed.fadeOutMs.coerceAtMost(half))
-        }
+    private fun clampFades(clip: VideoClip): VideoClip {
+        val half = clip.outputDurationMs() / 2
+        return clip.copy(fadeInMs = clip.fadeInMs.coerceAtMost(half), fadeOutMs = clip.fadeOutMs.coerceAtMost(half))
+    }
 
-    fun setSpeed(id: String, speed: Float) = editVideo(id) { it.copy(speed = speed.coerceIn(0.5f, 2f)) }
-    fun setVideoVolume(id: String, volume: Float) = editVideo(id, "volume") { it.copy(volume = volume.coerceIn(0f, 1f)) }
+    fun trimVideo(id: String, startMs: Long, endMs: Long) =
+        editVideo(id) { clamped -> clampFades(TimelineOps.trim(clamped, startMs, endMs)) }
+
+    fun setImageDuration(id: String, ms: Long) = editVideo(id, "imageDuration") { clip ->
+        clampFades(clip.copy(trimStartMs = 0, trimEndMs = ms.coerceIn(500, VideoClip.MAX_IMAGE_MS)))
+    }
+
+    fun setSpeed(id: String, speed: Float) = editVideo(id, "speed") {
+        clampFades(it.copy(speed = speed.coerceIn(VideoClip.MIN_SPEED, VideoClip.MAX_SPEED)))
+    }
+
+    fun setVideoVolume(id: String, volume: Float) = editVideo(id, "volume") { it.copy(volume = volume.coerceIn(0f, 2f)) }
     fun setVideoFadeIn(id: String, ms: Long) = editVideo(id, "fadeIn") { it.copy(fadeInMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
     fun setVideoFadeOut(id: String, ms: Long) = editVideo(id, "fadeOut") { it.copy(fadeOutMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
     fun rotate(id: String) = editVideo(id) { TimelineOps.rotate(it) }
+    fun flip(id: String) = editVideo(id) { it.copy(flipH = !it.flipH) }
     fun setCrop(id: String, ratio: Float?) = editVideo(id) { clip ->
         clip.copy(crop = ratio?.let { centerCrop(clip.width, clip.height, it) })
+    }
+
+    fun setFilter(id: String, filterId: String) = editVideo(id) { it.copy(filterId = filterId, filterIntensity = if (it.filterId == filterId) it.filterIntensity else 1f) }
+    fun setFilterIntensity(id: String, value: Float) = editVideo(id, "filterIntensity") { it.copy(filterIntensity = value.coerceIn(0f, 1f)) }
+    fun setAdjust(id: String, adjust: ColorAdjust) = editVideo(id, "adjust") { it.copy(adjust = adjust) }
+
+    fun applyLookToAll(id: String) = edit { p ->
+        val source = p.videoClips.firstOrNull { it.id == id } ?: return@edit p
+        p.copy(
+            videoClips = p.videoClips.map {
+                it.copy(filterId = source.filterId, filterIntensity = source.filterIntensity, adjust = source.adjust)
+            },
+        )
+    }
+
+    fun setTransition(id: String, type: TransitionType, ms: Long) = editVideo(id, "transition") {
+        it.copy(transition = type, transitionMs = ms.coerceIn(100, 2_000))
+    }
+
+    fun applyTransitionToAll(id: String) = edit { p ->
+        val source = p.videoClips.firstOrNull { it.id == id } ?: return@edit p
+        p.copy(
+            crossfadeMs = 0,
+            videoClips = p.videoClips.map { it.copy(transition = source.transition, transitionMs = source.transitionMs) },
+        )
     }
 
     fun splitSelected() {
@@ -304,13 +415,31 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
         val playhead = _playheadMs.value
         when (val sel = _selection.value) {
             is Selection.Audio -> {
-                val pos = TimelineMath.locateAudio(p.audioClips, playhead)
-                val clip = p.audioClips.getOrNull(pos?.index ?: -1)
-                if (pos == null || clip == null || clip.id != sel.id) {
-                    messageChannel.trySend("Move the playhead over the selected music clip to split it")
+                val clip = p.audioClips.firstOrNull { it.id == sel.id } ?: return
+                val offset = playhead - clip.startMs
+                if (offset < TimelineOps.MIN_SPLIT_MS || clip.outputDurationMs() - offset < TimelineOps.MIN_SPLIT_MS) {
+                    messageChannel.trySend("Move the playhead over the selected audio to split it")
                     return
                 }
-                edit { it.copy(audioClips = TimelineOps.splitAudio(it.audioClips, sel.id, pos.offsetInClipMs)) }
+                val at = clip.trimStartMs + offset
+                val left = clip.copy(id = newId(), trimEndMs = at)
+                val right = clip.copy(id = newId(), trimStartMs = at, startMs = clip.startMs + offset, fadeInMs = 0)
+                edit { cur ->
+                    cur.copy(audioClips = cur.audioClips.flatMap { if (it.id == clip.id) listOf(left.copy(fadeOutMs = 0), right) else listOf(it) })
+                }
+                _selection.value = Selection.Audio(right.id)
+            }
+            is Selection.Text -> {
+                val overlay = p.textOverlays.firstOrNull { it.id == sel.id } ?: return
+                if (playhead - overlay.startMs < 100 || overlay.endMs - playhead < 100) {
+                    messageChannel.trySend("Move the playhead over the selected text to split it")
+                    return
+                }
+                val right = overlay.copy(id = newId(), startMs = playhead)
+                edit { cur ->
+                    cur.copy(textOverlays = cur.textOverlays.flatMap { if (it.id == overlay.id) listOf(it.copy(endMs = playhead), right) else listOf(it) })
+                }
+                _selection.value = Selection.Text(right.id)
             }
             else -> {
                 val pos = TimelineMath.locateVideo(p.videoClips, playhead) ?: return
@@ -321,7 +450,17 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
                 if (after.size == before) {
                     messageChannel.trySend("Too close to the edge of the clip to split")
                 } else {
-                    _selection.value = Selection.Video(after[pos.index + 1].id)
+                    // Fresh ids keep repeated splits unique.
+                    val a = after[pos.index].copy(id = newId(), fadeOutMs = 0, transition = TransitionType.NONE)
+                    val b = after[pos.index + 1].copy(id = newId(), fadeInMs = 0)
+                    _project.value = _project.value?.copy(
+                        videoClips = after.toMutableList().apply {
+                            set(pos.index, a)
+                            set(pos.index + 1, b)
+                        },
+                    )
+                    _selection.value = Selection.Video(b.id)
+                    scheduleSave()
                 }
             }
         }
@@ -348,19 +487,25 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
             p.copy(audioClips = p.audioClips.map { if (it.id == id) transform(it) else it })
         }
 
-    fun trimAudio(id: String, startMs: Long, endMs: Long) =
-        editAudio(id, "trim") { TimelineOps.trimAudio(it, startMs, endMs) }
+    /** Moves and/or trims an audio clip; used by the timeline drag handles. */
+    fun placeAudio(id: String, startMs: Long, trimStartMs: Long, trimEndMs: Long) = editAudio(id) { clip ->
+        val ts = trimStartMs.coerceIn(0, clip.sourceDurationMs - TimelineOps.MIN_SPLIT_MS)
+        val te = trimEndMs.coerceIn(ts + TimelineOps.MIN_SPLIT_MS, clip.sourceDurationMs)
+        val trimmed = clip.copy(startMs = startMs.coerceAtLeast(0), trimStartMs = ts, trimEndMs = te)
+        val half = trimmed.outputDurationMs() / 2
+        trimmed.copy(fadeInMs = trimmed.fadeInMs.coerceAtMost(half), fadeOutMs = trimmed.fadeOutMs.coerceAtMost(half))
+    }
 
-    fun setAudioVolume(id: String, volume: Float) = editAudio(id, "volume") { it.copy(volume = volume.coerceIn(0f, 1f)) }
+    fun setAudioVolume(id: String, volume: Float) = editAudio(id, "volume") { it.copy(volume = volume.coerceIn(0f, 2f)) }
     fun setAudioFadeIn(id: String, ms: Long) = editAudio(id, "fadeIn") { it.copy(fadeInMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
     fun setAudioFadeOut(id: String, ms: Long) = editAudio(id, "fadeOut") { it.copy(fadeOutMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
 
-    fun moveAudio(id: String, delta: Int) = edit { p ->
-        val index = p.audioClips.indexOfFirst { it.id == id }
-        p.copy(audioClips = TimelineOps.reorder(p.audioClips, index, index + delta))
+    fun duplicateAudio(id: String) = edit { p ->
+        val clip = p.audioClips.firstOrNull { it.id == id } ?: return@edit p
+        p.copy(audioClips = p.audioClips + clip.copy(id = newId(), startMs = clip.endMs()))
     }
 
-    fun deleteAudio(id: String) = edit { p -> p.copy(audioClips = TimelineOps.deleteAudio(p.audioClips, id)) }
+    fun deleteAudio(id: String) = edit { p -> p.copy(audioClips = p.audioClips.filter { it.id != id }) }
 
     // ---- Text overlays -----------------------------------------------------------------
 
@@ -371,20 +516,27 @@ class EditorViewModel(private val app: FrameApp, projectId: String) : ViewModel(
 
     fun setText(id: String, text: String) = editText(id, "text") { it.copy(text = text) }
 
-    fun setTextRange(id: String, startMs: Long, endMs: Long) = editText(id, "range") {
+    fun setTextRange(id: String, startMs: Long, endMs: Long) = editText(id) {
         val total = totalMs()
         val start = startMs.coerceIn(0, (total - 100).coerceAtLeast(0))
         it.copy(startMs = start, endMs = endMs.coerceIn(start + 100, total.coerceAtLeast(start + 100)))
     }
 
     fun setTextPosition(id: String, x: Float, y: Float) =
-        editText(id, "position") { it.copy(x = x.coerceIn(0.05f, 0.95f), y = y.coerceIn(0.05f, 0.95f)) }
+        editText(id, "position") { it.copy(x = x.coerceIn(0.03f, 0.97f), y = y.coerceIn(0.03f, 0.97f)) }
+
+    fun styleText(id: String, transform: (TextOverlay) -> TextOverlay) = editText(id, "style", transform)
+
+    fun duplicateText(id: String) = edit { p ->
+        val o = p.textOverlays.firstOrNull { it.id == id } ?: return@edit p
+        p.copy(textOverlays = p.textOverlays + o.copy(id = newId(), y = (o.y + 0.08f).coerceAtMost(0.95f)))
+    }
 
     fun deleteText(id: String) = edit { p -> p.copy(textOverlays = p.textOverlays.filter { it.id != id }) }
 
     // ---- Project -----------------------------------------------------------------------
 
-    fun setTransition(ms: Long) = edit("transition") { it.copy(crossfadeMs = ms.coerceIn(0, 2_000)) }
+    fun setAspect(aspect: CanvasAspect) = edit { it.copy(aspect = aspect) }
 
     fun deleteSelected() {
         when (val sel = _selection.value) {

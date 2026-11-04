@@ -41,11 +41,11 @@ object TimelineMath {
 
     /** Converts output offset inside a clip to the media position the player must seek to. */
     fun outputOffsetToMediaMs(clip: VideoClip, offsetMs: Long): Long =
-        (offsetMs * clip.speed.coerceIn(0.5f, 2f)).toLong()
+        if (clip.isImage) offsetMs else (offsetMs * clip.speed.coerceIn(VideoClip.MIN_SPEED, VideoClip.MAX_SPEED)).toLong()
 
     /** Converts a player position (relative to clip start, in media time) to output time. */
     fun mediaToOutputMs(clip: VideoClip, mediaPositionMs: Long): Long =
-        (mediaPositionMs / clip.speed.coerceIn(0.5f, 2f)).toLong()
+        if (clip.isImage) mediaPositionMs else (mediaPositionMs / clip.speed.coerceIn(VideoClip.MIN_SPEED, VideoClip.MAX_SPEED)).toLong()
 
     fun globalFromVideo(clips: List<VideoClip>, index: Int, mediaPositionMs: Long): Long {
         if (index !in clips.indices) return 0

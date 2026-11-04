@@ -10,6 +10,7 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
+import androidx.media3.transformer.VideoEncoderSettings
 import app.frame.studio.data.ProjectRepository
 import app.frame.studio.domain.ExportRecord
 import app.frame.studio.domain.Project
@@ -90,7 +91,22 @@ class ExportManager(
         val t = Transformer.Builder(context)
             .setVideoMimeType(ExportPolicy.videoMimeType)
             .setAudioMimeType(ExportPolicy.audioMimeType)
-            .setEncoderFactory(DefaultEncoderFactory.Builder(context).setEnableFallback(true).build())
+            .setEncoderFactory(
+                DefaultEncoderFactory.Builder(context)
+                    .setEnableFallback(true)
+                    .setRequestedVideoEncoderSettings(
+                        VideoEncoderSettings.Builder()
+                            .setBitrate(
+                                ExportPlan.bitrate(
+                                    ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect),
+                                    project.exportFps,
+                                    project.exportQuality,
+                                ),
+                            )
+                            .build(),
+                    )
+                    .build(),
+            )
             .addListener(listener)
             .build()
         transformer = t

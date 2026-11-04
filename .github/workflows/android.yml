@@ -92,6 +92,7 @@ jobs:
           sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
           ffmpeg -y -f lavfi -i testsrc=size=1280x720:rate=30 -f lavfi -i sine=frequency=440:sample_rate=44100 -t 4 -c:v libx264 -pix_fmt yuv420p -c:a aac -shortest /tmp/sample.mp4
           ffmpeg -y -f lavfi -i sine=frequency=660:sample_rate=44100 -t 4 -c:a aac /tmp/sample.m4a
+          ffmpeg -y -f lavfi -i testsrc2=size=640x480 -frames:v 1 /tmp/sample.png
 
       - name: Enable KVM
         run: |

@@ -33,7 +33,8 @@ object TimelineOps {
         val clip = clips[index]
         if (clip.outputDurationMs() < MIN_SPLIT_MS * 2) return clips
         val relative = atOutputMs.coerceIn(1, clip.outputDurationMs() - 1)
-        val atSource = clip.trimStartMs + (relative * clip.speed.coerceIn(0.5f, 2f)).toLong()
+        val rate = if (clip.isImage) 1f else clip.speed.coerceIn(VideoClip.MIN_SPEED, VideoClip.MAX_SPEED)
+        val atSource = clip.trimStartMs + (relative * rate).toLong()
         if (atSource <= clip.trimStartMs || atSource >= clip.trimEndMs) return clips
         val left = clip.copy(id = "${clip.id}_a", trimEndMs = atSource)
         val right = clip.copy(id = "${clip.id}_b", trimStartMs = atSource)

@@ -1,205 +1,156 @@
 package app.frame.studio.ui.editor
 
 import android.content.Context
-import android.net.Uri
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
-import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import app.frame.studio.domain.AudioClip
+import androidx.media3.transformer.CompositionPlayer
+import app.frame.studio.domain.ExportHeight
+import app.frame.studio.domain.ExportQuality
 import app.frame.studio.domain.Project
-import app.frame.studio.domain.VideoClip
-import app.frame.studio.export.ExportPlan
+import app.frame.studio.export.CompositionFactory
 import app.frame.studio.timeline.TimelineMath
-import kotlin.math.abs
 
 /**
- * Drives the editor preview: one player for the video track and one for the music track,
- * kept in sync on the project's output timeline. Not thread-safe; use on the main thread.
+ * Plays the project's Media3 composition, so the preview shows exactly what the export renders
+ * (speed, filters, crop, transitions, text, mixed audio). Use on the main thread only.
  */
 @OptIn(UnstableApi::class)
-class PreviewController(context: Context) {
+class PreviewController(private val context: Context) {
 
-    val videoPlayer: ExoPlayer = ExoPlayer.Builder(context).build()
-    private val musicPlayer: ExoPlayer = ExoPlayer.Builder(context).build()
-
+    var player by mutableStateOf<CompositionPlayer?>(null)
+        private set
     var isPlaying by mutableStateOf(false)
         private set
     var positionMs by mutableLongStateOf(0L)
         private set
-    var currentClipIndex by mutableIntStateOf(0)
+    var totalMs by mutableLongStateOf(0L)
         private set
     var error by mutableStateOf<String?>(null)
         private set
 
-    private var clips: List<VideoClip> = emptyList()
-    private var music: List<AudioClip> = emptyList()
-    private var fades: List<ExportPlan.FadeWindow> = emptyList()
-    private var videoKey: List<Any> = emptyList()
-    private var musicKey: List<Any> = emptyList()
+    private var renderedKey: Project? = null
+    private var muted = false
+    private var ended = false
+    private var scrubbing = false
 
-    init {
-        videoPlayer.addListener(object : Player.Listener {
-            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                applyClipParameters()
-            }
-
-            override fun onIsPlayingChanged(playing: Boolean) {
-                isPlaying = playing
-                syncMusic(force = true)
-            }
-
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_ENDED) {
-                    videoPlayer.playWhenReady = false
-                    musicPlayer.playWhenReady = false
-                    positionMs = TimelineMath.totalVideoMs(clips)
-                }
-            }
-
-            override fun onPlayerError(e: PlaybackException) {
-                error = "Preview error: ${e.errorCodeName}"
-            }
-        })
-    }
-
-    val totalMs: Long get() = TimelineMath.totalVideoMs(clips)
-
-    fun setProject(project: Project, transitionMs: Long = project.crossfadeMs) {
-        val newVideoKey: List<Any> = project.videoClips.map { listOf(it.id, it.sourceUri, it.trimStartMs, it.trimEndMs) }
-        val resume = positionMs
-        clips = project.videoClips
-        fades = ExportPlan.fadeWindows(clips, transitionMs)
-        if (newVideoKey != videoKey) {
-            videoKey = newVideoKey
-            error = null
-            videoPlayer.setMediaItems(clips.map { clipItem(it.sourceUri, it.trimStartMs, it.trimEndMs) })
-            videoPlayer.prepare()
-            if (clips.isNotEmpty()) seekTo(resume.coerceAtMost((totalMs - 1).coerceAtLeast(0)))
+    private val listener = object : Player.Listener {
+        override fun onIsPlayingChanged(playing: Boolean) {
+            isPlaying = playing
         }
-        applyClipParameters()
 
-        val fitted = ExportPlan.fitAudio(project.audioClips, totalMs)
-        val newMusicKey: List<Any> = fitted.map { listOf(it.id, it.sourceUri, it.trimStartMs, it.trimEndMs) }
-        music = fitted
-        if (newMusicKey != musicKey) {
-            musicKey = newMusicKey
-            musicPlayer.setMediaItems(fitted.map { clipItem(it.sourceUri, it.trimStartMs, it.trimEndMs) })
-            musicPlayer.prepare()
-            syncMusic(force = true)
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            ended = playbackState == Player.STATE_ENDED
+            if (ended) positionMs = totalMs
+        }
+
+        override fun onPlayerError(e: PlaybackException) {
+            Log.w(TAG, "Preview error", e)
+            error = "Preview error: ${e.errorCodeName}"
         }
     }
 
-    private fun clipItem(uri: String, startMs: Long, endMs: Long) = MediaItem.Builder()
-        .setUri(Uri.parse(uri))
-        .setClippingConfiguration(
-            MediaItem.ClippingConfiguration.Builder()
-                .setStartPositionMs(startMs)
-                .setEndPositionMs(endMs)
-                .build(),
+    /** Rebuilds the preview when anything that affects rendering changed. */
+    fun setProject(project: Project) {
+        // Preview at 720p: fast to render, identical framing to the export.
+        val key = project.copy(
+            name = "",
+            createdAtEpochMs = 0,
+            updatedAtEpochMs = 0,
+            exportHeight = ExportHeight.HD_720,
+            exportFps = 30,
+            exportQuality = ExportQuality.HIGH,
         )
-        .build()
-
-    private fun applyClipParameters() {
-        val clip = clips.getOrNull(videoPlayer.currentMediaItemIndex) ?: return
-        currentClipIndex = videoPlayer.currentMediaItemIndex
-        val speed = clip.speed.coerceIn(0.5f, 2f)
-        if (videoPlayer.playbackParameters.speed != speed) {
-            videoPlayer.playbackParameters = PlaybackParameters(speed)
-        }
-        updateVolumes()
-    }
-
-    /** Called every frame-ish by the UI to refresh the playhead, fades and music sync. */
-    fun tick() {
-        if (clips.isEmpty()) {
+        if (key == renderedKey) return
+        renderedKey = key
+        totalMs = TimelineMath.totalVideoMs(project.videoClips)
+        if (project.videoClips.isEmpty()) {
+            replacePlayer(null)
             positionMs = 0
             return
         }
-        if (videoPlayer.playbackState != Player.STATE_ENDED) {
-            positionMs = TimelineMath.globalFromVideo(clips, videoPlayer.currentMediaItemIndex, videoPlayer.currentPosition)
-        }
-        updateVolumes()
-        syncMusic(force = false)
-    }
-
-    /** Brightness for the preview fade overlay. */
-    fun brightness(): Float = ExportPlan.brightnessAt(fades, positionMs)
-
-    private fun updateVolumes() {
-        val index = videoPlayer.currentMediaItemIndex
-        val clip = clips.getOrNull(index)
-        if (clip != null) {
-            val offset = positionMs - TimelineMath.videoStarts(clips)[index]
-            videoPlayer.volume = ExportPlan.gainAt(clip.volume, clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs(), offset)
-                .coerceIn(0f, 1f)
-        }
-        TimelineMath.locateAudio(music, positionMs)?.let { pos ->
-            val a = music[pos.index]
-            musicPlayer.volume = ExportPlan.gainAt(a.volume, a.fadeInMs, a.fadeOutMs, a.outputDurationMs(), pos.offsetInClipMs)
-                .coerceIn(0f, 1f)
-        }
-    }
-
-    private fun syncMusic(force: Boolean) {
-        if (music.isEmpty()) {
-            musicPlayer.playWhenReady = false
+        val composition = try {
+            CompositionFactory.build(key, forExport = false)
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not build preview", e)
+            error = e.message
             return
         }
-        val pos = TimelineMath.locateAudio(music, positionMs)
-        if (pos == null) {
-            musicPlayer.playWhenReady = false
-            return
-        }
-        val drift = if (musicPlayer.currentMediaItemIndex == pos.index) {
-            abs(musicPlayer.currentPosition - pos.offsetInClipMs)
-        } else {
-            Long.MAX_VALUE
-        }
-        if (force || drift > MAX_DRIFT_MS) musicPlayer.seekTo(pos.index, pos.offsetInClipMs)
-        musicPlayer.playWhenReady = videoPlayer.isPlaying
+        val resumeAt = positionMs.coerceIn(0, (totalMs - 1).coerceAtLeast(0))
+        val resume = isPlaying
+        error = null
+        val next = CompositionPlayer.Builder(context).build()
+        next.addListener(listener)
+        next.volume = if (muted) 0f else 1f
+        next.setComposition(composition)
+        next.seekTo(resumeAt)
+        next.prepare()
+        next.playWhenReady = resume
+        replacePlayer(next)
+        positionMs = resumeAt
+        ended = false
+    }
+
+    private fun replacePlayer(next: CompositionPlayer?) {
+        val old = player
+        player = next
+        old?.removeListener(listener)
+        old?.release()
+        if (next == null) isPlaying = false
+    }
+
+    /** Called every frame by the UI to refresh the playhead. */
+    fun tick() {
+        val p = player ?: return
+        if (!ended && !scrubbing) positionMs = p.currentPosition.coerceIn(0, totalMs)
     }
 
     fun togglePlay() {
-        if (clips.isEmpty()) return
-        if (videoPlayer.isPlaying) {
-            videoPlayer.pause()
+        val p = player ?: return
+        if (p.isPlaying) {
+            p.pause()
             return
         }
-        if (videoPlayer.playbackState == Player.STATE_ENDED || positionMs >= totalMs - 50) seekTo(0)
-        if (videoPlayer.playbackState == Player.STATE_IDLE) videoPlayer.prepare()
-        videoPlayer.play()
+        if (ended || positionMs >= totalMs - 50) seekTo(0)
+        p.play()
     }
 
     fun pause() {
-        videoPlayer.pause()
-        musicPlayer.pause()
+        player?.pause()
     }
 
-    fun seekTo(globalMs: Long) {
-        if (clips.isEmpty()) return
-        val target = globalMs.coerceIn(0, (totalMs - 1).coerceAtLeast(0))
-        val pos = TimelineMath.locateVideo(clips, target) ?: return
-        videoPlayer.seekTo(pos.index, TimelineMath.outputOffsetToMediaMs(clips[pos.index], pos.offsetInClipMs))
+    /** Silences the preview, e.g. while recording a voiceover. */
+    fun setMuted(value: Boolean) {
+        muted = value
+        player?.volume = if (value) 0f else 1f
+    }
+
+    fun setScrubbing(enabled: Boolean) {
+        if (scrubbing == enabled) return
+        scrubbing = enabled
+        runCatching { player?.setScrubbingModeEnabled(enabled) }
+    }
+
+    fun seekTo(ms: Long) {
+        val p = player ?: return
+        val target = ms.coerceIn(0, (totalMs - 1).coerceAtLeast(0))
+        p.seekTo(target)
         positionMs = target
-        applyClipParameters()
-        syncMusic(force = true)
+        ended = false
     }
 
     fun release() {
-        videoPlayer.release()
-        musicPlayer.release()
+        replacePlayer(null)
+        renderedKey = null
     }
 
     companion object {
-        private const val MAX_DRIFT_MS = 300L
+        private const val TAG = "PreviewController"
     }
 }
