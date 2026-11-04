@@ -2,6 +2,7 @@
 
 package app.frame.studio.ui.editor
 
+import androidx.compose.runtime.derivedStateOf
 import app.frame.studio.ui.common.bounceClick
 import androidx.compose.material3.FilterChip
 import androidx.compose.material.icons.filled.LayersClear
@@ -457,7 +458,8 @@ private fun EditorContent(
                         onAddMedia = ::launchMediaPicker,
                         onAddText = { showAddText = true },
                         onAddOverlay = { pickOverlay.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
-                        keyed = keyedAt(project, sel, controller.positionMs),
+                        // derivedStateOf: recompose when the answer flips, not on every playback frame.
+                        keyed = remember(project, sel) { derivedStateOf { keyedAt(project, sel, controller.positionMs) } }.value,
                     )
                 }
             }
@@ -641,16 +643,19 @@ private fun PreviewArea(
             }
             // Selected text, sticker or overlay: move, pinch and rotate it on the preview. Animated
             // objects get a keyframe at the playhead (the outline turns gold on a keyframe).
-            val playhead = controller.positionMs
-            val transform = transformOf(project, selection, playhead)
-            val box = boxOf(project, selection, outputSize.width, outputSize.height)
-            if (transform != null && box != null) {
+            // Only an object that is selected cares about the playhead; nothing else here should
+            // recompose on every playback frame.
+            val transform by remember(project, selection) { derivedStateOf { transformOf(project, selection, controller.positionMs) } }
+            val keyedNow by remember(project, selection) { derivedStateOf { keyedAt(project, selection, controller.positionMs) } }
+            val box = remember(project, selection, outputSize) { boxOf(project, selection, outputSize.width, outputSize.height) }
+            val shownTransform = transform
+            if (shownTransform != null && box != null) {
                 TransformFrame(
-                    transform = transform,
+                    transform = shownTransform,
                     boxFraction = box,
                     frameW = frameW,
                     frameH = frameH,
-                    keyed = keyedAt(project, selection, playhead),
+                    keyed = keyedNow,
                     onCommit = onTransform,
                     onTap = controller::togglePlay,
                 )
