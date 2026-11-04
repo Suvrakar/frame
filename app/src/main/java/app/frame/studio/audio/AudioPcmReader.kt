@@ -17,6 +17,12 @@ import java.nio.ByteOrder
 object AudioPcmReader {
 
     const val TARGET_RATE = 11_025
+    private const val KEY_ENCODER_DELAY = "encoder-delay"
+
+    /** Priming frames skipped by the last read (for diagnostics). */
+    @Volatile
+    var lastEncoderDelay = 0
+        private set
     private const val TAG = "AudioPcmReader"
     private const val TIMEOUT_US = 10_000L
 
@@ -42,6 +48,12 @@ object AudioPcmReader {
             decoder.configure(format, null, null, 0)
             decoder.start()
 
+            // AAC starts with encoder "priming" silence (usually 2112 samples). Some decoders don't
+            // strip it, which would put every detected beat ~48 ms late. Skip it when the file says.
+            var primingFrames = if (startMs <= 0 && format.containsKey(KEY_ENCODER_DELAY)) {
+                format.getInteger(KEY_ENCODER_DELAY).coerceIn(0, 8192)
+            } else 0
+            lastEncoderDelay = primingFrames
             var sourceRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
             var channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
             var floatPcm = false
@@ -95,6 +107,10 @@ object AudioPcmReader {
                                 mono += if (floatPcm) buffer.float else buffer.short / 32768f
                             }
                             if (frame < skip) continue
+                            if (primingFrames > 0) {
+                                primingFrames--
+                                continue
+                            }
                             sum += mono / channels
                             count++
                             acc += 1f

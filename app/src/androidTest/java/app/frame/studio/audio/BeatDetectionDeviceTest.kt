@@ -32,7 +32,7 @@ class BeatDetectionDeviceTest {
         // a little more (decoder priming differs between devices) but stay below what's audible.
         val errors = result.beatsMs.map { b -> (b % 500).let { minOf(it, 500 - it) } }
         val median = errors.sorted()[errors.size / 2]
-        android.util.Log.i("FramePerf", "beats.errors=$errors")
+        android.util.Log.i("FramePerf", "beats.errors=$errors encoderDelay=${AudioPcmReader.lastEncoderDelay}")
         assertTrue("median beat error $median ms", median < 30)
         errors.forEachIndexed { i, e -> assertTrue("beat ${result.beatsMs[i]} off by $e ms", e < 70) }
     }

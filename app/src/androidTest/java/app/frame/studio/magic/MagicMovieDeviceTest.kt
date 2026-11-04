@@ -121,8 +121,12 @@ class MagicMovieDeviceTest {
             retriever.setDataSource(output.absolutePath)
             val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
             assertEquals(total.toDouble(), duration.toDouble(), 400.0)
-            assertEquals("720", retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH))
-            assertEquals("1280", retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT))
+            // Encoders may store portrait video as landscape plus a rotation flag; players honour it.
+            val w = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)!!.toInt()
+            val h = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)!!.toInt()
+            val rotation = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
+            val (shownW, shownH) = if (rotation % 180 != 0) h to w else w to h
+            assertEquals("${w}x$h rot $rotation", 720 to 1280, shownW to shownH)
         } finally {
             retriever.release()
         }

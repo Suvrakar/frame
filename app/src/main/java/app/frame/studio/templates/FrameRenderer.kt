@@ -327,7 +327,7 @@ internal object FrameRenderer {
                     close()
                 }
                 canvas.drawPath(tri, Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = palette[i % palette.size]
+                    color = FLAGS[(i + if (accent == FLAGS[0]) 1 else 0) % FLAGS.size].let { if (i % 3 == 0) accent else it }
                     setShadowLayer(m * 0.006f, 0f, m * 0.003f, 0x33000000)
                 })
             }
@@ -357,10 +357,12 @@ internal object FrameRenderer {
             if (title.isBlank()) return
             val size = fit(title, face, min(m * rel, (bottom - top) * 0.62f), w * 0.86f)
             val subSize = m * 0.036f
-            val block = size + if (subtitle.isNotBlank()) subSize * 1.8f else 0f
+            // Script faces have deep descenders: leave room below the title before the subtitle.
+            val gap = size * 0.42f + subSize
+            val block = size + if (subtitle.isNotBlank()) gap else 0f
             val y0 = top + (bottom - top - block) / 2 + size * 0.85f
             line(title, w / 2, y0, size, face, on, shadow = on == 0xFFFFFFFF.toInt())
-            if (subtitle.isNotBlank()) line(subtitle.uppercase(), w / 2, y0 + subSize * 1.9f, subSize, MEDIUM, on, spacing = 0.2f)
+            if (subtitle.isNotBlank()) line(subtitle.uppercase(), w / 2, y0 + gap, subSize, MEDIUM, on, spacing = 0.2f)
         }
 
         fun fit(text: String, face: Typeface, start: Float, maxWidth: Float): Float {
@@ -380,7 +382,8 @@ internal object FrameRenderer {
         ) {
             val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 typeface = face
-                this.color = color
+                // With a shader the paint's alpha still applies, so keep it opaque.
+                this.color = if (shader != null) 0xFFFFFFFF.toInt() else color
                 letterSpacing = spacing
                 textAlign = Paint.Align.CENTER
                 this.shader = shader
@@ -395,6 +398,10 @@ internal object FrameRenderer {
             canvas.drawText(text, cx, baseline, p)
         }
     }
+
+    private val FLAGS = listOf(
+        0xFFFF6F91.toInt(), 0xFFFFC75F.toInt(), 0xFF4FC3F7.toInt(), 0xFF8BC34A.toInt(), 0xFFB388FF.toInt(), 0xFFFF9671.toInt(),
+    )
 
     private fun star(cx: Float, cy: Float, r: Float) = Path().apply {
         for (i in 0 until 10) {
