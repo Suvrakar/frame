@@ -854,36 +854,32 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ### Task 5: Measure the preview drag box with the real font
 
 **Files:**
-- Modify: `app/src/main/java/app/frame/studio/ui/editor/EditorScreen.kt` (`TextDragFrame`, ~lines 696-710)
+- Modify: `app/src/main/java/app/frame/studio/ui/editor/EditorScreen.kt` (`boxOf`, the `is Selection.Text ->` branch)
+
+Note: `boxOf` feeds the live `TransformFrame` outline. `TextDragFrame` in the same file is unused (no call sites) and is left alone.
 
 **Interfaces:**
 - Consumes: `TextFonts.typeface(id)`, `TextOverlay.font`, `TextOverlay.bold`
 
 - [ ] **Step 1: Replace the character-count estimate**
 
-In `TextDragFrame`, replace these lines:
+In `boxOf`, replace the whole `is Selection.Text -> ...` branch with:
 
 ```kotlin
-    val longestLine = overlay.text.lines().maxOfOrNull { it.length } ?: 1
-    val boxW = (fontPx * 0.58f * (longestLine + if (overlay.background) 2 else 0)).coerceIn(fontPx, frameW)
-    val boxH = (fontPx * 1.25f * overlay.text.lines().size.coerceAtLeast(1)).coerceAtMost(frameH)
-```
-
-with:
-
-```kotlin
-    val (textW, lineH) = remember(overlay.text, overlay.font, overlay.bold, overlay.background, fontPx) {
+    is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }?.let { t ->
+        // Measure with the overlay's real font: 100px glyphs per 1080px of short side.
+        val fontPx = minOf(canvasW, canvasH) * 100f / 1080f * t.scale * (if (t.isSticker) 2f else 1f)
         val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
             textSize = fontPx
-            typeface = app.frame.studio.text.TextFonts.typeface(overlay.font)
-            isFakeBoldText = overlay.bold && !typeface.isBold
+            typeface = app.frame.studio.text.TextFonts.typeface(t.font)
+            isFakeBoldText = t.bold && !typeface.isBold
         }
-        val pad = if (overlay.background && !overlay.isSticker) paint.measureText("  ") else 0f
-        val widest = overlay.text.lines().maxOfOrNull { paint.measureText(it) } ?: fontPx
-        (widest + pad) to paint.fontSpacing
+        val lines = t.text.lines().ifEmpty { listOf("") }
+        val pad = if (t.background && !t.isSticker) paint.measureText("  ") else 0f
+        val w = ((lines.maxOf { paint.measureText(it) }) + pad).coerceIn(fontPx, canvasW.toFloat())
+        val h = (paint.fontSpacing * lines.size).coerceAtMost(canvasH.toFloat())
+        (w / canvasW) to (h / canvasH)
     }
-    val boxW = textW.coerceIn(fontPx, frameW)
-    val boxH = (lineH * overlay.text.lines().size.coerceAtLeast(1)).coerceAtMost(frameH)
 ```
 
 - [ ] **Step 2: Build**
