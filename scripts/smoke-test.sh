@@ -30,9 +30,9 @@ if ./gradlew connectedDebugAndroidTest >> "$LOG" 2>&1; then
 else
   find app/build/outputs/androidTest-results -name "*.xml" -exec cat {} \; >> "$LOG" 2>/dev/null
   mkdir -p shots
-  adb pull /sdcard/Android/data/app.frame.studio.debug/files/shots/. shots/ >> "$LOG" 2>&1 || true
+  adb pull /data/local/tmp/shots/. shots/ >> "$LOG" 2>&1 || true
   echo "SMOKE: EXPORT FAILED" >> "$LOG"; exit 1
 fi
 mkdir -p shots
-adb pull /sdcard/Android/data/app.frame.studio.debug/files/shots/. shots/ >> "$LOG" 2>&1 || true
+adb pull /data/local/tmp/shots/. shots/ >> "$LOG" 2>&1 || true
 echo "SMOKE: OK" >> "$LOG"

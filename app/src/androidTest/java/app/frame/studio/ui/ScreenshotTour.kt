@@ -21,7 +21,7 @@ import java.io.File
 
 /**
  * Walks the main screens with a seeded project and saves screenshots for visual review.
- * Output: PNG files in the "shots" folder of external files (pulled by scripts/smoke-test.sh).
+ * Output: PNG files in /data/local/tmp/shots (pulled by scripts/smoke-test.sh).
  */
 @RunWith(AndroidJUnit4::class)
 class ScreenshotTour {
@@ -29,7 +29,11 @@ class ScreenshotTour {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
     private val device = UiDevice.getInstance(instrumentation)
-    private val shots = File(context.getExternalFilesDir(null), "shots").apply { mkdirs() }
+
+    init {
+        // Written by the shell user so the files survive the app being uninstalled after tests.
+        device.executeShellCommand("mkdir -p /data/local/tmp/shots")
+    }
 
     private fun sample(name: String): String {
         val copy = File(context.filesDir, "seed_$name")
@@ -40,7 +44,7 @@ class ScreenshotTour {
     private fun shot(name: String) {
         device.waitForIdle()
         Thread.sleep(1_200)
-        device.takeScreenshot(File(shots, "$name.png"))
+        device.executeShellCommand("screencap -p /data/local/tmp/shots/$name.png")
     }
 
     private fun tap(text: String): Boolean {
