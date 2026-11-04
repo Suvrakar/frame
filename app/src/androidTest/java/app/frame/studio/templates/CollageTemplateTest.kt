@@ -14,12 +14,15 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 
+private val SHOWCASE = setOf("birthday_collage", "party_polaroids", "birthday_filmstrip", "anniversary_collage", "our_years")
+
 /** Builds every collage template on a real device from sample media and checks the frames. */
 @RunWith(AndroidJUnit4::class)
 class CollageTemplateTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val app = context.applicationContext as FrameApp
+    private val device = androidx.test.uiautomator.UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
     private fun sample(name: String): Uri {
         val copy = File(context.filesDir, "collage_$name")
@@ -46,6 +49,15 @@ class CollageTemplateTest {
                 assertEquals(template.id, clip.height, bounds.outHeight)
             }
             assertNotNull(app.repository.get(project.id))
+            if (template.id in SHOWCASE) {
+                // Copy the finished collage where the CI script can collect it for visual review.
+                val finalFrame = project.videoClips.filter { it.displayName.startsWith("Collage") }.last()
+                val src = File(Uri.parse(finalFrame.sourceUri).path!!)
+                val ext = File(context.getExternalFilesDir(null), "collage_${template.id}.jpg")
+                src.copyTo(ext, overwrite = true)
+                device.executeShellCommand("mkdir -p /data/local/tmp/shots")
+                device.executeShellCommand("cp ${ext.absolutePath} /data/local/tmp/shots/collage_${template.id}.jpg")
+            }
             app.repository.delete(project.id)
         }
     }

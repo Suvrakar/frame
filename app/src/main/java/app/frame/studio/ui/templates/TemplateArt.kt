@@ -189,7 +189,8 @@ fun TemplateCard(template: VideoTemplate, modifier: Modifier = Modifier, onClick
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     modifier = Modifier
-                        .align(Alignment.TopStart)
+                        // Collages keep their title band clear.
+                        .align(if (template.collage != null) Alignment.BottomStart else Alignment.TopStart)
                         .padding(8.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.White)
@@ -201,7 +202,7 @@ fun TemplateCard(template: VideoTemplate, modifier: Modifier = Modifier, onClick
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.White,
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
+                    .align(if (template.collage != null) Alignment.BottomEnd else Alignment.TopEnd)
                     .padding(8.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.Black.copy(alpha = 0.45f))
