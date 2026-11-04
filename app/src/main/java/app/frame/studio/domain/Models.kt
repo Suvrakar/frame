@@ -182,7 +182,25 @@ data class TextOverlay(
     val animate: Boolean = true,
     /** Emoji sticker: rendered larger and without a background. */
     val isSticker: Boolean = false,
-)
+    /** Word-by-word caption timing, relative to [startMs]. Empty for ordinary text. */
+    val words: List<CaptionWord> = emptyList(),
+    val captionStyle: CaptionStyle = CaptionStyle.KARAOKE,
+) {
+    val isCaption: Boolean get() = words.isNotEmpty()
+}
+
+/** One spoken word of a caption; times are relative to the caption's start. */
+@Serializable
+data class CaptionWord(val text: String, val startMs: Long, val endMs: Long)
+
+/** How the current word of an animated caption is shown. */
+@Serializable
+enum class CaptionStyle(val label: String) {
+    KARAOKE("Karaoke"),
+    POP("Pop"),
+    BOX("Highlight"),
+    PLAIN("Plain"),
+}
 
 @Serializable
 enum class EffectGroup(val label: String) { WEATHER("Weather"), PARTY("Party"), FILM("Film"), MOTION("Motion") }

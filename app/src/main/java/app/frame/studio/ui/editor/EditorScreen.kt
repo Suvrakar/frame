@@ -2,6 +2,10 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.domain.CaptionStyle
+import app.frame.studio.pro.ProFeature
+import app.frame.studio.ui.pro.rememberProGate
+import app.frame.studio.ui.pro.ProGate
 import android.Manifest
 import android.content.pm.PackageManager
 import android.view.SurfaceHolder
@@ -51,6 +55,7 @@ import androidx.compose.material.icons.automirrored.filled.Redo
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.AcUnit
+import androidx.compose.material.icons.filled.ClosedCaption
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -224,6 +229,12 @@ private fun EditorContent(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     LaunchedEffect(vm) { vm.messages.collect { snackbar.showSnackbar(it) } }
+    val proGate = rememberProGate(app.pro)
+    var captionStyle by rememberSaveable { mutableStateOf(CaptionStyle.KARAOKE) }
+    val captionMic = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) vm.autoCaptions(captionStyle)
+    }
+    LaunchedEffect(vm) { vm.captionsNeedPermission.collect { captionMic.launch(Manifest.permission.RECORD_AUDIO) } }
     LaunchedEffect(controller.error) { controller.error?.let { snackbar.showSnackbar(it) } }
 
     // ---- Pickers ----------------------------------------------------------------------------
@@ -394,6 +405,9 @@ private fun EditorContent(
                 if (activeTool != null) {
                     ActivePanel(
                         app = app,
+                        proGate = proGate,
+                        captionStyle = captionStyle,
+                        onCaptionStyle = { captionStyle = it },
                         vm = vm,
                         project = project,
                         tool = activeTool,
@@ -709,6 +723,7 @@ private fun Toolbar(
             ToolbarItem(Icons.Filled.ContentCut, "Edit", enabled = hasClips) { vm.selectClipAtPlayhead() }
             ToolbarItem(Icons.Filled.MusicNote, "Audio", enabled = hasClips) { onTool(Tool.AUDIO) }
             ToolbarItem(Icons.Filled.TextFields, "Text", enabled = hasClips) { onAddText() }
+            ToolbarItem(Icons.Filled.ClosedCaption, "Captions", enabled = hasClips) { onTool(Tool.CAPTIONS) }
             ToolbarItem(Icons.Filled.AcUnit, "Effects", enabled = hasClips) { onTool(Tool.EFFECTS) }
             ToolbarItem(Icons.Filled.EmojiEmotions, "Stickers", enabled = hasClips) { onTool(Tool.STICKERS) }
             ToolbarItem(Icons.Filled.AutoAwesome, "Filters", enabled = hasClips) {
@@ -773,6 +788,9 @@ private fun Toolbar(
 @Composable
 private fun ActivePanel(
     app: FrameApp,
+    proGate: ProGate,
+    captionStyle: CaptionStyle,
+    onCaptionStyle: (CaptionStyle) -> Unit,
     vm: EditorViewModel,
     project: Project,
     tool: Tool,
@@ -836,6 +854,34 @@ private fun ActivePanel(
                         vm.syncToBeats(a.id, every)
                         onClose()
                     },
+                )
+            }
+            Tool.CAPTIONS -> {
+                val progress by vm.captioning.collectAsStateWithLifecycle()
+                val captions = project.textOverlays.filter { it.isCaption }
+                CaptionsPanel(
+                    hasCaptions = captions.isNotEmpty(),
+                    style = captions.firstOrNull()?.captionStyle ?: captionStyle,
+                    autoSupported = vm.autoCaptionsSupported,
+                    progress = progress,
+                    onStyle = { s ->
+                        onCaptionStyle(s)
+                        vm.setCaptionStyle(s)
+                    },
+                    onAuto = {
+                        proGate.require(ProFeature.ANIMATED_CAPTIONS) {
+                            app.pro.consumePass(ProFeature.ANIMATED_CAPTIONS)
+                            vm.autoCaptions(captions.firstOrNull()?.captionStyle ?: captionStyle)
+                        }
+                    },
+                    onCancel = vm::cancelCaptions,
+                    onTyped = { text ->
+                        proGate.require(ProFeature.ANIMATED_CAPTIONS) {
+                            app.pro.consumePass(ProFeature.ANIMATED_CAPTIONS)
+                            vm.typedCaptions(text, captions.firstOrNull()?.captionStyle ?: captionStyle)
+                        }
+                    },
+                    onClear = vm::clearCaptions,
                 )
             }
             Tool.EFFECTS -> EffectsPanel(current = null) { type ->

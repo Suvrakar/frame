@@ -1,5 +1,8 @@
 package app.frame.studio.ui.editor
 
+import app.frame.studio.domain.CaptionStyle
+import app.frame.studio.captions.CaptionPlanner
+import app.frame.studio.captions.AutoCaptioner
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -470,9 +473,9 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                     messageChannel.trySend("Move the playhead over the selected text to split it")
                     return
                 }
-                val right = overlay.copy(id = newId(), startMs = playhead)
+                val (left, right) = CaptionPlanner.split(overlay, playhead, newId())
                 edit { cur ->
-                    cur.copy(textOverlays = cur.textOverlays.flatMap { if (it.id == overlay.id) listOf(it.copy(endMs = playhead), right) else listOf(it) })
+                    cur.copy(textOverlays = cur.textOverlays.flatMap { if (it.id == overlay.id) listOf(left, right) else listOf(it) })
                 }
                 _selection.value = Selection.Text(right.id)
             }
@@ -549,12 +552,12 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             p.copy(textOverlays = p.textOverlays.map { if (it.id == id) transform(it) else it })
         }
 
-    fun setText(id: String, text: String) = editText(id, "text") { it.copy(text = text) }
+    fun setText(id: String, text: String) = editText(id, "text") { CaptionPlanner.retext(it, text) }
 
     fun setTextRange(id: String, startMs: Long, endMs: Long) = editText(id) {
         val total = totalMs()
         val start = startMs.coerceIn(0, (total - 100).coerceAtLeast(0))
-        it.copy(startMs = start, endMs = endMs.coerceIn(start + 100, total.coerceAtLeast(start + 100)))
+        CaptionPlanner.retime(it, start, endMs.coerceIn(start + 100, total.coerceAtLeast(start + 100)))
     }
 
     fun setTextPosition(id: String, x: Float, y: Float) =
@@ -568,6 +571,77 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     }
 
     fun deleteText(id: String) = edit { p -> p.copy(textOverlays = p.textOverlays.filter { it.id != id }) }
+
+    // ---- Animated captions ----------------------------------------------------------------
+
+    private val captioner by lazy { AutoCaptioner(app) }
+    val autoCaptionsSupported: Boolean get() = captioner.isSupported
+
+    private val _captioning = MutableStateFlow<Float?>(null)
+    /** Progress of on-device transcription (0..1), or null when idle. */
+    val captioning: StateFlow<Float?> = _captioning.asStateFlow()
+    private var captionJob: Job? = null
+
+    private val _captionsNeedPermission = Channel<Unit>(Channel.CONFLATED)
+    val captionsNeedPermission = _captionsNeedPermission.receiveAsFlow()
+
+    /** Listens to the clips and voiceovers on the device and adds word-by-word captions. */
+    fun autoCaptions(style: CaptionStyle) {
+        val p = _project.value ?: return
+        if (captionJob?.isActive == true) return
+        _captioning.value = 0f
+        captionJob = viewModelScope.launch {
+            try {
+                when (val r = captioner.transcribe(p) { _captioning.value = it }) {
+                    is AutoCaptioner.Result.Words -> {
+                        replaceCaptions(CaptionPlanner.toOverlays(r.words, style, totalMs(), ::newId))
+                        messageChannel.send("Added captions for ${r.words.size} words. Tap one to fix a word.")
+                    }
+                    AutoCaptioner.Result.NoSpeech -> messageChannel.send("No speech found in your clips or voiceovers")
+                    AutoCaptioner.Result.NeedsPermission -> _captionsNeedPermission.send(Unit)
+                    is AutoCaptioner.Result.Unavailable -> messageChannel.send(r.message)
+                    is AutoCaptioner.Result.Failed -> messageChannel.send(r.message)
+                }
+            } finally {
+                _captioning.value = null
+            }
+        }
+    }
+
+    fun cancelCaptions() {
+        captionJob?.cancel()
+    }
+
+    /** Typed captions: the words are spread over the selected clip (or the whole video) and animated. */
+    fun typedCaptions(text: String, style: CaptionStyle) {
+        val p = _project.value ?: return
+        val total = totalMs()
+        if (total <= 0 || CaptionPlanner.tokens(text).isEmpty()) return
+        val selected = (_selection.value as? Selection.Video)?.id
+        val index = p.videoClips.indexOfFirst { it.id == selected }
+        val (start, end) = if (index >= 0) {
+            val s = TimelineMath.videoStarts(p.videoClips)[index]
+            s to s + p.videoClips[index].outputDurationMs()
+        } else 0L to total
+        val words = CaptionPlanner.evenWords(text, start + 200, (end - 200).coerceAtLeast(start + 300))
+        val overlays = CaptionPlanner.toOverlays(words, style, total, ::newId)
+        edit { cur -> cur.copy(textOverlays = cur.textOverlays.filterNot { it.isCaption && it.startMs < end && it.endMs > start } + overlays) }
+        _selection.value = Selection.None
+    }
+
+    private fun replaceCaptions(overlays: List<TextOverlay>) =
+        edit { cur -> cur.copy(textOverlays = cur.textOverlays.filterNot { it.isCaption } + overlays) }
+
+    /** Restyles every animated caption at once. */
+    fun setCaptionStyle(style: CaptionStyle) = edit("captionStyle") { cur ->
+        cur.copy(
+            textOverlays = cur.textOverlays.map {
+                if (it.isCaption) it.copy(captionStyle = style, background = style == CaptionStyle.PLAIN) else it
+            },
+        )
+    }
+
+    fun clearCaptions() = edit { cur -> cur.copy(textOverlays = cur.textOverlays.filterNot { it.isCaption }) }
 
     // ---- Beat sync ---------------------------------------------------------------------
 

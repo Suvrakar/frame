@@ -242,6 +242,12 @@ class ScreenshotTour {
             }
         }
 
+        if (openProject("Summer trip") && tap("Captions")) {
+            device.wait(Until.hasObject(By.text("Karaoke")), 5_000)
+            Thread.sleep(600)
+            shot("22_captions_panel")
+        }
+
         // Magic Movie and the Frame Pro sheet.
         restartHome()
         if (tap("Magic Movie", scrollVertically = true)) {

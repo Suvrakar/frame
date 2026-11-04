@@ -98,6 +98,7 @@ enum class Tool(val title: String) {
     TEXT_STYLE("Text style"),
     EFFECTS("Effects"),
     BEAT_SYNC("Beat sync"),
+    CAPTIONS("Captions"),
     EFFECT_EDIT("Effect"),
 }
 
@@ -870,5 +871,64 @@ fun TextStylePanel(overlay: TextOverlay, onStyle: ((TextOverlay) -> TextOverlay)
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+@Composable
+fun CaptionsPanel(
+    hasCaptions: Boolean,
+    style: app.frame.studio.domain.CaptionStyle,
+    autoSupported: Boolean,
+    progress: Float?,
+    onStyle: (app.frame.studio.domain.CaptionStyle) -> Unit,
+    onAuto: () -> Unit,
+    onCancel: () -> Unit,
+    onTyped: (String) -> Unit,
+    onClear: () -> Unit,
+) {
+    var typed by remember { mutableStateOf("") }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            app.frame.studio.domain.CaptionStyle.entries.forEach { s ->
+                FilterChip(selected = s == style, onClick = { onStyle(s) }, label = { Text(s.label) })
+            }
+        }
+        if (progress != null) {
+            Text(
+                "Listening on your phone… ${(progress * 100).roundToInt()}%",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            androidx.compose.material3.LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
+            TextButton(onClick = onCancel) { Text("Cancel") }
+            return@Column
+        }
+        androidx.compose.material3.Button(onClick = onAuto, enabled = autoSupported, modifier = Modifier.fillMaxWidth()) {
+            Text(if (hasCaptions) "Redo auto captions" else "Auto captions from speech")
+        }
+        Text(
+            if (autoSupported) "Speech is recognised by your phone's on-device engine. Nothing is uploaded."
+            else "Auto captions need Android 13+ with an on-device speech engine. Type them instead — Frame times and animates each word.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = typed,
+                onValueChange = { typed = it.take(500) },
+                placeholder = { Text("Or type what's said…") },
+                maxLines = 2,
+                modifier = Modifier.weight(1f),
+            )
+            androidx.compose.material3.FilledTonalButton(
+                onClick = {
+                    onTyped(typed)
+                    typed = ""
+                },
+                enabled = typed.isNotBlank(),
+            ) { Text("Add") }
+        }
+        if (hasCaptions) {
+            TextButton(onClick = onClear) { Text("Remove all captions") }
+        }
     }
 }

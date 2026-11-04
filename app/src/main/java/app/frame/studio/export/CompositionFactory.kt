@@ -30,6 +30,8 @@ import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.EditedMediaItemSequence
 import androidx.media3.transformer.Effects
+import app.frame.studio.captions.CaptionPlanner
+import app.frame.studio.captions.CaptionSpans
 import app.frame.studio.domain.AudioClip
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.VideoClip
@@ -201,6 +203,7 @@ object CompositionFactory {
         overlay: app.frame.studio.domain.TextOverlay,
         size: ExportPlan.Size,
     ): TextureOverlay {
+        if (overlay.isCaption) return captionOverlay(overlay, size)
         val padded = if (overlay.background && !overlay.isSticker) " ${overlay.text.trim()} " else overlay.text.trim()
         val text = SpannableString(padded).apply {
             setSpan(ForegroundColorSpan(overlay.color.toInt()), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -237,6 +240,32 @@ object CompositionFactory {
                 )
                 return if (alpha >= 1f) visible else settings(alpha)
             }
+        }
+    }
+
+    /** Word-by-word caption: one pre-built styled string per word, switched by time. */
+    private fun captionOverlay(overlay: app.frame.studio.domain.TextOverlay, size: ExportPlan.Size): TextureOverlay {
+        val words = overlay.words
+        val variants = (-1 until words.size).map { active ->
+            CaptionSpans.build(words, overlay.captionStyle, overlay.color.toInt(), active, overlay.bold)
+        }
+        val base = (minOf(size.width, size.height) / 1080f).coerceAtLeast(0.3f)
+        val scale = base * overlay.scale.coerceIn(0.3f, 4f)
+        val visible = StaticOverlaySettings.Builder()
+            .setScale(scale, scale)
+            .setBackgroundFrameAnchor(overlay.x.coerceIn(0f, 1f) * 2 - 1, 1 - overlay.y.coerceIn(0f, 1f) * 2)
+            .build()
+        val hidden = StaticOverlaySettings.Builder().setAlphaScale(0f).setScale(scale, scale).build()
+        val startUs = overlay.startMs * 1000
+        val endUs = overlay.endMs * 1000
+        return object : TextOverlay() {
+            override fun getText(presentationTimeUs: Long): SpannableString {
+                val rel = (presentationTimeUs - startUs) / 1000
+                return variants[CaptionPlanner.activeIndex(words, rel) + 1]
+            }
+
+            override fun getOverlaySettings(presentationTimeUs: Long): OverlaySettings =
+                if (presentationTimeUs < startUs || presentationTimeUs >= endUs) hidden else visible
         }
     }
 

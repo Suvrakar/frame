@@ -22,7 +22,7 @@ object AudioPcmReader {
 
     class Pcm(val samples: FloatArray, val sampleRate: Int, val startMs: Long)
 
-    fun readMono(context: Context, uri: Uri, startMs: Long, endMs: Long): Pcm? {
+    fun readMono(context: Context, uri: Uri, startMs: Long, endMs: Long, targetRate: Int = TARGET_RATE): Pcm? {
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
         try {
@@ -45,8 +45,8 @@ object AudioPcmReader {
             var sourceRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
             var channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT).coerceAtLeast(1)
             var floatPcm = false
-            val out = FloatBuilder(((endMs - startMs).coerceAtLeast(1000) * TARGET_RATE / 1000).toInt() + TARGET_RATE)
-            var step = sourceRate.toFloat() / TARGET_RATE
+            val out = FloatBuilder(((endMs - startMs).coerceAtLeast(1000) * targetRate / 1000).toInt() + targetRate)
+            var step = sourceRate.toFloat() / targetRate
             var acc = 0f
             var sum = 0f
             var count = 0
@@ -77,7 +77,7 @@ object AudioPcmReader {
                         floatPcm = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
                             f.containsKey(MediaFormat.KEY_PCM_ENCODING) &&
                             f.getInteger(MediaFormat.KEY_PCM_ENCODING) == AudioFormat.ENCODING_PCM_FLOAT
-                        step = sourceRate.toFloat() / TARGET_RATE
+                        step = sourceRate.toFloat() / targetRate
                     }
                     outIndex >= 0 -> {
                         val buffer = decoder.getOutputBuffer(outIndex)!!.order(ByteOrder.nativeOrder())
@@ -111,7 +111,7 @@ object AudioPcmReader {
                     }
                 }
             }
-            return Pcm(out.toArray(), TARGET_RATE, startMs)
+            return Pcm(out.toArray(), targetRate, startMs)
         } catch (e: Exception) {
             Log.w(TAG, "Could not decode $uri", e)
             return null
