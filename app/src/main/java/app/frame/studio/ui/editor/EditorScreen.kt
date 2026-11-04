@@ -648,17 +648,19 @@ private fun PreviewArea(
             val transform = transformOf(project, selection, playhead)
             val box = boxOf(project, selection, outputSize.width, outputSize.height)
             if (transform != null && box != null) {
-                TransformFrame(
-                    transform = transform,
-                    boxFraction = box,
-                    frameW = frameW,
-                    frameH = frameH,
-                    keyed = keyedAt(project, selection, playhead),
-                    onCommit = onTransform,
-                    onTap = controller::togglePlay,
-                    frameVersion = controller.frameVersion,
-                    ghost = overlayGhost(project, selection, playhead),
-                )
+                androidx.compose.runtime.key(selection) {
+                    TransformFrame(
+                        transform = transform,
+                        boxFraction = box,
+                        frameW = frameW,
+                        frameH = frameH,
+                        keyed = keyedAt(project, selection, playhead),
+                        onCommit = onTransform,
+                        onTap = controller::togglePlay,
+                        frameVersion = controller.frameVersion,
+                        ghost = overlayGhost(project, selection, playhead),
+                    )
+                }
             }
         }
     }

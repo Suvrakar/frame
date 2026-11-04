@@ -43,7 +43,10 @@ import kotlin.math.roundToInt
  *
  * [ghost], when given, is drawn inside the outline while the object is being moved and until the
  * preview has rendered the new placement ([frameVersion] changes), so the object itself follows
- * the finger instead of jumping once the preview rebuilds.
+ * the finger instead of jumping once the preview rebuilds. After a gesture the committed placement
+ * is held only while [transform] still equals the base it was committed from; once the view model
+ * applies the (clamped) edit, [transform] is shown and only the ghost lingers. A commit that never
+ * changes [transform] is dropped after [NOOP_WINDOW_MS]. Without a ghost nothing is held.
  */
 @Composable
 fun TransformFrame(
@@ -58,25 +61,29 @@ fun TransformFrame(
     ghost: (@Composable () -> Unit)? = null,
 ) {
     var live by remember { mutableStateOf<Transform?>(null) }
-    // Committed placement shown until the preview catches up; paired with the frame version at commit.
-    var pending by remember { mutableStateOf<Pair<Transform, Int>?>(null) }
+    // Committed placement, the frame version and the base transform at commit (ghost overlays only).
+    var pending by remember { mutableStateOf<Held?>(null) }
+    val latestBase = rememberUpdatedState(transform)
     LaunchedEffect(frameVersion) {
         val waiting = pending ?: return@LaunchedEffect
-        if (frameVersion != waiting.second) {
+        if (frameVersion != waiting.version) {
             delay(GHOST_HANDOFF_MS) // let the rebuilt frame reach the screen before removing the ghost
             if (pending === waiting) pending = null
         }
     }
     LaunchedEffect(pending) {
-        if (pending != null) {
-            delay(GHOST_TIMEOUT_MS)
-            pending = null
-        }
+        val held = pending ?: return@LaunchedEffect
+        delay(NOOP_WINDOW_MS)
+        if (pending === held && latestBase.value == held.base) pending = null // edit changed nothing
+        delay(GHOST_TIMEOUT_MS - NOOP_WINDOW_MS)
+        if (pending === held) pending = null
     }
     val latestVersion = rememberUpdatedState(frameVersion)
-    val shown = live ?: pending?.first ?: transform
-    val showGhost = ghost != null && (live != null || pending != null)
-    val latestBase = rememberUpdatedState(transform)
+    val hasGhost = rememberUpdatedState(ghost != null)
+    val held = pending
+    // The held placement stands in only until the view model applies the edit.
+    val shown = live ?: held?.takeIf { it.base == transform }?.placed ?: transform
+    val showGhost = ghost != null && (live != null || held != null)
     val latestCommit = rememberUpdatedState(onCommit)
     val latestTap = rememberUpdatedState(onTap)
     val density = LocalDensity.current
@@ -112,7 +119,7 @@ fun TransformFrame(
                     } while (event.changes.any { it.pressed })
                     if (moved) {
                         val committed = snapRotation(current)
-                        pending = committed to latestVersion.value
+                        if (hasGhost.value) pending = Held(committed, latestVersion.value, latestBase.value)
                         latestCommit.value(committed)
                     } else {
                         latestTap.value()
@@ -150,9 +157,14 @@ fun TransformFrame(
     }
 }
 
+private class Held(val placed: Transform, val version: Int, val base: Transform)
+
 /** Longest the moved object is drawn by Compose while waiting for the preview to re-render. */
 private const val GHOST_TIMEOUT_MS = 4_000L
 private const val GHOST_HANDOFF_MS = 120L
+
+/** How long after a commit the transform may stay unchanged before the held state is dropped. */
+private const val NOOP_WINDOW_MS = 300L
 
 /** Snaps near-straight rotations to the nearest 90° so objects are easy to level. */
 private fun snapRotation(t: Transform): Transform {
