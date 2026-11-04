@@ -61,6 +61,11 @@ class PerfStressTest {
 
     private fun report(key: String, value: Any) = Log.i("FramePerf", "$key=$value")
 
+    private fun reportGfx(screen: String, gfx: String) {
+        listOf("Total frames rendered", "Janky frames", "50th percentile", "90th percentile", "95th percentile", "99th percentile")
+            .forEach { key -> gfx.lineSequence().firstOrNull { it.trim().startsWith(key) }?.let { report("ui.$screen.$key", it.substringAfter(":").trim()) } }
+    }
+
     private fun sample(name: String): File {
         val copy = File(context.filesDir, "perf_$name")
         File("/data/local/tmp/$name").copyTo(copy, overwrite = true)
@@ -205,6 +210,17 @@ class PerfStressTest {
         File(context.filesDir, "projects").apply { mkdirs() }.resolve("perf.json").writeText(ProjectJson.encode(project))
         context.startActivity(Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
         device.wait(Until.hasObject(By.text("New project")), 20_000)
+        Thread.sleep(2_000)
+        // Baseline: the home screen has no video at all, so its frame times show what this
+        // device/emulator renders at best.
+        device.executeShellCommand("dumpsys gfxinfo $pkg reset")
+        repeat(4) {
+            val x = device.displayWidth / 2
+            device.swipe(x, device.displayHeight * 3 / 4, x, device.displayHeight / 4, 12)
+            device.swipe(x, device.displayHeight / 4, x, device.displayHeight * 3 / 4, 12)
+        }
+        Thread.sleep(800)
+        reportGfx("home", device.executeShellCommand("dumpsys gfxinfo $pkg"))
         var opened = false
         repeat(4) {
             if (!opened) {
@@ -225,9 +241,7 @@ class PerfStressTest {
             device.swipe(device.displayWidth / 5, y, device.displayWidth * 4 / 5, y, 12)
         }
         Thread.sleep(1_000)
-        val gfx = device.executeShellCommand("dumpsys gfxinfo $pkg")
-        listOf("Total frames rendered", "Janky frames", "50th percentile", "90th percentile", "95th percentile", "99th percentile")
-            .forEach { key -> gfx.lineSequence().firstOrNull { it.trim().startsWith(key) }?.let { report("ui.$key", it.substringAfter(":").trim()) } }
+        reportGfx("editor", device.executeShellCommand("dumpsys gfxinfo $pkg"))
         val mem = device.executeShellCommand("dumpsys meminfo $pkg")
         val totalPssKb = mem.lineSequence().firstOrNull { it.trim().startsWith("TOTAL PSS:") || it.trim().startsWith("TOTAL:") }
             ?.trim()?.split(Regex("\\s+"))?.firstNotNullOfOrNull { it.toIntOrNull() }
