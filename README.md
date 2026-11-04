@@ -64,6 +64,20 @@ Exports never carry a watermark.
   - CI runs every device test on a low-end emulator (Android 10, 2 cores, 1.5 GB RAM) as well,
     including `PerfStressTest`: a 48 MP photo and a 20-clip timeline with heavy looks, previewed,
     exported and scrubbed, with frame and memory stats in the `ci-smoke-lowend` branch.
+- **Magic Movie** (Pro) – pick up to 60 photos/videos and an optional song. On the device Frame
+  scores every shot (sharpness, exposure, contrast), drops near-duplicates with a difference hash,
+  orders shots by capture date, keeps the best ones for the chosen length (15/30/60 s or all), finds
+  the song's beat and lands every cut on it. Five vibes set the look, pacing, transitions and a scene
+  effect; a title and date span ("May – July 2026") are added. The result opens in the editor.
+- **Animated captions** (Pro) – word-by-word captions in Karaoke, Pop, Highlight or Plain style.
+  Auto captions use only Android's on-device speech recogniser (Android 13+, word timestamps on 14+);
+  audio is split into speech chunks by a small voice-activity detector. Where no on-device engine
+  exists, typed captions are timed by word length and animated the same way. Captions stay in sync
+  when edited, trimmed or split.
+- **Frame Pro** – one-time Google Play purchase (`frame_pro`), verified on the device and cached
+  for offline use; "Restore purchase" in settings. Unlocks Magic Movie, animated captions, 2K/4K and
+  50/60 fps export, and removes banner ads. Free users can watch one rewarded ad to use a Pro
+  feature once. There is no server.
 - **Ads** – anchored adaptive AdMob banner after Google UMP consent; "Privacy choices" in settings.
 - **Undo / redo** for every edit.
 
@@ -93,6 +107,7 @@ Secrets are never committed. Copy `keystore.properties.example` to `keystore.pro
 | `keyPassword`       | `FRAME_KEY_PASSWORD`       |                                |
 | `admobAppId`        | `FRAME_ADMOB_APP_ID`       | AdMob app ID (`ca-app-pub-…~…`) |
 | `admobBannerId`     | `FRAME_ADMOB_BANNER_ID`    | AdMob banner unit (`ca-app-pub-…/…`) |
+| `admobRewardedId`   | `FRAME_ADMOB_REWARDED_ID`  | AdMob rewarded unit (`ca-app-pub-…/…`) |
 
 Without AdMob IDs a release build falls back to Google's **test** ad units and Gradle prints a
 warning. Without a keystore the release outputs are unsigned.
@@ -111,7 +126,7 @@ keytool -genkeypair -v -keystore release.jks -alias frame -keyalg RSA -keysize 4
 push and pull request, uploading them (plus the R8 `mapping.txt`) as artifacts. To sign in CI
 add these repository secrets: `FRAME_KEYSTORE_BASE64` (`base64 -w0 release.jks`),
 `FRAME_KEYSTORE_PASSWORD`, `FRAME_KEY_ALIAS`, `FRAME_KEY_PASSWORD`, `FRAME_ADMOB_APP_ID`,
-`FRAME_ADMOB_BANNER_ID`.
+`FRAME_ADMOB_BANNER_ID`, `FRAME_ADMOB_REWARDED_ID`.
 
 A second job boots an Android 14 emulator, launches the app (`scripts/smoke-test.sh`) and runs
 `ExportPipelineTest`, which renders a project using every editing feature through Media3 and
@@ -121,6 +136,9 @@ branches.
 
 ## Play Store checklist
 
+- [ ] In-app product `frame_pro` (one-time, non-consumable) created and active in Play Console →
+      Monetize → Products. Test with a license-tester account.
+- [ ] Rewarded ad unit created in AdMob and set as `FRAME_ADMOB_REWARDED_ID`.
 - [ ] Real AdMob app + banner IDs configured; `app-ads.txt` published on your developer website.
 - [ ] GDPR message and US state regulations message created in AdMob → Privacy & messaging.
 - [ ] Privacy policy URL (`privacy_policy_url` in `strings.xml`) is live and mentions AdMob.
