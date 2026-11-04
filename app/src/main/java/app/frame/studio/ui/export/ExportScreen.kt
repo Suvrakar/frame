@@ -166,9 +166,9 @@ fun ExportScreen(
                 )
             }
 
-            AnimatedContent(targetState = shownState::class, label = "exportState") { _ ->
+            AnimatedContent(targetState = shownState, contentKey = { it::class }, label = "exportState") { target ->
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    when (val s = shownState) {
+                    when (val s = target) {
                         ExportState.Idle -> Settings(
                             project = project,
                             size = size,

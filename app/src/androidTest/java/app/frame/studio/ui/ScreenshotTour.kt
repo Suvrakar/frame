@@ -21,7 +21,7 @@ import java.io.File
 
 /**
  * Walks the main screens with a seeded project and saves screenshots for visual review.
- * Output: <external files>/shots/*.png (pulled by scripts/smoke-test.sh).
+ * Output: PNG files in the "shots" folder of external files (pulled by scripts/smoke-test.sh).
  */
 @RunWith(AndroidJUnit4::class)
 class ScreenshotTour {
