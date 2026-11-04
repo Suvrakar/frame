@@ -171,6 +171,7 @@ fun ExportScreen(
                     when (val s = target) {
                         ExportState.Idle -> Settings(
                             project = project,
+                            heights = app.device.supportedExportHeights,
                             size = size,
                             durationMs = durationMs,
                             saveToGallery = saveToGallery,
@@ -295,6 +296,7 @@ private fun Poster(app: FrameApp, project: Project, size: ExportPlan.Size, state
 @Composable
 private fun Settings(
     project: Project,
+    heights: List<ExportHeight>,
     size: ExportPlan.Size,
     durationMs: Long,
     saveToGallery: Boolean,
@@ -312,7 +314,7 @@ private fun Settings(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Segmented("Resolution", ExportHeight.entries, project.exportHeight, { it.label }, onHeight)
+        Segmented("Resolution", heights, heights.firstOrNull { it == project.exportHeight } ?: heights.last(), { it.label }, onHeight)
         Segmented("Frame rate", listOf(24, 30, 60), project.exportFps, { "$it" }, onFps)
         Segmented("Quality", ExportQuality.entries, project.exportQuality, { it.label }, onQuality)
         Row(verticalAlignment = Alignment.CenterVertically) {

@@ -28,7 +28,10 @@ import app.frame.studio.timeline.TimelineMath
  */
 @SuppressLint("RestrictedApi")
 @OptIn(UnstableApi::class)
-class PreviewController(private val context: Context) {
+class PreviewController(
+    private val context: Context,
+    private val previewHeight: ExportHeight = ExportHeight.HD_720,
+) {
 
     var player by mutableStateOf<CompositionPlayer?>(null)
         private set
@@ -66,12 +69,12 @@ class PreviewController(private val context: Context) {
 
     /** Rebuilds the preview when anything that affects rendering changed. */
     fun setProject(project: Project) {
-        // Preview at 720p: fast to render, identical framing to the export.
+        // Preview at a device-appropriate resolution: identical framing to the export, cheaper to render.
         val key = project.copy(
             name = "",
             createdAtEpochMs = 0,
             updatedAtEpochMs = 0,
-            exportHeight = ExportHeight.HD_720,
+            exportHeight = previewHeight,
             exportFps = 30,
             exportQuality = ExportQuality.HIGH,
         )
@@ -127,6 +130,12 @@ class PreviewController(private val context: Context) {
         }
         if (ended || positionMs >= totalMs - 50) seekTo(0)
         p.play()
+    }
+
+    /** Re-renders the current frame, e.g. after the preview surface was resized while paused. */
+    fun redraw() {
+        val p = player ?: return
+        if (!p.isPlaying) p.seekTo(positionMs.coerceIn(0, (totalMs - 1).coerceAtLeast(0)))
     }
 
     fun play() {

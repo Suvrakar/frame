@@ -12,6 +12,7 @@ import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import androidx.media3.transformer.VideoEncoderSettings
 import app.frame.studio.data.ProjectRepository
+import app.frame.studio.device.DeviceProfile
 import app.frame.studio.domain.ExportRecord
 import app.frame.studio.domain.Project
 import app.frame.studio.timeline.TimelineMath
@@ -44,6 +45,7 @@ sealed interface ExportState {
 class ExportManager(
     private val context: Context,
     private val repository: ProjectRepository,
+    private val device: DeviceProfile,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _state = MutableStateFlow<ExportState>(ExportState.Idle)
@@ -57,8 +59,10 @@ class ExportManager(
         get() = _state.value is ExportState.Running || _state.value is ExportState.Saving
 
     /** Must be called on the main thread. */
-    fun start(project: Project, saveToGallery: Boolean) {
+    fun start(requested: Project, saveToGallery: Boolean) {
         if (isBusy) return
+        // Never ask the encoder for a size it can't produce.
+        val project = requested.copy(exportHeight = device.clampExportHeight(requested.exportHeight))
         val composition = try {
             CompositionFactory.build(project)
         } catch (e: Exception) {

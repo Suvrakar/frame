@@ -100,6 +100,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
@@ -180,11 +181,11 @@ private fun EditorContent(
     var dpPerSecond by rememberSaveable { mutableFloatStateOf(48f) }
 
     // ---- Preview ----------------------------------------------------------------------------
-    val controller = remember { PreviewController(context.applicationContext) }
+    val controller = remember { PreviewController(context.applicationContext, app.device.previewHeight) }
     DisposableEffect(controller) { onDispose { controller.release() } }
     // Rebuild shortly after edits settle so slider drags stay smooth.
     LaunchedEffect(project) {
-        if (controller.hasPlayer) kotlinx.coroutines.delay(120)
+        if (controller.hasPlayer) kotlinx.coroutines.delay(app.device.previewRebuildDelayMs)
         controller.setProject(project)
     }
     LaunchedEffect(controller) {
@@ -323,12 +324,7 @@ private fun EditorContent(
                 Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    "${formatDuration(controller.positionMs)} / ${formatDuration(controller.totalMs)}",
-                    style = MaterialTheme.typography.labelMedium.copy(fontFamily = FontFamily.Monospace),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.weight(1f).padding(start = 8.dp),
-                )
+                TimeLabel(controller, Modifier.weight(1f).padding(start = 8.dp))
                 FilledTonalIconButton(onClick = controller::togglePlay, enabled = controller.totalMs > 0 && !recording) {
                     Icon(
                         if (controller.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
@@ -367,7 +363,8 @@ private fun EditorContent(
                     tool = Tool.TRANSITION
                 },
                 onAddMedia = ::launchMediaPicker,
-                modifier = Modifier.height(timelineHeight(project)),
+                compact = tool != null,
+                modifier = Modifier.height(if (tool != null) COMPACT_TIMELINE_HEIGHT else timelineHeight(project)),
             )
 
             // ---- Bottom: tool panel or toolbar ----
@@ -444,6 +441,20 @@ private fun EditorContent(
             },
         )
     }
+}
+
+/** While a tool panel is open only the ruler and video track are shown, so the preview stays large. */
+private val COMPACT_TIMELINE_HEIGHT = (22 + 56 + 10).dp
+
+/** Isolated so only this label recomposes on every frame during playback. */
+@Composable
+private fun TimeLabel(controller: PreviewController, modifier: Modifier) {
+    Text(
+        "${formatDuration(controller.positionMs)} / ${formatDuration(controller.totalMs)}",
+        style = MaterialTheme.typography.labelMedium.copy(fontFamily = FontFamily.Monospace),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = modifier,
+    )
 }
 
 private fun timelineHeight(project: Project) = run {
@@ -527,7 +538,7 @@ private fun PreviewArea(
                 },
                 update = { view -> if (view.player !== controller.player) view.player = controller.player },
                 onRelease = { it.player = null },
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().onSizeChanged { controller.redraw() },
             )
             AnimatedVisibility(
                 visible = !controller.isPlaying,

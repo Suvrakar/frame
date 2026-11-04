@@ -13,13 +13,14 @@ import android.os.Build
 import android.provider.OpenableColumns
 import android.util.Log
 import android.util.LruCache
+import app.frame.studio.device.DeviceProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 
 /** Reads duration, size and thumbnails from user-picked media. */
-class MediaProbe(private val context: Context) {
+class MediaProbe(private val context: Context, device: DeviceProfile) {
 
     data class VideoInfo(
         val durationMs: Long,
@@ -84,7 +85,7 @@ class MediaProbe(private val context: Context) {
         }?.also { thumbnails.put(key, it) }
     }
 
-    private val thumbnails = object : LruCache<String, Bitmap>(32 * 1024 * 1024) {
+    private val thumbnails = object : LruCache<String, Bitmap>(device.thumbnailCacheBytes) {
         override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
     }
 
@@ -142,7 +143,7 @@ class MediaProbe(private val context: Context) {
     }
 
     /** Limits concurrent decoders; filmstrips request many frames at once. */
-    private val frameLimiter = Semaphore(3)
+    private val frameLimiter = Semaphore(device.decoderParallelism)
 
     private suspend fun extractFrame(uri: String, atMs: Long, maxSize: Int): Bitmap? {
         return withContext(Dispatchers.IO) {

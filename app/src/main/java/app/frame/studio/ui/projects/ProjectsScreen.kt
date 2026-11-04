@@ -20,6 +20,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items as rowItems
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -62,7 +64,9 @@ import app.frame.studio.R
 import app.frame.studio.ads.AdsService
 import app.frame.studio.ads.BannerAd
 import app.frame.studio.domain.Project
+import app.frame.studio.templates.Templates
 import app.frame.studio.timeline.TimelineMath
+import app.frame.studio.ui.templates.TemplateCard
 import app.frame.studio.ui.common.ConfirmDialog
 import app.frame.studio.ui.common.TextInputDialog
 import app.frame.studio.ui.common.VideoThumbnail
@@ -78,6 +82,8 @@ fun ProjectsScreen(
     onOpenProject: (String) -> Unit,
     onNewProject: (String) -> Unit,
     onOpenExports: () -> Unit,
+    onOpenTemplates: () -> Unit,
+    onOpenTemplate: (String) -> Unit,
 ) {
     val projects by app.repository.projects.collectAsStateWithLifecycle()
     val history by app.repository.history.collectAsStateWithLifecycle()
@@ -137,7 +143,7 @@ fun ProjectsScreen(
         bottomBar = { BannerAd() },
     ) { padding ->
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 160.dp),
+            columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -148,6 +154,16 @@ fun ProjectsScreen(
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 QuickRow(exportCount = history.size, onOpenExports = onOpenExports)
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                SectionHeader("Templates", action = "See all", onAction = onOpenTemplates)
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    rowItems(Templates.all.take(10), key = { it.id }) { t ->
+                        TemplateCard(t, Modifier.width(132.dp)) { onOpenTemplate(t.id) }
+                    }
+                }
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(
@@ -205,6 +221,14 @@ fun ProjectsScreen(
             },
             confirmButton = { TextButton(onClick = { showAbout = false }) { Text("OK") } },
         )
+    }
+}
+
+@Composable
+private fun SectionHeader(title: String, action: String, onAction: () -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+        TextButton(onClick = onAction) { Text(action) }
     }
 }
 

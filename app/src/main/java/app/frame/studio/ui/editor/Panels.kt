@@ -414,9 +414,9 @@ fun TransitionPanel(clip: VideoClip, onChange: (TransitionType, Long) -> Unit, o
 @Composable
 fun AddAudioPanel(onMusic: () -> Unit, onSound: () -> Unit, onVoice: () -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        BigTile(Icons.Filled.MusicNote, "Music", "From your files", Modifier.weight(1f), onMusic)
-        BigTile(Icons.Filled.GraphicEq, "Sound", "Effects & clips", Modifier.weight(1f), onSound)
-        BigTile(Icons.Filled.Mic, "Voiceover", "Record now", Modifier.weight(1f), onVoice)
+        BigTile(Icons.Filled.MusicNote, "Music", "Your files", Modifier.weight(1f), onMusic)
+        BigTile(Icons.Filled.GraphicEq, "Sound", "Effects", Modifier.weight(1f), onSound)
+        BigTile(Icons.Filled.Mic, "Voice", "Record", Modifier.weight(1f), onVoice)
     }
 }
 
@@ -431,8 +431,8 @@ private fun BigTile(icon: ImageVector, title: String, subtitle: String, modifier
     ) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.height(10.dp))
-        Text(title, style = MaterialTheme.typography.titleSmall)
-        Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 1)
+        Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
     }
 }
 
@@ -458,6 +458,43 @@ fun VoicePanel(recording: Boolean, elapsedMs: Long, onToggle: () -> Unit) {
         ) {
             Icon(if (recording) Icons.Filled.Stop else Icons.Filled.Mic, contentDescription = if (recording) "Stop" else "Record", tint = Color.White)
         }
+    }
+}
+
+private class TextPreset(
+    val name: String,
+    val color: Long,
+    val background: Boolean,
+    val bold: Boolean,
+    val apply: (TextOverlay) -> TextOverlay,
+)
+
+private val TEXT_PRESETS = listOf(
+    TextPreset("Classic", 0xFFFFFFFF, background = true, bold = false) { it.copy(color = 0xFFFFFFFF, background = true, bold = false, scale = 1f) },
+    TextPreset("Pop", 0xFFFFD60A, background = false, bold = true) { it.copy(color = 0xFFFFD60A, background = false, bold = true, scale = 1.4f) },
+    TextPreset("Neon", 0xFF64D2FF, background = false, bold = true) { it.copy(color = 0xFF64D2FF, background = false, bold = true, scale = 1.2f) },
+    TextPreset("Elegant", 0xFFFFFFFF, background = false, bold = false) { it.copy(color = 0xFFFFFFFF, background = false, bold = false, scale = 1.1f) },
+    TextPreset("Love", 0xFFFF375F, background = false, bold = true) { it.copy(color = 0xFFFF375F, background = false, bold = true, scale = 1.3f) },
+    TextPreset("Caption", 0xFFFFD60A, background = true, bold = true) { it.copy(color = 0xFFFFD60A, background = true, bold = true, scale = 0.9f) },
+)
+
+@Composable
+private fun TextPresetChip(preset: TextPreset, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            preset.name,
+            color = Color(preset.color.toInt()),
+            fontWeight = if (preset.bold) FontWeight.Bold else FontWeight.Normal,
+            style = MaterialTheme.typography.labelLarge,
+            modifier = if (preset.background) Modifier.background(Color.Black.copy(alpha = 0.6f)).padding(horizontal = 4.dp) else Modifier,
+        )
     }
 }
 
@@ -505,6 +542,13 @@ fun TextEditPanel(overlay: TextOverlay, onText: (String) -> Unit) {
 @Composable
 fun TextStylePanel(overlay: TextOverlay, onStyle: ((TextOverlay) -> TextOverlay) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (!overlay.isSticker) {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TEXT_PRESETS.forEach { preset ->
+                    TextPresetChip(preset) { onStyle(preset.apply) }
+                }
+            }
+        }
         if (!overlay.isSticker) {
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 TextSwatches.forEach { argb ->

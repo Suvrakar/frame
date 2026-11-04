@@ -2,6 +2,7 @@ package app.frame.studio.data
 
 import android.content.Context
 import android.util.Log
+import app.frame.studio.domain.ExportHeight
 import app.frame.studio.domain.ExportRecord
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.ProjectJson
@@ -20,7 +21,10 @@ import java.util.UUID
  * Stores projects as one JSON file each and the export history as a single JSON file.
  * Writes are atomic (temp file + rename) so a crash never leaves a half-written project.
  */
-class ProjectRepository(context: Context) {
+class ProjectRepository(
+    context: Context,
+    private val defaultExportHeight: ExportHeight = ExportHeight.HD_1080,
+) {
 
     private val root = File(context.filesDir, "projects").apply { mkdirs() }
     private val historyFile = File(context.filesDir, "export_history.json")
@@ -66,6 +70,7 @@ class ProjectRepository(context: Context) {
             name = name.ifBlank { "Untitled" },
             createdAtEpochMs = now,
             updatedAtEpochMs = now,
+            exportHeight = defaultExportHeight,
         )
         save(project)
         return project

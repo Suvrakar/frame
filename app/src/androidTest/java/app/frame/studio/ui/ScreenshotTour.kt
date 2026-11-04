@@ -47,10 +47,23 @@ class ScreenshotTour {
         device.executeShellCommand("screencap -p /data/local/tmp/shots/$name.png")
     }
 
-    private fun tap(text: String): Boolean {
-        val node = device.wait(Until.findObject(By.text(text)), 5_000) ?: return false
-        node.click()
-        return true
+    private fun tap(text: String, scrollVertically: Boolean = false): Boolean {
+        repeat(4) {
+            val node = device.wait(Until.findObject(By.text(text)), 2_500)
+            if (node != null) {
+                node.click()
+                return true
+            }
+            if (scrollVertically) {
+                val x = device.displayWidth / 2
+                device.swipe(x, device.displayHeight * 3 / 4, x, device.displayHeight / 4, 20)
+            } else {
+                // Scroll the bottom toolbar to reveal more tools.
+                val y = device.displayHeight - device.displayHeight / 18
+                device.swipe(device.displayWidth * 4 / 5, y, device.displayWidth / 5, y, 20)
+            }
+        }
+        return false
     }
 
     @Test
@@ -82,13 +95,24 @@ class ScreenshotTour {
         device.wait(Until.hasObject(By.text("New project")), 15_000)
         shot("1_home")
 
-        tap("Summer trip")
+        tap("See all")
+        shot("1b_templates")
+        tap("Birthday Bash")
+        device.wait(Until.hasObject(By.textStartsWith("Use template")), 5_000)
+        shot("1c_template_detail")
+        device.pressBack()
+        device.pressBack()
+
+        tap("Summer trip", scrollVertically = true)
         device.wait(Until.hasObject(By.text("Export")), 10_000)
         Thread.sleep(2_000)
         shot("2_editor")
 
         tap("Edit")
         shot("3_clip_tools")
+        tap("Speed")
+        shot("3b_speed")
+        device.pressBack()
 
         tap("Filters")
         Thread.sleep(1_500)

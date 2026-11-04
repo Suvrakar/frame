@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -110,6 +111,7 @@ fun Timeline(
     onTransition: (clipId: String) -> Unit,
     onAddMedia: () -> Unit,
     modifier: Modifier = Modifier,
+    compact: Boolean = false,
 ) {
     val density = LocalDensity.current
     val pxPerMs = with(density) { dpPerSecond.dp.toPx() } / 1000f
@@ -145,8 +147,12 @@ fun Timeline(
         }
     }
     // Follow playback, seeks and zoom.
-    LaunchedEffect(controller.positionMs, pxPerMs, userScrolling) {
-        if (!userScrolling) scroll.scrollTo((controller.positionMs * pxPerMs).roundToInt())
+    // Read through snapshotFlow so playback never recomposes the timeline itself.
+    LaunchedEffect(pxPerMs, userScrolling) {
+        if (userScrolling) return@LaunchedEffect
+        snapshotFlow { controller.positionMs }.collect { position ->
+            scroll.scrollTo((position * pxPerMs).roundToInt())
+        }
     }
 
     fun dp(ms: Float): Dp = with(density) { (ms * pxPerMs).toDp() }
@@ -192,10 +198,12 @@ fun Timeline(
             },
     ) {
         val half = maxWidth / 2
+        val halfPx = with(density) { half.toPx() }
+        val viewportPx = with(density) { maxWidth.toPx() }
         val contentWidth = half * 2 + dp(totalMs.toFloat())
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Box(Modifier.horizontalScroll(scroll).width(contentWidth)) {
-                Column(Modifier.width(contentWidth).padding(bottom = 12.dp)) {
+                Column(Modifier.width(contentWidth).padding(bottom = if (compact) 0.dp else 12.dp)) {
                     Ruler(totalMs, pxPerMs, half, Modifier.width(contentWidth).height(RULER_HEIGHT))
 
                     // ---- Video track ----
@@ -209,6 +217,9 @@ fun Timeline(
                                 clip = clip,
                                 width = dp(width),
                                 pxPerMs = pxPerMs,
+                                tileLeftPx = halfPx + x * pxPerMs,
+                                viewportPx = viewportPx,
+                                scroll = scroll,
                                 selected = selected,
                                 isMissing = clip.sourceUri in missing,
                                 modifier = Modifier.offset(x = half + dp(x)),
@@ -248,7 +259,7 @@ fun Timeline(
                     }
 
                     // ---- Audio lanes ----
-                    for (lane in 0 until audioLaneCount) {
+                    for (lane in 0 until if (compact) 0 else audioLaneCount) {
                         Box(Modifier.padding(top = LANE_GAP).width(contentWidth).height(LANE_HEIGHT)) {
                             audioClips.filter { audioLanes[it.id] == lane }.forEach { clip ->
                                 val selected = selection is Selection.Audio && selection.id == clip.id
@@ -285,7 +296,7 @@ fun Timeline(
                     }
 
                     // ---- Text lanes ----
-                    for (lane in 0 until textLaneCount) {
+                    for (lane in 0 until if (compact) 0 else textLaneCount) {
                         Box(Modifier.padding(top = LANE_GAP).width(contentWidth).height(LANE_HEIGHT)) {
                             texts.filter { textLanes[it.id] == lane }.forEach { o ->
                                 val selected = selection is Selection.Text && selection.id == o.id
@@ -497,6 +508,9 @@ private fun VideoTile(
     clip: VideoClip,
     width: Dp,
     pxPerMs: Float,
+    tileLeftPx: Float,
+    viewportPx: Float,
+    scroll: androidx.compose.foundation.ScrollState,
     selected: Boolean,
     isMissing: Boolean,
     modifier: Modifier,
@@ -521,23 +535,36 @@ private fun VideoTile(
                 .clip(shape)
                 .clickable(onClick = onClick),
         ) {
-            val frameMs = with(density) { FRAME_WIDTH.toPx() } / pxPerMs
-            val frames = max(1, ceil(clip.outputDurationMs() / frameMs).toInt()).coerceAtMost(200)
+            val framePx = with(density) { FRAME_WIDTH.toPx() }
+            val frameMs = framePx / pxPerMs
+            val frames = max(1, ceil(clip.outputDurationMs() / frameMs).toInt()).coerceAtMost(400)
             val rate = if (clip.isImage) 0f else clip.speed
+            // Only frames within one screen of the viewport are decoded; the rest are spacers.
+            val visible by remember(tileLeftPx, framePx, viewportPx) {
+                derivedStateOf {
+                    val from = ((scroll.value - viewportPx - tileLeftPx) / framePx).toInt()
+                    val to = ((scroll.value + 2 * viewportPx - tileLeftPx) / framePx).toInt()
+                    from..to
+                }
+            }
             repeat(frames) { i ->
-                // Quantized so nearby zoom levels reuse cached frames.
-                val at = (clip.trimStartMs + (i * frameMs * rate).toLong()) / 250 * 250
-                VideoThumbnail(
-                    probe = app.mediaProbe,
-                    uri = if (isMissing) null else clip.sourceUri,
-                    atMs = at,
-                    isImage = clip.isImage,
-                    maxSize = 160,
-                    rotationDegrees = clip.rotationDegrees,
-                    colorFilter = colorFilter,
-                    showPlaceholderIcon = i == 0,
-                    modifier = Modifier.width(FRAME_WIDTH).fillMaxHeight(),
-                )
+                if (i !in visible) {
+                    Box(Modifier.width(FRAME_WIDTH).fillMaxHeight())
+                } else {
+                    // Quantized so nearby zoom levels reuse cached frames.
+                    val at = (clip.trimStartMs + (i * frameMs * rate).toLong()) / 250 * 250
+                    VideoThumbnail(
+                        probe = app.mediaProbe,
+                        uri = if (isMissing) null else clip.sourceUri,
+                        atMs = at,
+                        isImage = clip.isImage,
+                        maxSize = app.device.filmstripFrameSize,
+                        rotationDegrees = clip.rotationDegrees,
+                        colorFilter = colorFilter,
+                        showPlaceholderIcon = i == 0,
+                        modifier = Modifier.width(FRAME_WIDTH).fillMaxHeight(),
+                    )
+                }
             }
         }
         if (isMissing) Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.error.copy(alpha = 0.5f)))
