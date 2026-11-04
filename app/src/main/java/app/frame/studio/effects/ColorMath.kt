@@ -105,7 +105,14 @@ value class ColorTransform(val m: FloatArray) {
     }
 }
 
-data class FilterPreset(val id: String, val name: String, val transform: ColorTransform)
+enum class FilterGroup(val label: String) { CLASSIC("Classic"), SOCIAL("Social looks") }
+
+data class FilterPreset(
+    val id: String,
+    val name: String,
+    val transform: ColorTransform,
+    val group: FilterGroup = FilterGroup.CLASSIC,
+)
 
 object Filters {
     val all: List<FilterPreset> = listOf(
@@ -121,7 +128,25 @@ object Filters {
         FilterPreset("sepia", "Sepia", ColorTransform.sepia()),
         FilterPreset("dream", "Dream", ColorTransform.scale(1.03f, 0.97f, 1.06f, 0.05f) * ColorTransform.saturation(1.15f)),
         FilterPreset("punch", "Punch", ColorTransform.contrast(1.25f) * ColorTransform.saturation(1.25f)),
+
+        // Instagram-style looks for feeds, Reels and Stories.
+        FilterPreset("glow", "Glow", ColorTransform.offset(-0.02f, 0f, 0.03f) * ColorTransform.saturation(1.2f) * ColorTransform.contrast(1.18f), FilterGroup.SOCIAL),
+        FilterPreset("sunkissed", "Sunkissed", ColorTransform.saturation(1.15f) * ColorTransform.brightness(0.04f) * ColorTransform.warmth(0.9f), FilterGroup.SOCIAL),
+        FilterPreset("golden_hour", "Golden Hour", ColorTransform.brightness(0.03f) * ColorTransform.saturation(1.2f) * ColorTransform.warmth(1.5f), FilterGroup.SOCIAL),
+        FilterPreset("pastel", "Pastel", ColorTransform.offset(0.05f, 0.04f, 0.07f) * ColorTransform.saturation(0.75f) * ColorTransform.contrast(0.85f), FilterGroup.SOCIAL),
+        FilterPreset("blush", "Blush", ColorTransform.saturation(0.9f) * ColorTransform.scale(1.06f, 0.98f, 1.02f, 0.03f), FilterGroup.SOCIAL),
+        FilterPreset("crisp", "Crisp", ColorTransform.saturation(1.05f) * ColorTransform.contrast(1.3f), FilterGroup.SOCIAL),
+        FilterPreset("lagoon", "Lagoon", ColorTransform.saturation(1.1f) * ColorTransform.scale(0.9f, 1.05f, 1.1f), FilterGroup.SOCIAL),
+        FilterPreset("matte", "Matte", ColorTransform.saturation(0.9f) * ColorTransform.scale(0.85f, 0.85f, 0.85f, 0.08f), FilterGroup.SOCIAL),
+        FilterPreset("retro", "Retro", ColorTransform.contrast(0.92f) * ColorTransform.warmth(0.8f) * ColorTransform.sepia().mix(0.4f), FilterGroup.SOCIAL),
+        FilterPreset("instant", "Instant", ColorTransform.contrast(0.95f) * ColorTransform.saturation(0.9f) * ColorTransform.warmth(0.5f) * ColorTransform.scale(0.95f, 0.95f, 0.9f, 0.05f), FilterGroup.SOCIAL),
+        FilterPreset("moody", "Moody", ColorTransform.warmth(-0.4f) * ColorTransform.brightness(-0.05f) * ColorTransform.saturation(0.7f) * ColorTransform.contrast(1.2f), FilterGroup.SOCIAL),
+        FilterPreset("city_night", "City Night", ColorTransform.brightness(-0.04f) * ColorTransform.saturation(1.1f) * ColorTransform.contrast(1.25f) * ColorTransform.warmth(-0.8f), FilterGroup.SOCIAL),
+        FilterPreset("ink", "Ink", ColorTransform.brightness(0.03f) * ColorTransform.saturation(0f) * ColorTransform.contrast(1.1f), FilterGroup.SOCIAL),
     )
+
+    fun inGroup(group: FilterGroup): List<FilterPreset> =
+        all.filter { it.group == group || it.id == "none" }
 
     fun byId(id: String): FilterPreset = all.firstOrNull { it.id == id } ?: all.first()
 

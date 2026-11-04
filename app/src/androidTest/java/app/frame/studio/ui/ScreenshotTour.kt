@@ -62,6 +62,9 @@ class ScreenshotTour {
                 val y = device.displayHeight - device.displayHeight / 18
                 device.swipe(device.displayWidth * 4 / 5, y, device.displayWidth / 5, y, 20)
             }
+            // Let any fling settle before looking again.
+            device.waitForIdle()
+            Thread.sleep(700)
         }
         return false
     }
@@ -132,6 +135,9 @@ class ScreenshotTour {
         tap("Filters")
         Thread.sleep(1_500)
         shot("4_filters")
+        tap("Social looks")
+        Thread.sleep(1_500)
+        shot("4b_social_looks")
         done()
         deselect()
 

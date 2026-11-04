@@ -12,6 +12,8 @@ import app.frame.studio.domain.Project
 import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
+import app.frame.studio.export.SocialPreset
+import app.frame.studio.export.SocialPresets
 import app.frame.studio.export.centerCrop
 import app.frame.studio.timeline.AudioLayout
 import app.frame.studio.timeline.TimelineMath
@@ -82,12 +84,14 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                 val current = _project.value ?: return@collect
                 if (stored.exportHeight != current.exportHeight ||
                     stored.exportFps != current.exportFps ||
-                    stored.exportQuality != current.exportQuality
+                    stored.exportQuality != current.exportQuality ||
+                    stored.aspect != current.aspect
                 ) {
                     _project.value = current.copy(
                         exportHeight = stored.exportHeight,
                         exportFps = stored.exportFps,
                         exportQuality = stored.exportQuality,
+                        aspect = stored.aspect,
                     )
                 }
             }
@@ -537,6 +541,9 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     // ---- Project -----------------------------------------------------------------------
 
     fun setAspect(aspect: CanvasAspect) = edit { it.copy(aspect = aspect) }
+
+    /** One-tap Instagram format: canvas shape plus matching export settings. */
+    fun applySocialPreset(preset: SocialPreset) = edit { SocialPresets.apply(it, preset, app.device::clampExportHeight) }
 
     fun deleteSelected() {
         when (val sel = _selection.value) {

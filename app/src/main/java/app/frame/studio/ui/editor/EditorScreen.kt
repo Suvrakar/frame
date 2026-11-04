@@ -751,7 +751,7 @@ private fun ActivePanel(
             Tool.TRANSITION -> clip?.let { c ->
                 TransitionPanel(c, { type, ms -> vm.setTransition(c.id, type, ms) }, { vm.applyTransitionToAll(c.id) })
             }
-            Tool.CANVAS -> CanvasPanel(project.aspect, vm::setAspect)
+            Tool.CANVAS -> CanvasPanel(project.aspect, app.frame.studio.export.SocialPresets.matching(project), vm::setAspect, vm::applySocialPreset)
             Tool.AUDIO -> AddAudioPanel(
                 onMusic = { onPickAudio(AudioKind.MUSIC) },
                 onSound = { onPickAudio(AudioKind.SOUND) },

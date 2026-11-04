@@ -49,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
@@ -63,7 +64,10 @@ import app.frame.studio.domain.ColorAdjust
 import app.frame.studio.domain.TextOverlay
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.domain.VideoClip
+import app.frame.studio.effects.FilterGroup
 import app.frame.studio.effects.Filters
+import app.frame.studio.export.SocialPreset
+import app.frame.studio.export.SocialPresets
 import app.frame.studio.export.centerCrop
 import app.frame.studio.ui.common.VideoThumbnail
 import app.frame.studio.ui.common.formatDuration
@@ -206,9 +210,15 @@ fun FadePanel(fadeInMs: Long, fadeOutMs: Long, durationMs: Long, onFadeIn: (Long
 
 @Composable
 fun FiltersPanel(app: FrameApp, clip: VideoClip, onFilter: (String) -> Unit, onIntensity: (Float) -> Unit) {
+    var group by remember(clip.id) { mutableStateOf(Filters.byId(clip.filterId).group) }
     Column {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterGroup.entries.forEach { g ->
+                FilterChip(selected = group == g, onClick = { group = g }, label = { Text(g.label) })
+            }
+        }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(vertical = 4.dp)) {
-            items(Filters.all, key = { it.id }) { filter ->
+            items(Filters.inGroup(group), key = { it.id }) { filter ->
                 val selected = clip.filterId == filter.id
                 val matrix = Filters.transformFor(filter.id, 1f, ColorAdjust())
                 Column(
@@ -318,8 +328,23 @@ fun CropPanel(clip: VideoClip, onCrop: (Float?) -> Unit) {
 }
 
 @Composable
-fun CanvasPanel(aspect: CanvasAspect, onAspect: (CanvasAspect) -> Unit) {
+fun CanvasPanel(
+    aspect: CanvasAspect,
+    activePreset: SocialPreset?,
+    onAspect: (CanvasAspect) -> Unit,
+    onPreset: (SocialPreset) -> Unit,
+) {
     Column {
+        Text("Instagram", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(
+            Modifier.horizontalScroll(rememberScrollState()).padding(top = 6.dp, bottom = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            SocialPresets.instagram.forEach { preset ->
+                SocialPresetPill(preset, selected = activePreset?.id == preset.id) { onPreset(preset) }
+            }
+        }
+        Text("Shape", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CanvasAspect.entries.forEach { a ->
                 ShapeCard(label = a.label, ratio = a.ratio ?: (16f / 9f), selected = aspect == a, dashed = a.ratio == null) { onAspect(a) }
@@ -337,6 +362,34 @@ fun CanvasPanel(aspect: CanvasAspect, onAspect: (CanvasAspect) -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 6.dp),
         )
+    }
+}
+
+/** Pill with a tiny frame-shape glyph, used for one-tap social formats. */
+@Composable
+fun SocialPresetPill(preset: SocialPreset, selected: Boolean, onClick: () -> Unit) {
+    val border = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    Row(
+        Modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surfaceContainerHigh)
+            .border(1.dp, border, RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val r = preset.aspect.ratio ?: 1f
+        Box(
+            Modifier
+                .then(if (r >= 1f) Modifier.width(18.dp) else Modifier.height(18.dp))
+                .aspectRatio(r)
+                .clip(RoundedCornerShape(3.dp))
+                .background(Brush.linearGradient(listOf(Color(0xFFFFB347), Color(0xFFFF5F8F), Color(0xFF8E5CFF)))),
+        )
+        Column(Modifier.padding(start = 8.dp)) {
+            Text(preset.name, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+            Text(preset.description, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 

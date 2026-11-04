@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,6 +69,9 @@ import app.frame.studio.export.ExportManager
 import app.frame.studio.export.ExportPlan
 import app.frame.studio.export.ExportState
 import app.frame.studio.export.GallerySaver
+import app.frame.studio.export.SocialPreset
+import app.frame.studio.export.SocialPresets
+import app.frame.studio.ui.editor.SocialPresetPill
 import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.ui.common.VideoThumbnail
 import app.frame.studio.ui.common.formatBytes
@@ -179,6 +183,7 @@ fun ExportScreen(
                             onHeight = { h -> update { it.copy(exportHeight = h) } },
                             onFps = { f -> update { it.copy(exportFps = f) } },
                             onQuality = { q -> update { it.copy(exportQuality = q) } },
+                            onPreset = { preset -> update { SocialPresets.apply(it, preset, app.device::clampExportHeight) } },
                             onExport = ::startExport,
                         )
                         is ExportState.Running -> {
@@ -304,6 +309,7 @@ private fun Settings(
     onHeight: (ExportHeight) -> Unit,
     onFps: (Int) -> Unit,
     onQuality: (ExportQuality) -> Unit,
+    onPreset: (SocialPreset) -> Unit,
     onExport: () -> Unit,
 ) {
     Column(
@@ -314,6 +320,16 @@ private fun Settings(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
+        Text("Instagram", style = MaterialTheme.typography.titleSmall)
+        val active = SocialPresets.matching(project)
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SocialPresets.instagram.forEach { preset ->
+                SocialPresetPill(preset, selected = active?.id == preset.id) { onPreset(preset) }
+            }
+        }
+        active?.let { SocialPresets.lengthWarning(it, durationMs) }?.let { warning ->
+            Text(warning, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+        }
         Segmented("Resolution", heights, heights.firstOrNull { it == project.exportHeight } ?: heights.last(), { it.label }, onHeight)
         Segmented("Frame rate", listOf(24, 30, 60), project.exportFps, { "$it" }, onFps)
         Segmented("Quality", ExportQuality.entries, project.exportQuality, { it.label }, onQuality)
