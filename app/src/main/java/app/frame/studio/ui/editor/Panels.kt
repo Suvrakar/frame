@@ -213,7 +213,7 @@ fun FadePanel(fadeInMs: Long, fadeOutMs: Long, durationMs: Long, onFadeIn: (Long
 fun FiltersPanel(app: FrameApp, clip: VideoClip, onFilter: (String) -> Unit, onIntensity: (Float) -> Unit) {
     var group by remember(clip.id) { mutableStateOf(Filters.byId(clip.filterId).group) }
     Column {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterGroup.entries.forEach { g ->
                 FilterChip(selected = group == g, onClick = { group = g }, label = { Text(g.label) })
             }

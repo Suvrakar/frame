@@ -138,6 +138,10 @@ class ScreenshotTour {
         tap("Social looks")
         Thread.sleep(1_500)
         shot("4b_social_looks")
+        if (tap("Cinematic")) {
+            Thread.sleep(1_500)
+            shot("4c_cinematic")
+        }
         done()
         deselect()
 

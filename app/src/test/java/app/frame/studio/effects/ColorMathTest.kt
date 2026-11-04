@@ -53,4 +53,23 @@ class ColorMathTest {
     fun everyFilterHasUniqueId() {
         assertEquals(Filters.all.size, Filters.all.map { it.id }.toSet().size)
     }
+
+    @Test
+    fun everyGroupHasLooksAndNoneBlowsOutMidGray() {
+        FilterGroup.entries.forEach { g -> assertTrue(g.label, Filters.inGroup(g).size >= 6) }
+        assertTrue(Filters.all.size >= 50)
+        Filters.all.forEach { f ->
+            f.transform.apply(0.5f, 0.5f, 0.5f).forEach { v -> assertTrue("${f.id}=$v", v in 0.2f..0.8f) }
+        }
+    }
+
+    @Test
+    fun blackAndWhiteLooksStayNeutralOrToned() {
+        Filters.inGroup(FilterGroup.BW).filter { it.id != "none" }.forEach { f ->
+            val out = f.transform.apply(1f, 0f, 0f)
+            // Pure red maps to (nearly) equal channels: a monochrome image.
+            assertEquals(f.id, out[0], out[1], 0.08f)
+            assertEquals(f.id, out[1], out[2], 0.08f)
+        }
+    }
 }
