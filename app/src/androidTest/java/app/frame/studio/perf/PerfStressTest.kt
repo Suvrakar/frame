@@ -164,6 +164,7 @@ class PerfStressTest {
 
         // 3) Export of the whole timeline completes at the device's default resolution.
         val out = File(context.cacheDir, "perf_out.mp4").apply { delete() }
+        var transformerRef: Transformer? = null
         val done = CountDownLatch(1)
         var exportError: ExportException? = null
         val exportStart = SystemClock.elapsedRealtime()
@@ -176,10 +177,23 @@ class PerfStressTest {
                 }
             }
             // Same configuration as the app's export screen.
-            ExportManager.newTransformer(context, app.device, project, listener)
-                .start(CompositionFactory.build(project), out.absolutePath)
+            transformerRef = ExportManager.newTransformer(context, app.device, project, listener).also {
+                it.start(CompositionFactory.build(project), out.absolutePath)
+            }
         }
-        assertTrue("export timed out", done.await(10, TimeUnit.MINUTES))
+        // Log progress so a stall can be located.
+        val holder = androidx.media3.transformer.ProgressHolder()
+        var waited = 0
+        while (!done.await(10, TimeUnit.SECONDS) && waited < 60) {
+            waited++
+            val progress = CountDownLatch(1)
+            Handler(Looper.getMainLooper()).post {
+                report("export.progressAt${waited * 10}s", "${transformerRef?.getProgress(holder)}:${holder.progress}")
+                progress.countDown()
+            }
+            progress.await(2, TimeUnit.SECONDS)
+        }
+        assertTrue("export timed out", done.await(1, TimeUnit.SECONDS))
         val exportMs = SystemClock.elapsedRealtime() - exportStart
         assertNull("export failed: ${exportError?.errorCodeName}", exportError)
         report("export.ms", exportMs)

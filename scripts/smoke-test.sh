@@ -33,6 +33,7 @@ if ./gradlew connectedDebugAndroidTest >> "$LOG" 2>&1; then
   echo "SMOKE: EXPORT OK" >> "$LOG"
 else
   adb logcat -d -s FramePerf:I > perf.log 2>&1 || true
+  adb logcat -d | grep -iE "transformer|muxer|mediacodec|codec2|ccodec|exoplayer|media3|videoframe|FramePerf|AndroidRuntime" | tail -600 > media.log || true
   find app/build/outputs/androidTest-results -name "*.xml" -exec cat {} \; >> "$LOG" 2>/dev/null
   mkdir -p shots
   adb pull /data/local/tmp/shots/. shots/ >> "$LOG" 2>&1 || true

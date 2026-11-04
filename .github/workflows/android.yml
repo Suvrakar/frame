@@ -140,6 +140,7 @@ jobs:
           cp smoke.png /tmp/smoke/ 2>/dev/null || true
           cp -r shots /tmp/smoke/ 2>/dev/null || true
           cp perf.log /tmp/smoke/ 2>/dev/null || true
+          cp media.log /tmp/smoke/ 2>/dev/null || true
           echo "${{ job.status }} ${{ github.sha }} ${{ github.ref_name }} ${{ matrix.profile }}" > /tmp/smoke/status.txt
           cd /tmp/smoke
           git init -q
