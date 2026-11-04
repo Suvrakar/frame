@@ -72,6 +72,30 @@ class ScreenshotTour {
         return false
     }
 
+    /** Taps a chip in a horizontally scrolling row that also contains [anchor]. */
+    private fun tapInRow(text: String, anchor: String): Boolean {
+        repeat(4) {
+            device.wait(Until.findObject(By.text(text)), 1_500)?.let {
+                it.click()
+                return true
+            }
+            val row = device.findObject(By.text(anchor)) ?: return false
+            val y = row.visibleCenter.y
+            device.swipe(device.displayWidth * 4 / 5, y, device.displayWidth / 5, y, 20)
+            device.waitForIdle()
+            Thread.sleep(500)
+        }
+        return false
+    }
+
+    private fun scrollToTop() {
+        repeat(4) {
+            val x = device.displayWidth / 2
+            device.swipe(x, device.displayHeight / 4, x, device.displayHeight * 3 / 4, 15)
+        }
+        device.waitForIdle()
+    }
+
     /** Closes the open tool panel with its ✓ button. */
     private fun done() {
         device.wait(Until.findObject(By.desc("Done")), 3_000)?.click()
@@ -126,7 +150,10 @@ class ScreenshotTour {
         tap("See all")
         device.wait(Until.hasObject(By.text("Birthday collection")), 5_000)
         shot("1b_templates")
-        if (tap("Collage")) shot("1b2_collage_gallery")
+        if (tapInRow("Collage", anchor = "All")) {
+            Thread.sleep(1_000)
+            shot("1b2_collage_gallery")
+        }
         device.pressBack()
         device.wait(Until.hasObject(By.text("New project")), 5_000)
         tap("See all")
@@ -180,6 +207,7 @@ class ScreenshotTour {
         device.wait(Until.hasObject(By.text("Export")), 5_000)
         device.pressBack()
         device.wait(Until.hasObject(By.text("New project")), 5_000)
+        scrollToTop()
         if (tap(collageName, scrollVertically = true)) {
             device.wait(Until.hasObject(By.text("Export")), 10_000)
             Thread.sleep(2_000)
