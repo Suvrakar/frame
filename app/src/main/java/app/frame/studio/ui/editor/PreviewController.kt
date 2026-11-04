@@ -1,5 +1,6 @@
 package app.frame.studio.ui.editor
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.annotation.OptIn
@@ -20,7 +21,12 @@ import app.frame.studio.timeline.TimelineMath
 /**
  * Plays the project's Media3 composition, so the preview shows exactly what the export renders
  * (speed, filters, crop, transitions, text, mixed audio). Use on the main thread only.
+ *
+ * CompositionPlayer is still marked library-internal in Media3 1.8 (it powers Media3's own
+ * composition demo). Media3 is pinned in app/build.gradle.kts and ExportPipelineTest exercises
+ * this player on a device in CI; re-check it whenever Media3 is upgraded.
  */
+@SuppressLint("RestrictedApi")
 @OptIn(UnstableApi::class)
 class PreviewController(private val context: Context) {
 
