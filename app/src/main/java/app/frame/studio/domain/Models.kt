@@ -61,12 +61,36 @@ data class ColorAdjust(
     val vignette: Float = 0f,
     /** 0..1, film grain */
     val grain: Float = 0f,
+    /** -1..1, about ±1 stop */
+    val exposure: Float = 0f,
+    /** -1..1, recover (−) or boost (+) bright areas */
+    val highlights: Float = 0f,
+    /** -1..1, deepen (−) or lift (+) dark areas */
+    val shadows: Float = 0f,
+    /** -1 (green) .. 1 (magenta) */
+    val tint: Float = 0f,
+    /** -1..1, saturation that spares already-saturated colours and skin */
+    val vibrance: Float = 0f,
+    /** 0..1, lifted blacks for a matte look */
+    val fade: Float = 0f,
+    /** Split toning: hue (0..360) and strength (0..1) for dark and bright areas. */
+    val shadowHue: Float = 210f,
+    val shadowTone: Float = 0f,
+    val highlightHue: Float = 35f,
+    val highlightTone: Float = 0f,
 ) {
+    /** True when the linear colour-matrix part does nothing. */
     val isColorIdentity: Boolean
-        get() = brightness == 0f && contrast == 0f && saturation == 0f && warmth == 0f
+        get() = brightness == 0f && contrast == 0f && saturation == 0f && warmth == 0f &&
+            exposure == 0f && tint == 0f && fade == 0f
+
+    /** True when the tone/texture shader part does nothing. */
+    val isToneIdentity: Boolean
+        get() = vignette == 0f && grain == 0f && highlights == 0f && shadows == 0f &&
+            vibrance == 0f && shadowTone == 0f && highlightTone == 0f
 
     val isIdentity: Boolean
-        get() = isColorIdentity && vignette == 0f && grain == 0f
+        get() = isColorIdentity && isToneIdentity
 }
 
 @Serializable

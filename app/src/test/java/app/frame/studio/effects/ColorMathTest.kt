@@ -84,4 +84,50 @@ class ColorMathTest {
         assertTrue(ColorAdjust(grain = 0.3f).isColorIdentity)
         assertTrue(Filters.inGroup(FilterGroup.LOFI).all { it.id == "none" || it.grain > 0f })
     }
+
+    @Test
+    fun exposureTintAndFade() {
+        assertEquals(0.4f, ColorTransform.exposure(1f).apply(0.2f, 0.2f, 0.2f)[0], 1e-4f)
+        assertEquals(0.1f, ColorTransform.exposure(-1f).apply(0.2f, 0.2f, 0.2f)[0], 1e-4f)
+        val magenta = ColorTransform.tint(1f).apply(0.5f, 0.5f, 0.5f)
+        assertTrue(magenta[0] > 0.5f && magenta[1] < 0.5f && magenta[2] > 0.5f)
+        // Fade lifts pure black.
+        assertEquals(0.14f, ColorTransform.fade(1f).apply(0f, 0f, 0f)[0], 1e-4f)
+        assertTrue(ColorAdjust(highlights = 0.5f).isColorIdentity)
+        assertTrue(!ColorAdjust(exposure = 0.1f).isColorIdentity)
+    }
+
+    @Test
+    fun toneGradingTargetsShadowsAndHighlights() {
+        val lift = GradeParams(0f, 0f, shadows = 1f)
+        assertTrue(GradeMath.tone(floatArrayOf(0.1f, 0.1f, 0.1f), lift)[0] > 0.3f)
+        // Shadows barely touch bright pixels.
+        assertEquals(0.9f, GradeMath.tone(floatArrayOf(0.9f, 0.9f, 0.9f), lift)[0], 0.01f)
+        val recover = GradeParams(0f, 0f, highlights = -1f)
+        assertTrue(GradeMath.tone(floatArrayOf(0.95f, 0.95f, 0.95f), recover)[0] < 0.75f)
+        assertEquals(0.1f, GradeMath.tone(floatArrayOf(0.1f, 0.1f, 0.1f), recover)[0], 0.01f)
+    }
+
+    @Test
+    fun splitToneTintsWithoutChangingBrightness() {
+        val teal = GradeMath.hueTint(190f)
+        assertEquals(0f, GradeMath.luma(teal[0], teal[1], teal[2]), 1e-4f)
+        val p = Filters.gradeFor("none", 1f, ColorAdjust(shadowHue = 210f, shadowTone = 1f, highlightHue = 35f, highlightTone = 1f))
+        val dark = GradeMath.tone(floatArrayOf(0.15f, 0.15f, 0.15f), p)
+        assertTrue("shadows go blue", dark[2] > dark[0])
+        val bright = GradeMath.tone(floatArrayOf(0.85f, 0.85f, 0.85f), p)
+        assertTrue("highlights go orange", bright[0] > bright[2])
+        assertTrue(!p.isNone)
+        assertTrue(Filters.gradeFor("none", 1f, ColorAdjust()).isNone)
+    }
+
+    @Test
+    fun vibranceSparesSaturatedColours() {
+        val p = GradeParams(0f, 0f, vibrance = 1f)
+        val muted = GradeMath.tone(floatArrayOf(0.55f, 0.5f, 0.45f), p)
+        val vivid = GradeMath.tone(floatArrayOf(0.9f, 0.1f, 0.1f), p)
+        val mutedGain = (muted[0] - muted[2]) / 0.1f
+        val vividGain = (vivid[0] - vivid[2]) / 0.8f
+        assertTrue(mutedGain > vividGain)
+    }
 }

@@ -122,6 +122,7 @@ import androidx.media3.common.util.UnstableApi
 import app.frame.studio.FrameApp
 import app.frame.studio.data.VoiceRecorder
 import app.frame.studio.domain.AudioKind
+import app.frame.studio.domain.ColorAdjust
 import app.frame.studio.domain.ExportHeight
 import app.frame.studio.domain.Project
 import app.frame.studio.domain.TextOverlay
@@ -190,9 +191,17 @@ private fun EditorContent(
         }
     }
     // Rebuild shortly after edits settle so slider drags stay smooth.
-    LaunchedEffect(project) {
-        if (controller.hasPlayer) kotlinx.coroutines.delay(app.device.previewRebuildDelayMs)
-        controller.setProject(project)
+    val compareOriginal by vm.compareOriginal.collectAsStateWithLifecycle()
+    LaunchedEffect(project, compareOriginal, selection) {
+        // Before/after: preview the selected clip without its filter and grade.
+        val shown = if (compareOriginal && selection is Selection.Video) {
+            val id = (selection as Selection.Video).id
+            project.copy(videoClips = project.videoClips.map { if (it.id == id) it.copy(filterId = "none", adjust = ColorAdjust()) else it })
+        } else {
+            project
+        }
+        if (controller.hasPlayer && !compareOriginal) kotlinx.coroutines.delay(app.device.previewRebuildDelayMs)
+        controller.setProject(shown)
     }
     LaunchedEffect(controller) {
         while (true) {
@@ -452,6 +461,36 @@ private fun EditorContent(
 /** While a tool panel is open only the ruler and video track are shown, so the preview stays large. */
 private val COMPACT_TIMELINE_HEIGHT = (22 + 56 + 10).dp
 
+/** Press and hold to see the clip without its filter and grade. */
+@Composable
+private fun CompareButton(onCompare: (Boolean) -> Unit) {
+    val current = androidx.compose.runtime.rememberUpdatedState(onCompare)
+    DisposableEffect(Unit) { onDispose { current.value(false) } }
+    Text(
+        "Before",
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), RoundedCornerShape(50))
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val down = awaitPointerEvent()
+                        if (down.changes.any { it.pressed }) {
+                            current.value(true)
+                            do {
+                                val event = awaitPointerEvent()
+                            } while (event.changes.any { it.pressed })
+                            current.value(false)
+                        }
+                    }
+                }
+            }
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+    )
+}
+
 /** Isolated so only this label recomposes on every frame during playback. */
 @Composable
 private fun TimeLabel(controller: PreviewController, modifier: Modifier) {
@@ -671,7 +710,7 @@ private fun Toolbar(
             ToolbarItem(Icons.Filled.AutoAwesome, "Filters", enabled = hasClips) {
                 if (vm.selectClipAtPlayhead() != null) onTool(Tool.FILTERS)
             }
-            ToolbarItem(Icons.Filled.Tune, "Adjust", enabled = hasClips) {
+            ToolbarItem(Icons.Filled.Tune, "Grade", enabled = hasClips) {
                 if (vm.selectClipAtPlayhead() != null) onTool(Tool.ADJUST)
             }
             ToolbarItem(Icons.Filled.AspectRatio, "Canvas", enabled = hasClips) { onTool(Tool.CANVAS) }
@@ -689,7 +728,7 @@ private fun Toolbar(
                     ToolbarItem(Icons.AutoMirrored.Filled.VolumeUp, "Volume") { onTool(Tool.VOLUME) }
                 }
                 ToolbarItem(Icons.Filled.AutoAwesome, "Filters") { onTool(Tool.FILTERS) }
-                ToolbarItem(Icons.Filled.Tune, "Adjust") { onTool(Tool.ADJUST) }
+                ToolbarItem(Icons.Filled.Tune, "Grade") { onTool(Tool.ADJUST) }
                 ToolbarItem(Icons.Filled.Gradient, "Fade") { onTool(Tool.FADE) }
                 ToolbarItem(Icons.Filled.Crop, "Crop") { onTool(Tool.CROP) }
                 ToolbarItem(Icons.Filled.Rotate90DegreesCw, "Rotate") { vm.rotate(clip.id) }
@@ -740,7 +779,10 @@ private fun ActivePanel(
 
     val action: (@Composable () -> Unit)? = when {
         clip != null && (tool == Tool.FILTERS || tool == Tool.ADJUST) -> {
-            { TextButton(onClick = { vm.applyLookToAll(clip.id) }) { Text("Apply to all") } }
+            {
+                CompareButton(onCompare = vm::setCompareOriginal)
+                TextButton(onClick = { vm.applyLookToAll(clip.id) }) { Text("Apply to all") }
+            }
         }
         else -> null
     }

@@ -95,12 +95,28 @@ value class ColorTransform(val m: FloatArray) {
             ),
         )
 
+        /** Exposure in stops (−1..1 maps to ×0.5..×2). */
+        fun exposure(e: Float): ColorTransform {
+            val f = Math.pow(2.0, e.toDouble()).toFloat()
+            return scale(f, f, f)
+        }
+
+        /** Green (−) to magenta (+) shift that keeps overall brightness. */
+        fun tint(t: Float): ColorTransform = scale(1 + 0.06f * t, 1 - 0.1f * t, 1 + 0.06f * t)
+
+        /** Lifts blacks and softens whites for a matte look. */
+        fun fade(f: Float): ColorTransform = scale(1 - 0.22f * f, 1 - 0.22f * f, 1 - 0.22f * f, 0.14f * f)
+
         fun fromAdjust(a: ColorAdjust): ColorTransform {
             if (a.isColorIdentity) return IDENTITY
-            return brightness(a.brightness * 0.4f) *
+            // Applied right to left: exposure first, fade last.
+            return fade(a.fade.coerceIn(0f, 1f)) *
+                brightness(a.brightness * 0.4f) *
                 contrast(1f + a.contrast * 0.6f) *
                 saturation(1f + a.saturation) *
-                warmth(a.warmth)
+                tint(a.tint) *
+                warmth(a.warmth) *
+                exposure(a.exposure)
         }
     }
 }
@@ -127,9 +143,85 @@ data class FilterPreset(
     val grain: Float = 0f,
 )
 
-/** Vignette and grain for a clip (0..1 each). */
-data class TextureLook(val vignette: Float, val grain: Float) {
-    val isNone: Boolean get() = vignette <= 0f && grain <= 0f
+/**
+ * Everything the tone shader applies to a clip: tone-dependent grading (highlights, shadows,
+ * vibrance, split toning) plus vignette and grain. Tints are luminance-neutral RGB offsets.
+ */
+data class GradeParams(
+    val vignette: Float,
+    val grain: Float,
+    val highlights: Float = 0f,
+    val shadows: Float = 0f,
+    val vibrance: Float = 0f,
+    val shadowTint: FloatArray = floatArrayOf(0f, 0f, 0f),
+    val highlightTint: FloatArray = floatArrayOf(0f, 0f, 0f),
+) {
+    val isNone: Boolean
+        get() = vignette <= 0f && grain <= 0f && highlights == 0f && shadows == 0f && vibrance == 0f &&
+            shadowTint.all { it == 0f } && highlightTint.all { it == 0f }
+
+    override fun equals(other: Any?): Boolean = other is GradeParams && vignette == other.vignette &&
+        grain == other.grain && highlights == other.highlights && shadows == other.shadows &&
+        vibrance == other.vibrance && shadowTint.contentEquals(other.shadowTint) &&
+        highlightTint.contentEquals(other.highlightTint)
+
+    override fun hashCode(): Int = listOf(vignette, grain, highlights, shadows, vibrance).hashCode() * 31 +
+        shadowTint.contentHashCode() * 17 + highlightTint.contentHashCode()
+}
+
+typealias TextureLook = GradeParams
+
+/**
+ * CPU mirror of the tone shader in [GradeEffect], used by tests and kept in sync with it.
+ * Inputs and outputs are 0..1 RGB.
+ */
+object GradeMath {
+    private const val LR = 0.2126f
+    private const val LG = 0.7152f
+    private const val LB = 0.0722f
+
+    fun luma(r: Float, g: Float, b: Float) = LR * r + LG * g + LB * b
+
+    /** A fully saturated colour for [hueDegrees], as an offset with zero luminance. */
+    fun hueTint(hueDegrees: Float): FloatArray {
+        val h = ((hueDegrees % 360f) + 360f) % 360f / 60f
+        val x = 1f - kotlin.math.abs(h % 2f - 1f)
+        val (r, g, b) = when (h.toInt()) {
+            0 -> Triple(1f, x, 0f)
+            1 -> Triple(x, 1f, 0f)
+            2 -> Triple(0f, 1f, x)
+            3 -> Triple(0f, x, 1f)
+            4 -> Triple(x, 0f, 1f)
+            else -> Triple(1f, 0f, x)
+        }
+        val l = luma(r, g, b)
+        return floatArrayOf(r - l, g - l, b - l)
+    }
+
+    private fun smoothstep(e0: Float, e1: Float, x: Float): Float {
+        val t = ((x - e0) / (e1 - e0)).coerceIn(0f, 1f)
+        return t * t * (3 - 2 * t)
+    }
+
+    /** Tone grading only (no vignette/grain), exactly as the shader does it. */
+    fun tone(rgb: FloatArray, p: GradeParams): FloatArray {
+        var r = rgb[0]
+        var g = rgb[1]
+        var b = rgb[2]
+        val l = luma(r, g, b)
+        val sw = 1f - smoothstep(0f, 0.55f, l)
+        val hw = smoothstep(0.45f, 1f, l)
+        val lift = p.shadows * 0.28f * sw + p.highlights * 0.28f * hw
+        r += lift; g += lift; b += lift
+        r += (p.shadowTint[0] * sw + p.highlightTint[0] * hw) * 0.3f
+        g += (p.shadowTint[1] * sw + p.highlightTint[1] * hw) * 0.3f
+        b += (p.shadowTint[2] * sw + p.highlightTint[2] * hw) * 0.3f
+        val l2 = luma(r, g, b)
+        val sat = maxOf(r, g, b) - minOf(r, g, b)
+        val k = 1f + p.vibrance * (1f - sat)
+        r = l2 + (r - l2) * k; g = l2 + (g - l2) * k; b = l2 + (b - l2) * k
+        return floatArrayOf(r.coerceIn(0f, 1f), g.coerceIn(0f, 1f), b.coerceIn(0f, 1f))
+    }
 }
 
 object Filters {
@@ -227,15 +319,24 @@ object Filters {
         FilterPreset("grain_bw", "Grain B&W", ColorTransform.contrast(1.2f) * ColorTransform.saturation(0f), FilterGroup.LOFI, vignette = 0.3f, grain = 0.55f),
     )
 
-    /** Vignette and grain for a clip: the filter's own (scaled by intensity) plus manual adjustments. */
-    fun textureFor(filterId: String, intensity: Float, adjust: ColorAdjust): TextureLook {
+    /** Shader grading for a clip: the filter's vignette/grain (scaled by intensity) plus the user's grade. */
+    fun gradeFor(filterId: String, intensity: Float, adjust: ColorAdjust): GradeParams {
         val f = byId(filterId)
         val t = intensity.coerceIn(0f, 1f)
-        return TextureLook(
+        fun tint(hue: Float, amount: Float): FloatArray =
+            if (amount <= 0f) floatArrayOf(0f, 0f, 0f) else GradeMath.hueTint(hue).map { it * amount.coerceIn(0f, 1f) }.toFloatArray()
+        return GradeParams(
             vignette = (f.vignette * t + adjust.vignette).coerceIn(0f, 1f),
             grain = (f.grain * t + adjust.grain).coerceIn(0f, 1f),
+            highlights = adjust.highlights.coerceIn(-1f, 1f),
+            shadows = adjust.shadows.coerceIn(-1f, 1f),
+            vibrance = adjust.vibrance.coerceIn(-1f, 1f),
+            shadowTint = tint(adjust.shadowHue, adjust.shadowTone),
+            highlightTint = tint(adjust.highlightHue, adjust.highlightTone),
         )
     }
+
+    fun textureFor(filterId: String, intensity: Float, adjust: ColorAdjust): TextureLook = gradeFor(filterId, intensity, adjust)
 
     fun inGroup(group: FilterGroup): List<FilterPreset> =
         all.filter { it.group == group || it.id == "none" }

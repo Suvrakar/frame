@@ -60,7 +60,11 @@ class ExportPipelineTest {
                 VideoClip(
                     id = "b", sourceUri = uri, sourceDurationMs = 4_000, trimEndMs = 2_000,
                     rotationDegrees = 90, crop = centerCrop(1280, 720, 1f), width = 1280, height = 720,
-                    filterId = "vivid", adjust = app.frame.studio.domain.ColorAdjust(brightness = 0.2f, warmth = 0.5f),
+                    filterId = "vivid",
+                    adjust = app.frame.studio.domain.ColorAdjust(
+                        brightness = 0.2f, warmth = 0.5f, exposure = 0.3f, highlights = -0.4f, shadows = 0.3f,
+                        tint = 0.2f, vibrance = 0.5f, fade = 0.3f, shadowTone = 0.6f, highlightTone = 0.5f,
+                    ),
                     flipH = true, transition = app.frame.studio.domain.TransitionType.FADE_WHITE, transitionMs = 600,
                 ),
                 VideoClip(
@@ -127,7 +131,8 @@ class ExportPipelineTest {
             name = "Preview",
             createdAtEpochMs = 0,
             videoClips = listOf(
-                VideoClip(id = "a", sourceUri = android.net.Uri.fromFile(video).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, speed = 1.5f, filterId = "vhs", width = 1280, height = 720),
+                VideoClip(id = "a", sourceUri = android.net.Uri.fromFile(video).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, speed = 1.5f, filterId = "vhs", width = 1280, height = 720,
+                    adjust = app.frame.studio.domain.ColorAdjust(highlights = 0.5f, shadows = -0.3f, vibrance = 0.8f, shadowTone = 1f, highlightTone = 1f)),
                 VideoClip(id = "b", sourceUri = android.net.Uri.fromFile(image).toString(), sourceDurationMs = VideoClip.MAX_IMAGE_MS, trimEndMs = 1_500, isImage = true, width = 640, height = 480),
             ),
             audioClips = listOf(AudioClip(id = "m", sourceUri = android.net.Uri.fromFile(music).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, startMs = 500)),

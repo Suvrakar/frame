@@ -223,6 +223,11 @@ class ScreenshotTour {
             Thread.sleep(2_600)
             device.wait(Until.findObject(By.desc("Pause")), 2_000)?.click()
             shot("9_collage_editor")
+            if (tap("Edit") && tap("Grade")) {
+                Thread.sleep(800)
+                shot("16_grade_light")
+                if (tapInRow("Split tone", anchor = "Light")) shot("17_split_tone")
+            }
         }
 
         // Settings and dark mode.

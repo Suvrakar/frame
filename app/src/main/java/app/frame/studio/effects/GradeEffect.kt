@@ -12,24 +12,18 @@ import androidx.media3.effect.BaseGlShaderProgram
 import androidx.media3.effect.GlEffect
 
 /**
- * Vignette (darkened corners) and film grain in a single GPU pass. Applied per clip after the
- * frame is fitted to the canvas, so the vignette follows the output frame's shape.
+ * Tone grading (highlights, shadows, vibrance, split toning) plus vignette and grain, in a single
+ * GPU pass. Runs after the clip's colour matrix and after the frame is fitted to the canvas.
+ * [GradeMath.tone] is the CPU mirror of the tone part; keep them in sync.
  */
 @OptIn(UnstableApi::class)
-class TextureLookEffect(
-    /** 0..1 */
-    private val vignette: Float,
-    /** 0..1 */
-    private val grain: Float,
-) : GlEffect {
+class GradeEffect(private val params: GradeParams) : GlEffect {
 
-    override fun toGlShaderProgram(context: Context, useHdr: Boolean): BaseGlShaderProgram =
-        Program(useHdr, vignette.coerceIn(0f, 1f), grain.coerceIn(0f, 1f))
+    override fun toGlShaderProgram(context: Context, useHdr: Boolean): BaseGlShaderProgram = Program(useHdr, params)
 
-    override fun isNoOp(inputWidth: Int, inputHeight: Int): Boolean = vignette <= 0f && grain <= 0f
+    override fun isNoOp(inputWidth: Int, inputHeight: Int): Boolean = params.isNone
 
-    private class Program(useHdr: Boolean, vignette: Float, grain: Float) :
-        BaseGlShaderProgram(useHdr, /* texturePoolCapacity= */ 1) {
+    private class Program(useHdr: Boolean, p: GradeParams) : BaseGlShaderProgram(useHdr, /* texturePoolCapacity= */ 1) {
 
         private val program: GlProgram = try {
             GlProgram(VERTEX, FRAGMENT)
@@ -46,8 +40,13 @@ class TextureLookEffect(
             val identity = GlUtil.create4x4IdentityMatrix()
             program.setFloatsUniform("uTransformationMatrix", identity)
             program.setFloatsUniform("uTexTransformationMatrix", identity)
-            program.setFloatUniform("uVignette", vignette)
-            program.setFloatUniform("uGrain", grain)
+            program.setFloatUniform("uVignette", p.vignette.coerceIn(0f, 1f))
+            program.setFloatUniform("uGrain", p.grain.coerceIn(0f, 1f))
+            program.setFloatUniform("uHighlights", p.highlights)
+            program.setFloatUniform("uShadows", p.shadows)
+            program.setFloatUniform("uVibrance", p.vibrance)
+            program.setFloatsUniform("uShadowTint", p.shadowTint)
+            program.setFloatsUniform("uHighlightTint", p.highlightTint)
             program.setFloatUniform("uAspect", 1f)
         }
 
@@ -103,7 +102,14 @@ uniform float uVignette;
 uniform float uGrain;
 uniform float uAspect;
 uniform float uSeed;
+uniform float uHighlights;
+uniform float uShadows;
+uniform float uVibrance;
+uniform vec3 uShadowTint;
+uniform vec3 uHighlightTint;
 varying vec2 vTexSamplingCoord;
+
+const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
 
 float hash(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -113,14 +119,29 @@ float hash(vec2 p) {
 
 void main() {
   vec4 color = texture2D(uTexSampler, vTexSamplingCoord);
+  vec3 c = color.rgb;
+
+  // Tone: weights for dark and bright areas.
+  float l = dot(c, LUMA);
+  float sw = 1.0 - smoothstep(0.0, 0.55, l);
+  float hw = smoothstep(0.45, 1.0, l);
+  c += vec3(uShadows * 0.28 * sw + uHighlights * 0.28 * hw);
+  c += (uShadowTint * sw + uHighlightTint * hw) * 0.3;
+
+  // Vibrance: boost muted colours more than already-saturated ones.
+  float l2 = dot(c, LUMA);
+  float sat = max(c.r, max(c.g, c.b)) - min(c.r, min(c.g, c.b));
+  c = mix(vec3(l2), c, 1.0 + uVibrance * (1.0 - sat));
+  c = clamp(c, 0.0, 1.0);
+
+  // Vignette and grain.
   vec2 p = vTexSamplingCoord - 0.5;
   p.x *= uAspect;
   float d = length(p) / length(vec2(0.5 * uAspect, 0.5));
-  float v = smoothstep(0.4, 1.05, d);
-  color.rgb *= 1.0 - uVignette * v * 0.85;
-  float n = hash(vTexSamplingCoord * 731.0 + uSeed * 17.0) - 0.5;
-  color.rgb += n * uGrain * 0.14;
-  gl_FragColor = vec4(clamp(color.rgb, 0.0, 1.0), color.a);
+  c *= 1.0 - uVignette * smoothstep(0.4, 1.05, d) * 0.85;
+  c += (hash(vTexSamplingCoord * 731.0 + uSeed * 17.0) - 0.5) * uGrain * 0.14;
+
+  gl_FragColor = vec4(clamp(c, 0.0, 1.0), color.a);
 }
 """
     }

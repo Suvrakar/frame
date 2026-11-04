@@ -66,6 +66,14 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     private val messageChannel = Channel<String>(Channel.BUFFERED)
     val messages = messageChannel.receiveAsFlow()
 
+    /** While true, the preview shows the selected clip without its filter and grade. */
+    private val _compareOriginal = MutableStateFlow(false)
+    val compareOriginal: StateFlow<Boolean> = _compareOriginal.asStateFlow()
+
+    fun setCompareOriginal(on: Boolean) {
+        _compareOriginal.value = on
+    }
+
     /** Output-timeline playhead, updated by the preview player. */
     private val _playheadMs = MutableStateFlow(0L)
     val playheadMs: StateFlow<Long> = _playheadMs.asStateFlow()

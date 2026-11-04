@@ -83,7 +83,7 @@ enum class Tool(val title: String) {
     VOLUME("Volume"),
     FADE("Fade"),
     FILTERS("Filters"),
-    ADJUST("Adjust"),
+    ADJUST("Color grade"),
     CROP("Crop"),
     TRANSITION("Transition"),
     CANVAS("Canvas"),
@@ -269,57 +269,121 @@ fun FiltersPanel(app: FrameApp, clip: VideoClip, onFilter: (String) -> Unit, onI
     }
 }
 
-private enum class AdjustKind(val label: String, val bipolar: Boolean = true) {
-    BRIGHTNESS("Brightness"),
-    CONTRAST("Contrast"),
-    SATURATION("Saturation"),
-    WARMTH("Warmth"),
-    VIGNETTE("Vignette", bipolar = false),
-    GRAIN("Grain", bipolar = false),
+/** One grading control: how to read/write it on [ColorAdjust] and its slider range. */
+private enum class GradeControl(
+    val label: String,
+    val range: ClosedFloatingPointRange<Float>,
+    val get: (ColorAdjust) -> Float,
+    val set: (ColorAdjust, Float) -> ColorAdjust,
+) {
+    EXPOSURE("Exposure", -1f..1f, { it.exposure }, { a, v -> a.copy(exposure = v) }),
+    BRIGHTNESS("Brightness", -1f..1f, { it.brightness }, { a, v -> a.copy(brightness = v) }),
+    CONTRAST("Contrast", -1f..1f, { it.contrast }, { a, v -> a.copy(contrast = v) }),
+    HIGHLIGHTS("Highlights", -1f..1f, { it.highlights }, { a, v -> a.copy(highlights = v) }),
+    SHADOWS("Shadows", -1f..1f, { it.shadows }, { a, v -> a.copy(shadows = v) }),
+    SATURATION("Saturation", -1f..1f, { it.saturation }, { a, v -> a.copy(saturation = v) }),
+    VIBRANCE("Vibrance", -1f..1f, { it.vibrance }, { a, v -> a.copy(vibrance = v) }),
+    WARMTH("Temperature", -1f..1f, { it.warmth }, { a, v -> a.copy(warmth = v) }),
+    TINT("Tint", -1f..1f, { it.tint }, { a, v -> a.copy(tint = v) }),
+    FADE("Fade", 0f..1f, { it.fade }, { a, v -> a.copy(fade = v) }),
+    VIGNETTE("Vignette", 0f..1f, { it.vignette }, { a, v -> a.copy(vignette = v) }),
+    GRAIN("Grain", 0f..1f, { it.grain }, { a, v -> a.copy(grain = v) }),
 }
 
-private fun ColorAdjust.valueOf(kind: AdjustKind): Float = when (kind) {
-    AdjustKind.BRIGHTNESS -> brightness
-    AdjustKind.CONTRAST -> contrast
-    AdjustKind.SATURATION -> saturation
-    AdjustKind.WARMTH -> warmth
-    AdjustKind.VIGNETTE -> vignette
-    AdjustKind.GRAIN -> grain
+private enum class GradeGroup(val label: String, val controls: List<GradeControl>) {
+    LIGHT("Light", listOf(GradeControl.EXPOSURE, GradeControl.BRIGHTNESS, GradeControl.CONTRAST, GradeControl.HIGHLIGHTS, GradeControl.SHADOWS)),
+    COLOR("Color", listOf(GradeControl.SATURATION, GradeControl.VIBRANCE, GradeControl.WARMTH, GradeControl.TINT)),
+    SPLIT("Split tone", emptyList()),
+    EFFECTS("Effects", listOf(GradeControl.FADE, GradeControl.VIGNETTE, GradeControl.GRAIN)),
 }
 
-private fun ColorAdjust.with(kind: AdjustKind, v: Float): ColorAdjust = when (kind) {
-    AdjustKind.BRIGHTNESS -> copy(brightness = v)
-    AdjustKind.CONTRAST -> copy(contrast = v)
-    AdjustKind.SATURATION -> copy(saturation = v)
-    AdjustKind.WARMTH -> copy(warmth = v)
-    AdjustKind.VIGNETTE -> copy(vignette = v)
-    AdjustKind.GRAIN -> copy(grain = v)
-}
-
+/** Lightroom-style colour grading for a clip. */
 @Composable
 fun AdjustPanel(adjust: ColorAdjust, onAdjust: (ColorAdjust) -> Unit) {
-    var kind by remember { mutableStateOf(AdjustKind.BRIGHTNESS) }
-    val value = adjust.valueOf(kind)
-    Column {
+    var group by remember { mutableStateOf(GradeGroup.LIGHT) }
+    var control by remember { mutableStateOf(GradeControl.EXPOSURE) }
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AdjustKind.entries.forEach { k ->
+            GradeGroup.entries.forEach { g ->
+                val changed = when (g) {
+                    GradeGroup.SPLIT -> adjust.shadowTone > 0f || adjust.highlightTone > 0f
+                    else -> g.controls.any { it.get(adjust) != 0f }
+                }
                 FilterChip(
-                    selected = kind == k,
-                    onClick = { kind = k },
-                    label = { Text(if (adjust.valueOf(k) != 0f) "${k.label} •" else k.label) },
+                    selected = group == g,
+                    onClick = {
+                        group = g
+                        g.controls.firstOrNull()?.let { control = it }
+                    },
+                    label = { Text(if (changed) "${g.label} •" else g.label) },
                 )
             }
         }
-        ValueSlider(
-            kind.label,
-            "${(value * 100).roundToInt()}",
-            value,
-            if (kind.bipolar) -1f..1f else 0f..1f,
-            { raw -> onAdjust(adjust.with(kind, (raw * 100).roundToInt() / 100f)) },
-        )
-        if (!adjust.isIdentity) {
-            TextButton(onClick = { onAdjust(ColorAdjust()) }) { Text("Reset all") }
+        if (group == GradeGroup.SPLIT) {
+            SplitToneRow("Shadows", adjust.shadowHue, adjust.shadowTone,
+                { h -> onAdjust(adjust.copy(shadowHue = h)) }, { a -> onAdjust(adjust.copy(shadowTone = a)) })
+            SplitToneRow("Highlights", adjust.highlightHue, adjust.highlightTone,
+                { h -> onAdjust(adjust.copy(highlightHue = h)) }, { a -> onAdjust(adjust.copy(highlightTone = a)) })
+        } else {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                group.controls.forEach { c ->
+                    val v = c.get(adjust)
+                    val selected = c == control
+                    Text(
+                        if (v != 0f) "${c.label} •" else c.label,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHighest)
+                            .clickable { control = c }
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                    )
+                }
+            }
+            val value = control.get(adjust)
+            ValueSlider(
+                control.label,
+                "${if (value > 0f && control.range.start < 0f) "+" else ""}${(value * 100).roundToInt()}",
+                value,
+                control.range,
+                { raw -> onAdjust(control.set(adjust, (raw * 100).roundToInt() / 100f)) },
+            )
         }
+        if (!adjust.isIdentity) {
+            TextButton(onClick = { onAdjust(ColorAdjust()) }) { Text("Reset grade") }
+        }
+    }
+}
+
+/** Hue strip plus strength for one split-tone range. */
+@Composable
+private fun SplitToneRow(label: String, hue: Float, amount: Float, onHue: (Float) -> Unit, onAmount: (Float) -> Unit) {
+    val rainbow = remember {
+        androidx.compose.ui.graphics.Brush.horizontalGradient(
+            listOf(0f, 60f, 120f, 180f, 240f, 300f, 360f).map { Color.hsv(it % 360f, 0.85f, 1f) },
+        )
+    }
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(12.dp).clip(CircleShape).background(Color.hsv(hue % 360f, 0.85f, 1f)))
+            Text(label, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(start = 6.dp).weight(1f))
+            Text("${(amount * 100).roundToInt()}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+        }
+        Box(Modifier.fillMaxWidth().height(36.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().padding(horizontal = 10.dp).height(10.dp).clip(RoundedCornerShape(5.dp)).background(rainbow))
+            Slider(
+                value = hue,
+                onValueChange = { onHue(it.roundToInt().toFloat()) },
+                valueRange = 0f..360f,
+                colors = androidx.compose.material3.SliderDefaults.colors(
+                    activeTrackColor = Color.Transparent,
+                    inactiveTrackColor = Color.Transparent,
+                    thumbColor = Color.hsv(hue % 360f, 0.85f, 1f),
+                ),
+            )
+        }
+        Slider(value = amount, onValueChange = { onAmount((it * 100).roundToInt() / 100f) }, valueRange = 0f..1f)
     }
 }
 
