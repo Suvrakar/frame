@@ -64,7 +64,9 @@ Bundled fonts (SIL Open Font License, files in `app/src/main/res/font/`, license
 | press_start_2p | Pixel | retro |
 | bungee | Bungee | retro |
 
-Static (non-variable) TTFs only, to keep size predictable (target ≤ 2 MB total).
+Static TTFs where Google Fonts ships them; Dancing Script and Caveat are only published as
+variable fonts and load at their default weight (target ≤ 2.5 MB total). Permanent Marker is
+Apache 2.0, the rest OFL.
 Typefaces load with `ResourcesCompat.getFont` and are cached in a map; load failure falls back
 to `Typeface.DEFAULT` and is logged, never thrown.
 
@@ -116,8 +118,9 @@ Unit (JVM):
 
 Device (androidTest):
 - Every catalog font loads to a non-default `Typeface`.
-- Exporting a one-frame project with text in `pacifico` yields a frame that differs from the
-  same project with `default` font (pixel diff over the text region).
+- Text laid out with `FontSpan("pacifico")` renders different pixels from the default font
+  (the same `StaticLayout` path Media3's `TextOverlay` uses).
+- Manual on-device check: preview and exported frame show the same font and color.
 
 ## Risks
 
