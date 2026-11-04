@@ -5,6 +5,10 @@ import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.transformer.Composition
+import androidx.media3.common.util.Clock
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
+import androidx.media3.transformer.DefaultAssetLoaderFactory
+import androidx.media3.transformer.DefaultDecoderFactory
 import androidx.media3.transformer.DefaultEncoderFactory
 import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
@@ -175,6 +179,19 @@ class ExportManager(
          * watchdog: a heavy timeline can legitimately take more than Media3's default 10 s to
          * produce a frame there, and the default would abort a healthy export.
          */
+        /**
+         * Decoders for export: if a hardware decoder can't be created (budget chips often allow
+         * only a few at once) another one is tried instead of failing. Emulator-only "goldfish"
+         * decoders, which stall on long timelines, are tried last.
+         */
+        private fun robustDecoderFactory(context: Context) = DefaultDecoderFactory.Builder(context)
+            .setEnableDecoderFallback(true)
+            .setMediaCodecSelector { mimeType, secure, tunneling ->
+                MediaCodecUtil.getDecoderInfos(mimeType, secure, tunneling)
+                    .sortedBy { if (it.name.contains("goldfish", ignoreCase = true)) 1 else 0 }
+            }
+            .build()
+
         fun newTransformer(
             context: Context,
             device: DeviceProfile,
@@ -184,6 +201,9 @@ class ExportManager(
             .setVideoMimeType(ExportPolicy.videoMimeType)
             .setAudioMimeType(ExportPolicy.audioMimeType)
             .setMaxDelayBetweenMuxerSamplesMs(if (device.isLowEnd) 90_000 else 30_000)
+            .setAssetLoaderFactory(
+                DefaultAssetLoaderFactory(context, robustDecoderFactory(context), Clock.DEFAULT, null),
+            )
             .setEncoderFactory(
                 DefaultEncoderFactory.Builder(context)
                     .setEnableFallback(true)
