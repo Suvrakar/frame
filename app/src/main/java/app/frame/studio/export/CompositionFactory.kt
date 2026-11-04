@@ -313,9 +313,9 @@ object CompositionFactory {
             .setBackgroundFrameAnchor(anchorX, anchorY)
             .build()
         val keyframes = overlay.keyframes
-        val base = Transform(overlay.x, overlay.y, 1f, overlay.rotation, overlay.opacity)
+        val restPose = Transform(overlay.x, overlay.y, 1f, overlay.rotation, overlay.opacity)
         fun animated(presentationTimeUs: Long, alpha: Float): OverlaySettings {
-            val t = Keyframes.at(base, keyframes, presentationTimeUs / 1000 - overlay.startMs)
+            val t = Keyframes.at(restPose, keyframes, presentationTimeUs / 1000 - overlay.startMs)
             val s = scale * t.scale.coerceIn(0.1f, 6f)
             return StaticOverlaySettings.Builder()
                 .setAlphaScale((alpha * t.opacity).coerceIn(0f, 1f))

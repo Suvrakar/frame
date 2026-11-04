@@ -952,7 +952,7 @@ private fun ActivePanel(
             Tool.OPACITY -> overlayClip?.let { o ->
                 val at = controller.positionMs - o.startMs
                 val current = Keyframes.at(Keyframes.base(o), o.keyframes, at.coerceIn(0, o.durationMs())).opacity
-                ValueSlider("Opacity", "${(current * 100).roundToInt()}%", current, 0f..1f) { vm.setOverlayOpacity(o.id, it) }
+                ValueSlider("Opacity", "${(current * 100).roundToInt()}%", current, 0f..1f, onChange = { vm.setOverlayOpacity(o.id, it) })
                 if (o.keyframes.isNotEmpty()) {
                     Text(
                         "Animated: this sets the opacity keyframe at the playhead.",
