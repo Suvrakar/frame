@@ -13,6 +13,7 @@ import androidx.media3.common.Effect
 import androidx.media3.common.MediaItem
 import androidx.media3.common.OverlaySettings
 import androidx.media3.common.audio.AudioProcessor
+import androidx.media3.common.audio.SpeedChangingAudioProcessor
 import androidx.media3.common.audio.SpeedProvider
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.effect.Crop
@@ -21,6 +22,7 @@ import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.Presentation
 import androidx.media3.effect.RgbMatrix
 import androidx.media3.effect.ScaleAndRotateTransformation
+import androidx.media3.effect.SpeedChangeEffect
 import androidx.media3.effect.StaticOverlaySettings
 import androidx.media3.effect.TextOverlay
 import androidx.media3.effect.TextureOverlay
@@ -52,7 +54,7 @@ object CompositionFactory {
         require(project.videoClips.isNotEmpty()) { "Add at least one clip" }
         val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect)
 
-        val videoSequence = EditedMediaItemSequence.Builder(project.videoClips.map { videoItem(it, size) })
+        val videoSequence = EditedMediaItemSequence.Builder(project.videoClips.map { videoItem(it, size, forExport) })
             // Clips without an audio track (and photos) still contribute silence so the mix stays in sync.
             .experimentalSetForceAudioTrack(true)
             .build()
@@ -103,7 +105,7 @@ object CompositionFactory {
             )
             .build()
 
-    private fun videoItem(clip: VideoClip, size: ExportPlan.Size): EditedMediaItem {
+    private fun videoItem(clip: VideoClip, size: ExportPlan.Size, forExport: Boolean): EditedMediaItem {
         val audio = mutableListOf<AudioProcessor>()
         val video = mutableListOf<Effect>()
 
@@ -119,9 +121,18 @@ object CompositionFactory {
         } else {
             val speed = clip.speed.coerceIn(VideoClip.MIN_SPEED, VideoClip.MAX_SPEED)
             if (speed != 1f) {
-                val pair = Effects.createExperimentalSpeedChangingEffect(ConstantSpeedProvider(speed))
-                audio += pair.first
-                video += pair.second
+                if (forExport) {
+                    // Export: independent audio and video speed changes. The audio-driven variant
+                    // below can stall long exports when audio and video timing race.
+                    val provider = ConstantSpeedProvider(speed)
+                    audio += SpeedChangingAudioProcessor(provider)
+                    video += SpeedChangeEffect(provider)
+                } else {
+                    // Preview: CompositionPlayer only supports the audio-driven speed effect.
+                    val pair = Effects.createExperimentalSpeedChangingEffect(ConstantSpeedProvider(speed))
+                    audio += pair.first
+                    video += pair.second
+                }
             }
             if (clip.volume != 1f || clip.fadeInMs > 0 || clip.fadeOutMs > 0) {
                 audio += GainAudioProcessor(clip.volume, clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs())
