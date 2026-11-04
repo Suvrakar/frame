@@ -97,8 +97,7 @@ enum class Tool(val title: String) {
     AUDIO("Add audio"),
     VOICE("Voiceover"),
     STICKERS("Stickers"),
-    TEXT_EDIT("Edit text"),
-    TEXT_STYLE("Text style"),
+    TEXT_STYLE("Text"),
     EFFECTS("Effects"),
     BEAT_SYNC("Beat sync"),
     CAPTIONS("Captions"),
@@ -779,16 +778,17 @@ private class TextPreset(
     val color: Long,
     val background: Boolean,
     val bold: Boolean,
+    val font: String,
     val apply: (TextOverlay) -> TextOverlay,
 )
 
 private val TEXT_PRESETS = listOf(
-    TextPreset("Classic", 0xFFFFFFFF, background = true, bold = false) { it.copy(color = 0xFFFFFFFF, background = true, bold = false, scale = 1f) },
-    TextPreset("Pop", 0xFFFFD60A, background = false, bold = true) { it.copy(color = 0xFFFFD60A, background = false, bold = true, scale = 1.4f) },
-    TextPreset("Neon", 0xFF64D2FF, background = false, bold = true) { it.copy(color = 0xFF64D2FF, background = false, bold = true, scale = 1.2f) },
-    TextPreset("Elegant", 0xFFFFFFFF, background = false, bold = false) { it.copy(color = 0xFFFFFFFF, background = false, bold = false, scale = 1.1f) },
-    TextPreset("Love", 0xFFFF375F, background = false, bold = true) { it.copy(color = 0xFFFF375F, background = false, bold = true, scale = 1.3f) },
-    TextPreset("Caption", 0xFFFFD60A, background = true, bold = true) { it.copy(color = 0xFFFFD60A, background = true, bold = true, scale = 0.9f) },
+    TextPreset("Classic", 0xFFFFFFFF, background = true, bold = false, font = "default") { it.copy(color = 0xFFFFFFFF, background = true, bold = false, scale = 1f, font = "default") },
+    TextPreset("Pop", 0xFFFFD60A, background = false, bold = true, font = "bungee") { it.copy(color = 0xFFFFD60A, background = false, bold = true, scale = 1.4f, font = "bungee") },
+    TextPreset("Neon", 0xFF64D2FF, background = false, bold = true, font = "bebas_neue") { it.copy(color = 0xFF64D2FF, background = false, bold = true, scale = 1.2f, font = "bebas_neue") },
+    TextPreset("Elegant", 0xFFFFFFFF, background = false, bold = false, font = "great_vibes") { it.copy(color = 0xFFFFFFFF, background = false, bold = false, scale = 1.1f, font = "great_vibes") },
+    TextPreset("Love", 0xFFFF375F, background = false, bold = true, font = "pacifico") { it.copy(color = 0xFFFF375F, background = false, bold = true, scale = 1.3f, font = "pacifico") },
+    TextPreset("Caption", 0xFFFFD60A, background = true, bold = true, font = "default") { it.copy(color = 0xFFFFD60A, background = true, bold = true, scale = 0.9f, font = "default") },
 )
 
 @Composable
@@ -805,11 +805,19 @@ private fun TextPresetChip(preset: TextPreset, onClick: () -> Unit) {
             preset.name,
             color = Color(preset.color.toInt()),
             fontWeight = if (preset.bold) FontWeight.Bold else FontWeight.Normal,
+            fontFamily = fontFamilyFor(preset.font),
             style = MaterialTheme.typography.labelLarge,
             modifier = if (preset.background) Modifier.background(Color.Black.copy(alpha = 0.6f)).padding(horizontal = 4.dp) else Modifier,
         )
     }
 }
+
+@Composable
+private fun fontFamilyFor(id: String): androidx.compose.ui.text.font.FontFamily =
+    remember(id) {
+        if (id == app.frame.studio.text.TextFonts.DEFAULT_ID) androidx.compose.ui.text.font.FontFamily.Default
+        else androidx.compose.ui.text.font.FontFamily(app.frame.studio.text.TextFonts.typeface(id))
+    }
 
 private val STICKERS = listOf(
     "😀", "😂", "😍", "🥳", "😎", "🤯", "😭", "😡", "👍", "👏", "🙌", "🙏", "💪", "🔥", "✨", "⭐",
@@ -836,35 +844,48 @@ fun StickersPanel(onSticker: (String) -> Unit) {
 }
 
 @Composable
-fun TextEditPanel(overlay: TextOverlay, onText: (String) -> Unit) {
-    var text by remember(overlay.id) { mutableStateOf(overlay.text) }
-    OutlinedTextField(
-        value = text,
-        onValueChange = {
-            if (it.length <= 200) {
-                text = it
-                if (it.isNotBlank()) onText(it)
-            }
-        },
-        label = { Text(if (overlay.isSticker) "Sticker" else "Text") },
-        modifier = Modifier.fillMaxWidth(),
-        maxLines = 3,
-    )
-}
-
-@Composable
-fun TextStylePanel(overlay: TextOverlay, onStyle: ((TextOverlay) -> TextOverlay) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+fun TextStylePanel(
+    overlay: TextOverlay,
+    onText: (String) -> Unit,
+    onStyle: ((TextOverlay) -> TextOverlay) -> Unit,
+) {
+    var showPicker by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        var text by remember(overlay.id) { mutableStateOf(overlay.text) }
+        OutlinedTextField(
+            value = text,
+            onValueChange = {
+                if (it.length <= 200) {
+                    text = it
+                    if (it.isNotBlank()) onText(it)
+                }
+            },
+            label = { Text(if (overlay.isSticker) "Sticker" else "Text") },
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 3,
+        )
         if (!overlay.isSticker) {
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TEXT_PRESETS.forEach { preset ->
                     TextPresetChip(preset) { onStyle(preset.apply) }
                 }
             }
-        }
-        if (!overlay.isSticker) {
-            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                TextSwatches.forEach { argb ->
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                app.frame.studio.text.TextFonts.all.forEach { font ->
+                    FilterChip(
+                        selected = overlay.font == font.id,
+                        onClick = { onStyle { it.copy(font = font.id) } },
+                        label = { Text(font.label, fontFamily = fontFamilyFor(font.id)) },
+                    )
+                }
+            }
+            Row(
+                Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val custom = overlay.color !in TextSwatches
+                (if (custom) listOf(overlay.color) + TextSwatches else TextSwatches).forEach { argb ->
                     val selected = overlay.color == argb
                     Box(
                         Modifier
@@ -875,6 +896,19 @@ fun TextStylePanel(overlay: TextOverlay, onStyle: ((TextOverlay) -> TextOverlay)
                             .clickable { onStyle { it.copy(color = argb) } },
                     )
                 }
+                Box(
+                    Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.sweepGradient(
+                                listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red),
+                            ),
+                        )
+                        .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                        .clickable { showPicker = true },
+                    contentAlignment = Alignment.Center,
+                ) { Text("+", color = Color.White, fontWeight = FontWeight.Bold) }
             }
         }
         ValueSlider("Size", "${(overlay.scale * 100).roundToInt()}%", overlay.scale, 0.4f..3f, { v -> onStyle { it.copy(scale = v) } })
@@ -896,6 +930,16 @@ fun TextStylePanel(overlay: TextOverlay, onStyle: ((TextOverlay) -> TextOverlay)
             "Tip: drag the text on the preview to place it anywhere.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+    if (showPicker) {
+        ColorPickerDialog(
+            initial = overlay.color,
+            onDismiss = { showPicker = false },
+            onPick = { argb ->
+                showPicker = false
+                onStyle { it.copy(color = argb) }
+            },
         )
     }
 }

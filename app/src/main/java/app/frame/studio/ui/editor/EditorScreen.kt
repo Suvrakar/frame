@@ -490,6 +490,7 @@ private fun EditorContent(
             onConfirm = {
                 showAddText = false
                 vm.addText(it)
+                tool = Tool.TEXT_STYLE
             },
         )
     }
@@ -883,7 +884,6 @@ private fun Toolbar(
             }
         }
         is Selection.Text -> ToolbarRow(onBack = { vm.select(Selection.None) }) {
-            ToolbarItem(Icons.Filled.Edit, "Edit") { onTool(Tool.TEXT_EDIT) }
             ToolbarItem(if (keyed) Icons.Filled.Diamond else Icons.Outlined.Diamond, if (keyed) "Remove key" else "Keyframe") { vm.toggleKeyframe() }
             ToolbarItem(Icons.Filled.Palette, "Style") { onTool(Tool.TEXT_STYLE) }
             ToolbarItem(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
@@ -964,8 +964,9 @@ private fun ActivePanel(
             )
             Tool.VOICE -> VoicePanel(recording, recordElapsed, onToggleRecord)
             Tool.STICKERS -> StickersPanel { vm.addText(it, sticker = true) }
-            Tool.TEXT_EDIT -> text?.let { o -> TextEditPanel(o) { vm.setText(o.id, it) } }
-            Tool.TEXT_STYLE -> text?.let { o -> TextStylePanel(o) { transform -> vm.styleText(o.id, transform) } }
+            Tool.TEXT_STYLE -> text?.let { o ->
+                TextStylePanel(o, onText = { vm.setText(o.id, it) }) { transform -> vm.styleText(o.id, transform) }
+            }
             Tool.BEAT_SYNC -> audio?.let { a ->
                 val detecting by vm.detectingBeats.collectAsStateWithLifecycle()
                 BeatSyncPanel(
