@@ -46,11 +46,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import app.frame.studio.FrameApp
+import app.frame.studio.ui.common.GlassBackground
 import app.frame.studio.templates.TemplateField
 import app.frame.studio.templates.Templates
 import app.frame.studio.ui.common.formatDuration
@@ -91,102 +93,106 @@ fun TemplateDetailScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbar) },
-        topBar = {
-            TopAppBar(
-                title = { Text(template.name) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-            )
-        },
-        bottomBar = {
-            Box(Modifier.fillMaxWidth().navigationBarsPadding().imePadding().padding(16.dp)) {
-                Button(
-                    onClick = { pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
-                    enabled = !creating,
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
-                ) {
-                    if (creating) {
-                        CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
-                        Spacer(Modifier.size(10.dp))
-                        Text("Creating your video…")
-                    } else {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Use template", fontWeight = FontWeight.SemiBold)
-                            Text(
-                                "Pick up to ${template.slots} photos or videos",
-                                style = MaterialTheme.typography.labelSmall,
-                                maxLines = 1,
-                            )
+    GlassBackground {
+        Scaffold(
+            containerColor = Color.Transparent,
+            snackbarHost = { SnackbarHost(snackbar) },
+            topBar = {
+                TopAppBar(
+                    title = { Text(template.name) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                )
+            },
+            bottomBar = {
+                Box(Modifier.fillMaxWidth().navigationBarsPadding().imePadding().padding(16.dp)) {
+                    Button(
+                        onClick = { pick.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
+                        enabled = !creating,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth().height(60.dp),
+                    ) {
+                        if (creating) {
+                            CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+                            Spacer(Modifier.size(10.dp))
+                            Text("Creating your video…")
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Use template", fontWeight = FontWeight.SemiBold)
+                                Text(
+                                    "Pick up to ${template.slots} photos or videos",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    maxLines = 1,
+                                )
+                            }
                         }
                     }
                 }
-            }
-        },
-    ) { padding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            val ratio = template.aspect.ratio ?: (9f / 16f)
-            Box(Modifier.fillMaxWidth().heightIn(max = 380.dp), contentAlignment = Alignment.Center) {
-                Box(
-                    Modifier
-                        .aspectRatio(ratio, matchHeightConstraintsFirst = ratio < 1f)
-                        .clip(RoundedCornerShape(24.dp)),
-                ) {
-                    TemplateArt(
-                        template,
-                        Modifier.fillMaxSize(),
-                        values = Templates.previewValues + values.filterValues { it.isNotBlank() },
-                        animated = app.device.animationsEnabled,
-                    )
+            },
+        ) { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                val ratio = template.aspect.ratio ?: (9f / 16f)
+                Box(Modifier.fillMaxWidth().heightIn(max = 380.dp), contentAlignment = Alignment.Center) {
+                    Box(
+                        Modifier
+                            .aspectRatio(ratio, matchHeightConstraintsFirst = ratio < 1f)
+                            .clip(RoundedCornerShape(24.dp)),
+                    ) {
+                        TemplateArt(
+                            template,
+                            Modifier.fillMaxSize(),
+                            values = Templates.previewValues + values.filterValues { it.isNotBlank() },
+                            animated = app.device.animationsEnabled,
+                        )
+                    }
                 }
-            }
-            Column {
-                Text(template.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text(template.tagline, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MetaPill(template.aspect.label)
-                MetaPill(Templates.mediaLabel(template))
-                MetaPill(formatDuration(template.totalMs))
-                template.badge?.let { MetaPill(it) }
-            }
-            if (template.fields.isNotEmpty()) {
-                Text("Make it yours", style = MaterialTheme.typography.titleMedium)
-                template.fields.forEach { field ->
-                    OutlinedTextField(
-                        value = values[field].orEmpty(),
-                        onValueChange = { if (it.length <= if (field == TemplateField.AGE) 3 else 40) values[field] = it },
-                        label = { Text(field.label) },
-                        placeholder = { Text(field.hint) },
-                        singleLine = true,
-                        keyboardOptions = if (field == TemplateField.AGE) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                Column {
+                    Text(template.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text(template.tagline, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    MetaPill(template.aspect.label)
+                    MetaPill(Templates.mediaLabel(template))
+                    MetaPill(formatDuration(template.totalMs))
+                    template.badge?.let { MetaPill(it) }
+                }
+                if (template.fields.isNotEmpty()) {
+                    Text("Make it yours", style = MaterialTheme.typography.titleMedium)
+                    template.fields.forEach { field ->
+                        OutlinedTextField(
+                            value = values[field].orEmpty(),
+                            onValueChange = { if (it.length <= if (field == TemplateField.AGE) 3 else 40) values[field] = it },
+                            label = { Text(field.label) },
+                            placeholder = { Text(field.hint) },
+                            singleLine = true,
+                            keyboardOptions = if (field == TemplateField.AGE) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                Text(
+                    if (template.collage != null) {
+                        "Photos are arranged into the collage and pop in one by one. Videos are used as a still. Add music or a voiceover afterwards."
+                    } else {
+                        "Everything stays editable afterwards — swap clips, change text, add music or a voiceover."
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(8.dp))
             }
-            Text(
-                if (template.collage != null) {
-                    "Photos are arranged into the collage and pop in one by one. Videos are used as a still. Add music or a voiceover afterwards."
-                } else {
-                    "Everything stays editable afterwards — swap clips, change text, add music or a voiceover."
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(8.dp))
         }
     }
+
 }
 
 @Composable

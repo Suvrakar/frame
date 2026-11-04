@@ -61,6 +61,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.frame.studio.FrameApp
+import app.frame.studio.ui.common.GlassBackground
+import app.frame.studio.ui.theme.LocalGlass
+import androidx.compose.foundation.border
 import app.frame.studio.ads.BannerAd
 import app.frame.studio.domain.ExportHeight
 import app.frame.studio.domain.ExportQuality
@@ -133,108 +136,112 @@ fun ExportScreen(
         scope.launch { app.repository.save(transform(p)) }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Export") },
-                navigationIcon = {
-                    IconButton(onClick = ::leave) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-            )
-        },
-        bottomBar = { BannerAd() },
-    ) { padding ->
-        if (project == null) {
-            Text("Project not found", modifier = Modifier.padding(padding).padding(24.dp))
-            return@Scaffold
-        }
-        val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect)
-        val durationMs = TimelineMath.totalVideoMs(project.videoClips)
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Poster(app, project, size, shownState)
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                Text(project.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Text(
-                    "${formatDuration(durationMs)} · ${size.width}×${size.height} · ${project.exportFps} fps",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium,
+    GlassBackground {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = { Text("Export") },
+                    colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                    navigationIcon = {
+                        IconButton(onClick = ::leave) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
                 )
+            },
+            bottomBar = { BannerAd() },
+        ) { padding ->
+            if (project == null) {
+                Text("Project not found", modifier = Modifier.padding(padding).padding(24.dp))
+                return@Scaffold
             }
+            val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect)
+            val durationMs = TimelineMath.totalVideoMs(project.videoClips)
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Poster(app, project, size, shownState)
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    Text(project.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "${formatDuration(durationMs)} · ${size.width}×${size.height} · ${project.exportFps} fps",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
 
-            AnimatedContent(targetState = shownState, contentKey = { it::class }, label = "exportState") { target ->
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    when (val s = target) {
-                        ExportState.Idle -> Settings(
-                            project = project,
-                            heights = app.device.supportedExportHeights,
-                            size = size,
-                            durationMs = durationMs,
-                            saveToGallery = saveToGallery,
-                            onSaveToGallery = { saveToGallery = it },
-                            onHeight = { h -> update { it.copy(exportHeight = h) } },
-                            onFps = { f -> update { it.copy(exportFps = f) } },
-                            onQuality = { q -> update { it.copy(exportQuality = q) } },
-                            onPreset = { preset -> update { SocialPresets.apply(it, preset, app.device::clampExportHeight) } },
-                            onExport = ::startExport,
-                        )
-                        is ExportState.Running -> {
-                            Text(
-                                "Keep Frame open while your video is exported.",
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.fillMaxWidth(),
+                AnimatedContent(targetState = shownState, contentKey = { it::class }, label = "exportState") { target ->
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        when (val s = target) {
+                            ExportState.Idle -> Settings(
+                                project = project,
+                                heights = app.device.supportedExportHeights,
+                                size = size,
+                                durationMs = durationMs,
+                                saveToGallery = saveToGallery,
+                                onSaveToGallery = { saveToGallery = it },
+                                onHeight = { h -> update { it.copy(exportHeight = h) } },
+                                onFps = { f -> update { it.copy(exportFps = f) } },
+                                onQuality = { q -> update { it.copy(exportQuality = q) } },
+                                onPreset = { preset -> update { SocialPresets.apply(it, preset, app.device::clampExportHeight) } },
+                                onExport = ::startExport,
                             )
-                            OutlinedButton(onClick = app.exportManager::cancel, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
-                        }
-                        is ExportState.Saving -> Text(
-                            "Saving to your gallery…",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        is ExportState.Done -> {
-                            Text(
-                                buildString {
-                                    append(formatBytes(s.record.sizeBytes))
-                                    if (s.savedToGallery) append(" · Saved to Movies/Frame")
-                                },
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                Button(onClick = { shareExport(context, s.record) }, modifier = Modifier.weight(1f).height(52.dp)) {
-                                    Icon(Icons.Filled.Share, contentDescription = null)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text("Share")
-                                }
-                                OutlinedButton(onClick = { playExport(context, s.record) }, modifier = Modifier.weight(1f).height(52.dp)) {
-                                    Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text("Play")
-                                }
+                            is ExportState.Running -> {
+                                Text(
+                                    "Keep Frame open while your video is exported.",
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                                OutlinedButton(onClick = app.exportManager::cancel, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
                             }
-                            OutlinedButton(
-                                onClick = {
-                                    app.exportManager.acknowledge()
-                                    onOpenExports()
-                                },
+                            is ExportState.Saving -> Text(
+                                "Saving to your gallery…",
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth(),
-                            ) { Text("All exports") }
-                        }
-                        is ExportState.Failed -> {
-                            val cancelled = s.message == ExportManager.CANCELLED
-                            Text(s.message, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
-                            Button(onClick = { app.exportManager.acknowledge() }, modifier = Modifier.fillMaxWidth()) {
-                                Text(if (cancelled) "OK" else "Try again")
+                            )
+                            is ExportState.Done -> {
+                                Text(
+                                    buildString {
+                                        append(formatBytes(s.record.sizeBytes))
+                                        if (s.savedToGallery) append(" · Saved to Movies/Frame")
+                                    },
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    Button(onClick = { shareExport(context, s.record) }, modifier = Modifier.weight(1f).height(52.dp)) {
+                                        Icon(Icons.Filled.Share, contentDescription = null)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text("Share")
+                                    }
+                                    OutlinedButton(onClick = { playExport(context, s.record) }, modifier = Modifier.weight(1f).height(52.dp)) {
+                                        Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text("Play")
+                                    }
+                                }
+                                OutlinedButton(
+                                    onClick = {
+                                        app.exportManager.acknowledge()
+                                        onOpenExports()
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) { Text("All exports") }
+                            }
+                            is ExportState.Failed -> {
+                                val cancelled = s.message == ExportManager.CANCELLED
+                                Text(s.message, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth())
+                                Button(onClick = { app.exportManager.acknowledge() }, modifier = Modifier.fillMaxWidth()) {
+                                    Text(if (cancelled) "OK" else "Try again")
+                                }
                             }
                         }
                     }
@@ -242,6 +249,7 @@ fun ExportScreen(
             }
         }
     }
+
 }
 
 @Composable
@@ -315,8 +323,9 @@ private fun Settings(
     Column(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .clip(RoundedCornerShape(22.dp))
+            .background(LocalGlass.current.fill)
+            .border(1.dp, LocalGlass.current.border, RoundedCornerShape(22.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {

@@ -1,6 +1,26 @@
 package app.frame.studio.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material.icons.outlined.Dashboard
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.VideoLibrary
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import app.frame.studio.ads.BannerAd
+import app.frame.studio.templates.TemplateCategory
+import app.frame.studio.ui.common.GlassBackground
+import app.frame.studio.ui.common.GlassBottomBar
+import app.frame.studio.ui.common.NavTab
+import app.frame.studio.ui.settings.SettingsScreen
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +45,10 @@ object Routes {
     const val EDITOR = "editor/{projectId}?import={import}"
     const val EXPORT = "export/{projectId}"
     const val EXPORTS = "exports"
-    const val TEMPLATES = "templates"
+    const val TEMPLATES = "templates?category={category}"
+    const val SETTINGS = "settings"
+
+    fun templates(category: TemplateCategory? = null) = "templates?category=${category?.name.orEmpty()}"
     const val TEMPLATE = "template/{templateId}"
 
     fun template(id: String) = "template/$id"
@@ -49,17 +72,38 @@ fun FrameNavHost(app: FrameApp) {
     val nav = rememberNavController()
     NavHost(navController = nav, startDestination = Routes.PROJECTS) {
         composable(Routes.PROJECTS) {
-            ProjectsScreen(
-                app = app,
-                onOpenProject = { nav.navigate(Routes.editor(it)) },
-                onNewProject = { nav.navigate(Routes.editor(it, autoImport = true)) },
-                onOpenExports = { nav.navigate(Routes.EXPORTS) },
-                onOpenTemplates = { nav.navigate(Routes.TEMPLATES) },
-                onOpenTemplate = { nav.navigate(Routes.template(it)) },
-            )
+            TabShell(nav, Routes.PROJECTS) {
+                ProjectsScreen(
+                    app = app,
+                    onOpenProject = { nav.navigate(Routes.editor(it)) },
+                    onNewProject = { nav.navigate(Routes.editor(it, autoImport = true)) },
+                    onOpenExports = { nav.switchTab(Routes.EXPORTS) },
+                    onOpenTemplates = { nav.switchTab(Routes.templates(it)) },
+                    onOpenTemplate = { nav.navigate(Routes.template(it)) },
+                )
+            }
         }
-        composable(Routes.TEMPLATES) {
-            TemplatesScreen(onBack = { nav.popBackStack() }, onOpen = { nav.navigate(Routes.template(it)) })
+        composable(
+            Routes.TEMPLATES,
+            arguments = listOf(
+                navArgument("category") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+            ),
+        ) { entry ->
+            val category = entry.arguments?.getString("category")
+                ?.takeIf { it.isNotBlank() }
+                ?.let { runCatching { TemplateCategory.valueOf(it) }.getOrNull() }
+            TabShell(nav, Routes.TEMPLATES) {
+                TemplatesScreen(onBack = null, onOpen = { nav.navigate(Routes.template(it)) }, initialCategory = category)
+            }
+        }
+        composable(Routes.EXPORTS) {
+            TabShell(nav, Routes.EXPORTS) { ExportsScreen(app = app, onBack = null) }
+        }
+        composable(Routes.SETTINGS) {
+            TabShell(nav, Routes.SETTINGS) { SettingsScreen(app) }
         }
         composable(
             Routes.TEMPLATE,
@@ -102,13 +146,44 @@ fun FrameNavHost(app: FrameApp) {
                 app = app,
                 projectId = id,
                 onBack = { nav.popBackStack() },
-                onOpenExports = {
-                    nav.navigate(Routes.EXPORTS) { popUpTo(Routes.PROJECTS) }
-                },
+                onOpenExports = { nav.switchTab(Routes.EXPORTS) },
             )
         }
-        composable(Routes.EXPORTS) {
-            ExportsScreen(app = app, onBack = { nav.popBackStack() })
+    }
+}
+
+private val TABS = listOf(
+    NavTab(Routes.PROJECTS, "Home", Icons.Outlined.Home, Icons.Filled.Home),
+    NavTab(Routes.TEMPLATES, "Templates", Icons.Outlined.Dashboard, Icons.Filled.Dashboard),
+    NavTab(Routes.EXPORTS, "Exports", Icons.Outlined.VideoLibrary, Icons.Filled.VideoLibrary),
+    NavTab(Routes.SETTINGS, "Settings", Icons.Outlined.Settings, Icons.Filled.Settings),
+)
+
+/** Top-level tabs keep one back stack entry each, like Google's apps. */
+private fun NavHostController.switchTab(route: String) {
+    navigate(route) {
+        popUpTo(Routes.PROJECTS) { saveState = true }
+        launchSingleTop = true
+        restoreState = !route.startsWith("templates?category=") || route == Routes.templates(null)
+    }
+}
+
+/** Glass background, content, banner and the floating bottom navigation shared by all tabs. */
+@Composable
+private fun TabShell(nav: NavHostController, current: String, content: @Composable () -> Unit) {
+    GlassBackground {
+        Column(Modifier.fillMaxSize()) {
+            Box(Modifier.weight(1f)) { content() }
+            BannerAd(insetNavigationBar = false)
+            GlassBottomBar(
+                tabs = TABS,
+                current = current,
+                onSelect = { tab ->
+                    if (tab.route != current) {
+                        nav.switchTab(if (tab.route == Routes.TEMPLATES) Routes.templates(null) else tab.route)
+                    }
+                },
+            )
         }
     }
 }

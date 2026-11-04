@@ -557,7 +557,7 @@ fun VoicePanel(recording: Boolean, elapsedMs: Long, onToggle: () -> Unit) {
             Modifier
                 .size(72.dp)
                 .clip(CircleShape)
-                .border(3.dp, Color.White, CircleShape)
+                .border(3.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
                 .padding(6.dp)
                 .clip(if (recording) RoundedCornerShape(8.dp) else CircleShape)
                 .background(Color(0xFFFF453A))

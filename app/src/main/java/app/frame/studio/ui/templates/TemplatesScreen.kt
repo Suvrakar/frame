@@ -48,19 +48,26 @@ import app.frame.studio.templates.VideoTemplate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TemplatesScreen(onBack: () -> Unit, onOpen: (String) -> Unit) {
-    var categoryName by rememberSaveable { mutableStateOf<String?>(null) }
+fun TemplatesScreen(
+    onBack: (() -> Unit)?,
+    onOpen: (String) -> Unit,
+    initialCategory: TemplateCategory? = null,
+) {
+    var categoryName by rememberSaveable(initialCategory) { mutableStateOf(initialCategory?.name) }
     val category = categoryName?.let { TemplateCategory.valueOf(it) }
     val list = Templates.inCategory(category)
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = { Text("Templates", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+                    }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
         },
     ) { padding ->

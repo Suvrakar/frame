@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ComponentCallbacks2
 import app.frame.studio.data.ImageNormalizer
 import app.frame.studio.data.MediaProbe
+import app.frame.studio.data.SettingsStore
 import app.frame.studio.device.DeviceProfile
 import app.frame.studio.data.ProjectRepository
 import app.frame.studio.export.ExportManager
@@ -16,6 +17,8 @@ import kotlinx.coroutines.launch
 class FrameApp : Application() {
 
     lateinit var device: DeviceProfile
+        private set
+    lateinit var settings: SettingsStore
         private set
     lateinit var repository: ProjectRepository
         private set
@@ -34,6 +37,7 @@ class FrameApp : Application() {
     override fun onCreate() {
         super.onCreate()
         device = DeviceProfile(this)
+        settings = SettingsStore(this)
         repository = ProjectRepository(this, device.defaultExportHeight)
         mediaProbe = MediaProbe(this, device)
         imageNormalizer = ImageNormalizer(this, device.maxImageLongSide)

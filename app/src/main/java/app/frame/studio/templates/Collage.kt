@@ -75,14 +75,15 @@ object CollageLayout {
             }
             CollageStyle.POLAROIDS -> {
                 // Four tilted prints, one per quadrant, slightly overlapping the centre.
-                val pw = min(rw * 0.5f, rh * 0.42f)
+                // Sized so the top prints' captions stay visible above the bottom prints.
+                val pw = min(rw * 0.46f, rh * 0.39f)
                 val ph = pw * 1.2f
-                val rotations = listOf(-7f, 5f, 4f, -6f)
+                val rotations = listOf(-6f, 5f, 4f, -5f)
                 val centers = listOf(
-                    left + rw * 0.28f to top + rh * 0.27f,
-                    left + rw * 0.72f to top + rh * 0.3f,
-                    left + rw * 0.3f to top + rh * 0.72f,
-                    left + rw * 0.71f to top + rh * 0.74f,
+                    left + rw * 0.27f to top + rh * 0.25f,
+                    left + rw * 0.73f to top + rh * 0.27f,
+                    left + rw * 0.29f to top + rh * 0.75f,
+                    left + rw * 0.72f to top + rh * 0.76f,
                 )
                 centers.mapIndexed { i, (cx, cy) ->
                     Cell(cx - pw / 2, cy - ph / 2, cx + pw / 2, cy + ph / 2, rotations[i])

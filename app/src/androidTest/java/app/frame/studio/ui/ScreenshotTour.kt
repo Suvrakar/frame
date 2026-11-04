@@ -225,5 +225,24 @@ class ScreenshotTour {
             shot("9_collage_editor")
         }
         if (tap("YouTube")) shot("8_export_youtube")
+
+        // Dark mode: Settings → Dark, then the home screen and an editor.
+        repeat(3) { device.pressBack() }
+        device.wait(Until.hasObject(By.text("New project")), 5_000)
+        if (tap("Settings")) {
+            shot("10_settings_light")
+            tap("Dark")
+            Thread.sleep(800)
+            shot("11_settings_dark")
+            tap("Home")
+            device.wait(Until.hasObject(By.text("New project")), 5_000)
+            scrollToTop()
+            shot("12_home_dark")
+            if (tap("Summer trip", scrollVertically = true)) {
+                device.wait(Until.hasObject(By.text("Export")), 10_000)
+                Thread.sleep(2_000)
+                shot("13_editor_dark")
+            }
+        }
     }
 }

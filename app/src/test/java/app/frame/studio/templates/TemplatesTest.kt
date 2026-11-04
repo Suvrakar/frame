@@ -73,6 +73,12 @@ class TemplatesTest {
                 }
             }
         }
+        // Polaroid captions (bottom fifth of each top print) clear the prints below.
+        listOf(1080f to 1350f, 1080f to 1920f, 1080f to 1080f).forEach { (w, h) ->
+            val p = CollageLayout.cells(CollageStyle.POLAROIDS, w, h)
+            assertTrue("$w x $h", p[0].bottom < p[2].top + p[2].height * 0.04f)
+            assertTrue("$w x $h", p[1].bottom < p[3].top + p[3].height * 0.04f)
+        }
         // Grid cells don't overlap.
         val grid = CollageLayout.cells(CollageStyle.GRID, 1080f, 1920f)
         assertTrue(grid[0].right < grid[1].left && grid[0].bottom < grid[2].top)

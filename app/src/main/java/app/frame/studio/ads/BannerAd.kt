@@ -16,7 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /** Anchored adaptive banner. Renders nothing until consent allows ad requests. */
 @Composable
-fun BannerAd(modifier: Modifier = Modifier) {
+fun BannerAd(modifier: Modifier = Modifier, insetNavigationBar: Boolean = true) {
     val canShow by AdsService.canShowAds.collectAsStateWithLifecycle()
     if (!canShow) return
     val activity = LocalActivity.current ?: return
@@ -38,6 +38,6 @@ fun BannerAd(modifier: Modifier = Modifier) {
     }
     AndroidView(
         factory = { adView },
-        modifier = modifier.fillMaxWidth().navigationBarsPadding(),
+        modifier = modifier.fillMaxWidth().then(if (insetNavigationBar) Modifier.navigationBarsPadding() else Modifier),
     )
 }

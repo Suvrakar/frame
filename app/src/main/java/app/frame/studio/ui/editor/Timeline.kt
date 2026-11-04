@@ -338,7 +338,7 @@ fun Timeline(
                 .padding(top = 4.dp)
                 .width(2.dp)
                 .fillMaxHeight()
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.onSurface),
         )
         Box(
             Modifier
@@ -346,7 +346,7 @@ fun Timeline(
                 .padding(top = 2.dp)
                 .size(8.dp)
                 .clip(CircleShape)
-                .background(Color.White),
+                .background(MaterialTheme.colorScheme.onSurface),
         )
 
         // Add media, pinned at the right edge beside the video track.
@@ -356,11 +356,11 @@ fun Timeline(
                 .padding(top = RULER_HEIGHT + (VIDEO_TRACK_HEIGHT - 40.dp) / 2, end = 12.dp)
                 .size(40.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable(onClick = onAddMedia),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Add media", tint = Color.Black)
+            Icon(Icons.Filled.Add, contentDescription = "Add media", tint = MaterialTheme.colorScheme.onPrimary)
         }
     }
 }
@@ -471,14 +471,14 @@ private fun TransitionButton(active: Boolean, modifier: Modifier, onClick: () ->
         modifier
             .size(22.dp)
             .clip(RoundedCornerShape(6.dp))
-            .background(if (active) MaterialTheme.colorScheme.primary else Color.White)
+            .background(if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerLowest)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             Icons.Filled.SwapHoriz,
             contentDescription = "Transition",
-            tint = if (active) MaterialTheme.colorScheme.onPrimary else Color.Black,
+            tint = if (active) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.size(14.dp),
         )
     }
@@ -582,7 +582,7 @@ private fun VideoTile(
             if (clip.isImage) Icon(Icons.Outlined.Image, null, tint = Color.White, modifier = Modifier.size(12.dp))
         }
         if (selected) {
-            Box(Modifier.fillMaxSize().border(2.dp, Color.White, shape))
+            Box(Modifier.fillMaxSize().border(2.dp, MaterialTheme.colorScheme.primary, shape))
             TrimHandle(
                 Modifier
                     .align(Alignment.CenterStart)
@@ -621,10 +621,10 @@ private fun TrimHandle(modifier: Modifier, start: Boolean) {
             .width(HANDLE_WIDTH)
             .fillMaxHeight()
             .clip(shape)
-            .background(Color.White),
+            .background(MaterialTheme.colorScheme.primary),
         contentAlignment = Alignment.Center,
     ) {
-        Box(Modifier.width(2.dp).height(16.dp).clip(RoundedCornerShape(1.dp)).background(Color.Black.copy(alpha = 0.6f)))
+        Box(Modifier.width(2.dp).height(16.dp).clip(RoundedCornerShape(1.dp)).background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)))
     }
 }
 
@@ -685,7 +685,7 @@ private fun LaneItem(
             )
         }
         if (selected) {
-            Box(Modifier.fillMaxSize().border(2.dp, Color.White, shape))
+            Box(Modifier.fillMaxSize().border(2.dp, MaterialTheme.colorScheme.primary, shape))
             TrimHandle(
                 Modifier
                     .align(Alignment.CenterStart)

@@ -32,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,7 @@ import app.frame.studio.FrameApp
 import app.frame.studio.ads.BannerAd
 import app.frame.studio.domain.ExportRecord
 import app.frame.studio.ui.common.ConfirmDialog
+import app.frame.studio.ui.common.GlassCard
 import app.frame.studio.ui.common.formatBytes
 import app.frame.studio.ui.common.formatDate
 import app.frame.studio.ui.common.formatDuration
@@ -49,7 +51,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExportsScreen(app: FrameApp, onBack: () -> Unit) {
+fun ExportsScreen(app: FrameApp, onBack: (() -> Unit)?) {
     val history by app.repository.history.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -60,13 +62,17 @@ fun ExportsScreen(app: FrameApp, onBack: () -> Unit) {
             TopAppBar(
                 title = { Text("Exports") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 },
+                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
         },
-        bottomBar = { BannerAd() },
+        containerColor = Color.Transparent,
+        bottomBar = { if (onBack != null) BannerAd() },
     ) { padding ->
         if (history.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
@@ -80,10 +86,7 @@ fun ExportsScreen(app: FrameApp, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items(history, key = { it.id }) { record ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-                ) {
+                GlassCard(modifier = Modifier.fillMaxWidth(), elevation = 6.dp) {
                     Row(Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(
