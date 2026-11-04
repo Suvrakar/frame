@@ -156,6 +156,9 @@ data class AudioClip(
     /** Position on the timeline. Negative means "after the previous clip" (projects from v1.0). */
     val startMs: Long = -1,
     val kind: AudioKind = AudioKind.MUSIC,
+    /** Detected beats, in source time (ms). Empty until beat detection runs. */
+    val beatsMs: List<Long> = emptyList(),
+    val bpm: Float = 0f,
 ) {
     fun outputDurationMs(): Long = (trimEndMs - trimStartMs).coerceAtLeast(0)
     fun endMs(): Long = startMs.coerceAtLeast(0) + outputDurationMs()

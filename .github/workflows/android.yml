@@ -111,6 +111,8 @@ jobs:
           ffmpeg -y -f lavfi -i testsrc=size=1280x720:rate=30 -f lavfi -i sine=frequency=440:sample_rate=44100 -t 4 -c:v libx264 -pix_fmt yuv420p -c:a aac -shortest /tmp/sample.mp4
           ffmpeg -y -f lavfi -i sine=frequency=660:sample_rate=44100 -t 4 -c:a aac /tmp/sample.m4a
           ffmpeg -y -f lavfi -i testsrc2=size=640x480 -frames:v 1 /tmp/sample.png
+          # A 120 BPM metronome for the beat-detection device test.
+          ffmpeg -y -f lavfi -i "aevalsrc=0.8*sin(2*PI*880*t)*exp(-mod(t\,0.5)*60):s=44100" -t 12 -c:a aac -b:a 128k /tmp/beats.m4a
           # A 48 MP photo, like a modern phone camera produces.
           ffmpeg -y -f lavfi -i testsrc2=size=8000x6000 -frames:v 1 -q:v 4 /tmp/big.jpg
 

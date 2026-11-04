@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.frame.studio.FrameApp
+import app.frame.studio.domain.AudioClip
 import app.frame.studio.domain.CanvasAspect
 import app.frame.studio.domain.ColorAdjust
 import app.frame.studio.domain.EffectGroup
@@ -96,6 +97,7 @@ enum class Tool(val title: String) {
     TEXT_EDIT("Edit text"),
     TEXT_STYLE("Text style"),
     EFFECTS("Effects"),
+    BEAT_SYNC("Beat sync"),
     EFFECT_EDIT("Effect"),
 }
 
@@ -389,6 +391,50 @@ private fun SplitToneRow(label: String, hue: Float, amount: Float, onHue: (Float
             )
         }
         Slider(value = amount, onValueChange = { onAmount((it * 100).roundToInt() / 100f) }, valueRange = 0f..1f)
+    }
+}
+
+/** Detect the beats of a music clip, then cut the video on them. */
+@Composable
+fun BeatSyncPanel(clip: AudioClip, detecting: Boolean, onDetect: () -> Unit, onSync: (every: Int) -> Unit) {
+    var every by remember { mutableStateOf(2) }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        if (clip.beatsMs.isEmpty()) {
+            Text(
+                "Frame listens to this track on your phone and finds its beats. Nothing is uploaded.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            androidx.compose.material3.Button(onClick = onDetect, enabled = !detecting, modifier = Modifier.fillMaxWidth()) {
+                if (detecting) {
+                    androidx.compose.material3.CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+                    Spacer(Modifier.width(10.dp))
+                    Text("Listening…")
+                } else {
+                    Text("Detect beats")
+                }
+            }
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("♩ ${clip.bpm.roundToInt()} BPM", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    "  ·  ${clip.beatsMs.size} beats",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = onDetect, enabled = !detecting) { Text("Re-detect") }
+            }
+            Text("Cut every", style = MaterialTheme.typography.labelMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(1 to "Beat", 2 to "2 beats", 4 to "Bar (4)").forEach { (n, label) ->
+                    FilterChip(selected = every == n, onClick = { every = n }, label = { Text(label) })
+                }
+            }
+            androidx.compose.material3.Button(onClick = { onSync(every) }, modifier = Modifier.fillMaxWidth()) {
+                Text("Sync clips to the beat")
+            }
+        }
     }
 }
 

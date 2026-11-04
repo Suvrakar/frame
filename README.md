@@ -27,6 +27,9 @@ Exports never carry a watermark.
   temperature, tint, fade, vignette, grain and split toning (shadow/highlight hues), with a
   press-and-hold Before compare. Linear controls fold into the clip's colour matrix; the rest run
   in one GPU pass (`GradeEffect`).
+- **Beat sync (on device)** – Frame decodes the music on the phone, finds its tempo and beats
+  (spectral-flux onsets + autocorrelation, `BeatDetector`), shows beat markers on the music lane,
+  and re-times the clips so every cut lands on a beat, every 2 beats or every bar. No server.
 - **Scene effects** – 12 procedural GPU effects on their own timeline lane: Rain, Snow, Fog,
   Confetti, Sparkle, Hearts, Bokeh, Light leak, Old film, Glitch, Shake and Beat pulse, each with
   strength and soft fade in/out. No assets: everything is drawn by shaders (`SceneShaderEffect`).

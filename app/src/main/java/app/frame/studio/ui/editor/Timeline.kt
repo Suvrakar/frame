@@ -272,6 +272,9 @@ fun Timeline(
                             audioClips.filter { audioLanes[it.id] == lane }.forEach { clip ->
                                 val selected = selection is Selection.Audio && selection.id == clip.id
                                 LaneItem(
+                                    markers = clip.beatsMs
+                                        .filter { it >= clip.trimStartMs && it < clip.trimEndMs }
+                                        .map { dp((it - clip.trimStartMs).toFloat()) },
                                     label = clip.displayName.ifBlank { clip.kind.label },
                                     icon = when (clip.kind) {
                                         AudioKind.MUSIC -> Icons.Filled.MusicNote
@@ -700,6 +703,7 @@ private fun TrimHandle(modifier: Modifier, start: Boolean) {
 
 @Composable
 private fun LaneItem(
+    markers: List<Dp> = emptyList(),
     label: String,
     icon: ImageVector?,
     color: Color,
@@ -744,6 +748,18 @@ private fun LaneItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+        if (markers.isNotEmpty()) {
+            // Beat markers: small ticks along the bottom of the lane.
+            val tick = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.75f)
+            Canvas(Modifier.fillMaxSize()) {
+                markers.forEach { x ->
+                    val px = x.toPx()
+                    if (px in 0f..size.width) {
+                        drawLine(tick, Offset(px, size.height * 0.68f), Offset(px, size.height - 2.dp.toPx()), strokeWidth = 1.5.dp.toPx())
+                    }
+                }
+            }
         }
         if (dimmedAfter != null) {
             Box(

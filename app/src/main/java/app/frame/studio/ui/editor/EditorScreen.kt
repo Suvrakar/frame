@@ -61,6 +61,7 @@ import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.Equalizer
 import androidx.compose.material.icons.filled.Flip
 import androidx.compose.material.icons.filled.Gradient
 import androidx.compose.material.icons.filled.MusicNote
@@ -746,6 +747,7 @@ private fun Toolbar(
             }
         }
         is Selection.Audio -> ToolbarRow(onBack = { vm.select(Selection.None) }) {
+            ToolbarItem(Icons.Filled.Equalizer, "Beat sync") { onTool(Tool.BEAT_SYNC) }
             ToolbarItem(Icons.Filled.ContentCut, "Split") { vm.splitSelected() }
             ToolbarItem(Icons.AutoMirrored.Filled.VolumeUp, "Volume") { onTool(Tool.VOLUME) }
             ToolbarItem(Icons.Filled.Gradient, "Fade") { onTool(Tool.FADE) }
@@ -824,6 +826,18 @@ private fun ActivePanel(
             Tool.STICKERS -> StickersPanel { vm.addText(it, sticker = true) }
             Tool.TEXT_EDIT -> text?.let { o -> TextEditPanel(o) { vm.setText(o.id, it) } }
             Tool.TEXT_STYLE -> text?.let { o -> TextStylePanel(o) { transform -> vm.styleText(o.id, transform) } }
+            Tool.BEAT_SYNC -> audio?.let { a ->
+                val detecting by vm.detectingBeats.collectAsStateWithLifecycle()
+                BeatSyncPanel(
+                    clip = a,
+                    detecting = detecting == a.id,
+                    onDetect = { vm.detectBeats(a.id) },
+                    onSync = { every ->
+                        vm.syncToBeats(a.id, every)
+                        onClose()
+                    },
+                )
+            }
             Tool.EFFECTS -> EffectsPanel(current = null) { type ->
                 vm.addEffect(type)
                 onClose()

@@ -18,7 +18,11 @@ import app.frame.studio.domain.VideoClip
 import app.frame.studio.export.SocialPreset
 import app.frame.studio.export.SocialPresets
 import app.frame.studio.export.centerCrop
+import app.frame.studio.audio.AudioPcmReader
+import app.frame.studio.audio.BeatDetector
 import app.frame.studio.timeline.AudioLayout
+import app.frame.studio.timeline.BeatSync
+import kotlin.math.roundToInt
 import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.timeline.TimelineOps
 import kotlinx.coroutines.Dispatchers
@@ -564,6 +568,47 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     }
 
     fun deleteText(id: String) = edit { p -> p.copy(textOverlays = p.textOverlays.filter { it.id != id }) }
+
+    // ---- Beat sync ---------------------------------------------------------------------
+
+    private val _detectingBeats = MutableStateFlow<String?>(null)
+    /** Id of the audio clip whose beats are being detected, if any. */
+    val detectingBeats: StateFlow<String?> = _detectingBeats.asStateFlow()
+
+    /** Finds the beats of an audio clip on the device (no network) and stores them on the clip. */
+    fun detectBeats(audioId: String) {
+        val clip = _project.value?.audioClips?.firstOrNull { it.id == audioId } ?: return
+        if (_detectingBeats.value != null) return
+        _detectingBeats.value = audioId
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.Default) {
+                // Up to 10 minutes of the used part of the song.
+                val end = minOf(clip.trimEndMs, clip.trimStartMs + 600_000)
+                AudioPcmReader.readMono(app, Uri.parse(clip.sourceUri), clip.trimStartMs, end)?.let { pcm ->
+                    BeatDetector.detect(pcm.samples, pcm.sampleRate)?.let { r ->
+                        r.copy(beatsMs = r.beatsMs.map { it + pcm.startMs })
+                    }
+                }
+            }
+            _detectingBeats.value = null
+            if (result == null || result.beatsMs.size < 4) {
+                messageChannel.send("Couldn't find a steady beat in this audio")
+                return@launch
+            }
+            editAudio(audioId) { it.copy(beatsMs = result.beatsMs, bpm = result.bpm) }
+            messageChannel.send("Found ${result.beatsMs.size} beats · ${result.bpm.roundToInt()} BPM")
+        }
+    }
+
+    /** Re-times every video clip so cuts land on every [every]-th beat of the audio clip. */
+    fun syncToBeats(audioId: String, every: Int) {
+        val p = _project.value ?: return
+        val clip = AudioLayout.normalize(p.audioClips).firstOrNull { it.id == audioId } ?: return
+        val cuts = BeatSync.cutPoints(BeatSync.timelineBeats(clip), every)
+        if (cuts.isEmpty()) return
+        edit { it.copy(videoClips = BeatSync.retime(it.videoClips, cuts)) }
+        messageChannel.trySend("Clips synced to the beat. Undo to go back.")
+    }
 
     // ---- Scene effects -----------------------------------------------------------------
 
