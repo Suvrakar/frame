@@ -35,6 +35,7 @@ fun VideoThumbnail(
     maxSize: Int = 320,
     colorFilter: ColorFilter? = null,
     showPlaceholderIcon: Boolean = true,
+    animate: Boolean = true,
 ) {
     val bitmap by produceState<Bitmap?>(initialValue = null, uri, atMs, isImage, maxSize) {
         value = when {
@@ -44,25 +45,36 @@ fun VideoThumbnail(
         }
     }
     Box(modifier.background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {
-        Crossfade(targetState = bitmap, label = "thumbnail", modifier = Modifier.matchParentSize()) { bmp ->
-            if (bmp != null) {
-                Image(
-                    bitmap = bmp.asImageBitmap(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    colorFilter = colorFilter,
-                    modifier = Modifier.fillMaxSize().rotate(rotationDegrees.toFloat()),
-                )
-            } else if (showPlaceholderIcon) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Icon(
-                    Icons.Outlined.Movie,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
+        if (animate) {
+            Crossfade(targetState = bitmap, label = "thumbnail", modifier = Modifier.matchParentSize()) { bmp ->
+                ThumbnailContent(bmp, colorFilter, rotationDegrees, showPlaceholderIcon)
             }
+        } else {
+            Box(Modifier.matchParentSize()) {
+                ThumbnailContent(bitmap, colorFilter, rotationDegrees, showPlaceholderIcon)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThumbnailContent(bmp: Bitmap?, colorFilter: ColorFilter?, rotationDegrees: Int, showPlaceholderIcon: Boolean) {
+    if (bmp != null) {
+        Image(
+            bitmap = bmp.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            colorFilter = colorFilter,
+            modifier = Modifier.fillMaxSize().rotate(rotationDegrees.toFloat()),
+        )
+    } else if (showPlaceholderIcon) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(
+                Icons.Outlined.Movie,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp),
+            )
         }
     }
 }

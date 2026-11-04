@@ -268,6 +268,40 @@ class PreviewController(
         onPlayer { runCatching { player?.setScrubbingModeEnabled(enabled) } }
     }
 
+    private var lastScrubSeekAt = 0L
+    private var pendingScrubMs = -1L
+    private val trailingScrubSeek = Runnable {
+        val target = pendingScrubMs
+        if (target >= 0) {
+            pendingScrubMs = -1
+            lastScrubSeekAt = android.os.SystemClock.uptimeMillis()
+            onPlayer { player?.seekTo(target) }
+        }
+    }
+
+    /**
+     * Scrubbing from the timeline: the playhead follows every frame, but the player (which must
+     * decode a frame per seek) is asked at most every [SCRUB_SEEK_INTERVAL_MS], plus once more at
+     * the final position. Keeps fast scrubbing smooth on slow phones.
+     */
+    fun scrubTo(ms: Long) {
+        if (!hasPlayer) return
+        val target = ms.coerceIn(0, (totalMs - 1).coerceAtLeast(0))
+        positionMs = target
+        publishedPositionMs = target
+        ended = false
+        val now = android.os.SystemClock.uptimeMillis()
+        main.removeCallbacks(trailingScrubSeek)
+        if (now - lastScrubSeekAt >= SCRUB_SEEK_INTERVAL_MS) {
+            lastScrubSeekAt = now
+            pendingScrubMs = -1
+            onPlayer { player?.seekTo(target) }
+        } else {
+            pendingScrubMs = target
+            main.postDelayed(trailingScrubSeek, SCRUB_SEEK_INTERVAL_MS)
+        }
+    }
+
     fun seekTo(ms: Long) {
         if (!hasPlayer) return
         val target = ms.coerceIn(0, (totalMs - 1).coerceAtLeast(0))
@@ -279,6 +313,7 @@ class PreviewController(
 
     fun release() {
         if (released) return
+        main.removeCallbacks(trailingScrubSeek)
         hasPlayer = false
         renderedKey = null
         playerHandler.post {
@@ -291,5 +326,6 @@ class PreviewController(
     companion object {
         private const val TAG = "PreviewController"
         private const val SURFACE_RELEASE_TIMEOUT_MS = 1_000L
+        private const val SCRUB_SEEK_INTERVAL_MS = 50L
     }
 }

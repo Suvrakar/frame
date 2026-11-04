@@ -142,7 +142,7 @@ fun Timeline(
             if (userScrollingState.value) {
                 val raw = (value / pxPerMsState.value).toLong()
                 val threshold = (6f * density.density / pxPerMsState.value).toLong()
-                controller.seekTo(TimelineOps.snap(raw, edges.value, threshold))
+                controller.scrubTo(TimelineOps.snap(raw, edges.value, threshold))
             }
         }
     }
@@ -562,6 +562,8 @@ private fun VideoTile(
                         rotationDegrees = clip.rotationDegrees,
                         colorFilter = colorFilter,
                         showPlaceholderIcon = i == 0,
+                        // Dozens of frames appear at once while scrolling; skip per-frame fades.
+                        animate = false,
                         modifier = Modifier.width(FRAME_WIDTH).fillMaxHeight(),
                     )
                 }
