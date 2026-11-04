@@ -35,10 +35,21 @@ Exports never carry a watermark.
 - **Export** – 480p–4K (only resolutions the phone's encoder supports are offered), 24/30/60 fps,
   Standard/High/Best quality with a size estimate, optional copy to `Movies/Frame`, share and
   history. No watermark.
-- **Built for low-end phones** – `DeviceProfile` detects the device tier and lowers preview
-  resolution, thumbnail cache and decoder parallelism, delays preview rebuilds while sliders move,
-  skips decorative animation, and the editor avoids per-frame recomposition (only the time label
-  and scroll offset follow playback; filmstrips decode only visible frames).
+- **Built for low-end phones**
+  - `DeviceProfile` detects the device tier and lowers preview resolution, thumbnail cache and
+    decoder parallelism, delays preview rebuilds while sliders move, and skips decorative animation.
+  - Photos larger than the export needs (often 12–50 MP) are downscaled once on import
+    (`ImageNormalizer`), instead of being decoded at full size for every frame.
+  - The preview player runs on its own thread and renders into a plain `SurfaceView`; building,
+    seeking and releasing it never blocks the UI thread. Timeline scrubbing throttles seeks.
+  - Filmstrips reuse open decoders, decode only frames near the viewport, and are released when
+    leaving the editor or under memory pressure; the editor avoids per-frame recomposition.
+  - Export: decoder fallback when a hardware decoder can't start, a longer muxer watchdog on slow
+    phones, and the stable (non-experimental) speed effect.
+  - `profileinstaller` installs the baseline profiles shipped by Compose and Media3.
+  - CI runs every device test on a low-end emulator (Android 10, 2 cores, 1.5 GB RAM) as well,
+    including `PerfStressTest`: a 48 MP photo and a 20-clip timeline with heavy looks, previewed,
+    exported and scrubbed, with frame and memory stats in the `ci-smoke-lowend` branch.
 - **Ads** – anchored adaptive AdMob banner after Google UMP consent; "Privacy choices" in settings.
 - **Undo / redo** for every edit.
 
