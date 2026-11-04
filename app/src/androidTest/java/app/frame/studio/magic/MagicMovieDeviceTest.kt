@@ -43,12 +43,29 @@ class MagicMovieDeviceTest {
         return Uri.fromFile(copy)
     }
 
+    /** A photo that looks nothing like the test pattern: soft diagonal gradient with a disc. */
+    private fun gradientPhoto(): Uri {
+        val bmp = android.graphics.Bitmap.createBitmap(1200, 900, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bmp)
+        val paint = android.graphics.Paint()
+        paint.shader = android.graphics.LinearGradient(0f, 0f, 1200f, 900f, 0xFF203A80.toInt(), 0xFFF0A040.toInt(), android.graphics.Shader.TileMode.CLAMP)
+        canvas.drawRect(0f, 0f, 1200f, 900f, paint)
+        paint.shader = null
+        paint.color = 0xFFFFFFFF.toInt()
+        canvas.drawCircle(400f, 500f, 220f, paint)
+        val file = File(context.filesDir, "magic_gradient.png")
+        file.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+        bmp.recycle()
+        return Uri.fromFile(file)
+    }
+
     @Test
     fun makesBeatSyncedMovieAndExportsIt() = runBlocking {
         val media = listOf(
             sample("sample.png", "a.png"),
             sample("sample.png", "b.png"), // exact duplicate: should be dropped
-            sample("big.jpg"),
+            sample("big.jpg"), // same test pattern at 48 MP: also a duplicate
+            gradientPhoto(),
             sample("sample.mp4"),
         )
         val stages = mutableListOf<String>()
@@ -66,9 +83,10 @@ class MagicMovieDeviceTest {
         assertTrue(stages.contains("Listening for the beat"))
         assertEquals("Test Movie", project.name)
         assertEquals(CanvasAspect.R9_16, project.aspect)
-        val pngCopies = project.videoClips.count { it.sourceUri.contains("magic_a.png") || it.sourceUri.contains("magic_b.png") }
-        assertEquals("duplicates kept", 1, pngCopies)
-        assertEquals(3, project.videoClips.size)
+        // One of the three identical test-pattern photos, the distinct photo and the video.
+        assertEquals("clips: ${project.videoClips.map { it.displayName }}", 3, project.videoClips.size)
+        assertEquals(1, project.videoClips.count { it.sourceUri.contains("magic_gradient") })
+        assertEquals(1, project.videoClips.count { !it.isImage })
 
         val music = project.audioClips.single()
         assertTrue("bpm ${music.bpm}", music.bpm in 110f..130f)
