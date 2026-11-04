@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -59,6 +60,10 @@ class PreviewController(
     var hasPlayer: Boolean = false
         private set
 
+    /** Bumps each time the player is ready with a freshly rendered frame (after a rebuild or seek). */
+    var frameVersion by mutableIntStateOf(0)
+        private set
+
     private val main = Handler(Looper.getMainLooper())
     private val thread = HandlerThread("FramePreview", Process.THREAD_PRIORITY_DISPLAY).apply { start() }
     private val playerHandler = Handler(thread.looper)
@@ -100,7 +105,9 @@ class PreviewController(
 
         override fun onPlaybackStateChanged(playbackState: Int) {
             val isEnded = playbackState == Player.STATE_ENDED
+            val isReady = playbackState == Player.STATE_READY
             main.post {
+                if (isReady) frameVersion++
                 ended = isEnded
                 if (isEnded) positionMs = totalMs
             }

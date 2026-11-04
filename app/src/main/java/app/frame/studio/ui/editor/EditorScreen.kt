@@ -121,6 +121,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.graphicsLayer
+import app.frame.studio.ui.common.VideoThumbnail
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -653,9 +655,35 @@ private fun PreviewArea(
                     keyed = keyedAt(project, selection, playhead),
                     onCommit = onTransform,
                     onTap = controller::togglePlay,
+                    frameVersion = controller.frameVersion,
+                    ghost = overlayGhost(project, selection, playhead),
                 )
             }
         }
+    }
+}
+
+/**
+ * The selected picture-in-picture overlay drawn by Compose while it is dragged, so it follows the
+ * finger before the preview re-renders it. Null for anything else.
+ */
+@Composable
+private fun overlayGhost(project: Project, selection: Selection, playheadMs: Long): (@Composable () -> Unit)? {
+    val overlay = (selection as? Selection.Overlay)?.let { s -> project.overlays.firstOrNull { it.id == s.id } } ?: return null
+    val app = LocalContext.current.applicationContext as app.frame.studio.FrameApp
+    // Quantized like the timeline filmstrip so the cached frame is reused while scrubbing.
+    val atMs = (overlay.trimStartMs + (playheadMs - overlay.startMs).coerceAtLeast(0)) / 250 * 250
+    return {
+        VideoThumbnail(
+            probe = app.mediaProbe,
+            uri = overlay.sourceUri,
+            atMs = atMs,
+            isImage = overlay.isImage,
+            maxSize = 640,
+            showPlaceholderIcon = false,
+            animate = false,
+            modifier = Modifier.fillMaxSize().graphicsLayer { alpha = overlay.opacity },
+        )
     }
 }
 

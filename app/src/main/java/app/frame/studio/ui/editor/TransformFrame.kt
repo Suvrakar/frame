@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +40,10 @@ import kotlin.math.roundToInt
  * frame re-renders when the gesture ends. A tap without movement is passed to [onTap].
  *
  * [boxFraction] is the object's size at scale 1 in 0..1 frame units.
+ *
+ * [ghost], when given, is drawn inside the outline while the object is being moved and until the
+ * preview has rendered the new placement ([frameVersion] changes), so the object itself follows
+ * the finger instead of jumping once the preview rebuilds.
  */
 @Composable
 fun TransformFrame(
@@ -48,9 +54,28 @@ fun TransformFrame(
     keyed: Boolean,
     onCommit: (Transform) -> Unit,
     onTap: () -> Unit,
+    frameVersion: Int = 0,
+    ghost: (@Composable () -> Unit)? = null,
 ) {
     var live by remember { mutableStateOf<Transform?>(null) }
-    val shown = live ?: transform
+    // Committed placement shown until the preview catches up; paired with the frame version at commit.
+    var pending by remember { mutableStateOf<Pair<Transform, Int>?>(null) }
+    LaunchedEffect(frameVersion) {
+        val waiting = pending ?: return@LaunchedEffect
+        if (frameVersion != waiting.second) {
+            delay(GHOST_HANDOFF_MS) // let the rebuilt frame reach the screen before removing the ghost
+            if (pending === waiting) pending = null
+        }
+    }
+    LaunchedEffect(pending) {
+        if (pending != null) {
+            delay(GHOST_TIMEOUT_MS)
+            pending = null
+        }
+    }
+    val latestVersion = rememberUpdatedState(frameVersion)
+    val shown = live ?: pending?.first ?: transform
+    val showGhost = ghost != null && (live != null || pending != null)
     val latestBase = rememberUpdatedState(transform)
     val latestCommit = rememberUpdatedState(onCommit)
     val latestTap = rememberUpdatedState(onTap)
@@ -85,7 +110,13 @@ fun TransformFrame(
                             event.changes.forEach { if (it.positionChanged()) it.consume() }
                         }
                     } while (event.changes.any { it.pressed })
-                    if (moved) latestCommit.value(snapRotation(current)) else latestTap.value()
+                    if (moved) {
+                        val committed = snapRotation(current)
+                        pending = committed to latestVersion.value
+                        latestCommit.value(committed)
+                    } else {
+                        latestTap.value()
+                    }
                     live = null
                 }
             },
@@ -102,6 +133,9 @@ fun TransformFrame(
                     .graphicsLayer { rotationZ = shown.rotation }
                     .border(1.5.dp, if (keyed) Color(0xFFFFC94D) else Color.White, RoundedCornerShape(3.dp)),
             ) {
+                if (showGhost) {
+                    Box(Modifier.fillMaxSize()) { ghost?.invoke() }
+                }
                 // Corner dots hint that the object can be resized and rotated.
                 listOf(Offset(0f, 0f), Offset(w, 0f), Offset(0f, h), Offset(w, h)).forEach { p ->
                     Box(
@@ -115,6 +149,10 @@ fun TransformFrame(
         }
     }
 }
+
+/** Longest the moved object is drawn by Compose while waiting for the preview to re-render. */
+private const val GHOST_TIMEOUT_MS = 4_000L
+private const val GHOST_HANDOFF_MS = 120L
 
 /** Snaps near-straight rotations to the nearest 90° so objects are easy to level. */
 private fun snapRotation(t: Transform): Transform {
