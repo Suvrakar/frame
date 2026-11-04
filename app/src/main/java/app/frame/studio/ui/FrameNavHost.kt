@@ -38,6 +38,7 @@ import app.frame.studio.ui.export.ExportScreen
 import app.frame.studio.ui.exports.ExportsScreen
 import app.frame.studio.ui.projects.ProjectsScreen
 import app.frame.studio.ui.templates.TemplateDetailScreen
+import app.frame.studio.ui.magic.MagicMovieScreen
 import app.frame.studio.ui.templates.TemplatesScreen
 
 object Routes {
@@ -47,6 +48,7 @@ object Routes {
     const val EXPORTS = "exports"
     const val TEMPLATES = "templates?category={category}"
     const val SETTINGS = "settings"
+    const val MAGIC = "magic"
 
     fun templates(category: TemplateCategory? = null) = "templates?category=${category?.name.orEmpty()}"
     const val TEMPLATE = "template/{templateId}"
@@ -80,6 +82,7 @@ fun FrameNavHost(app: FrameApp) {
                     onOpenExports = { nav.switchTab(Routes.EXPORTS) },
                     onOpenTemplates = { nav.switchTab(Routes.templates(it)) },
                     onOpenTemplate = { nav.navigate(Routes.template(it)) },
+                    onOpenMagic = { nav.navigate(Routes.MAGIC) },
                 )
             }
         }
@@ -104,6 +107,13 @@ fun FrameNavHost(app: FrameApp) {
         }
         composable(Routes.SETTINGS) {
             TabShell(nav, Routes.SETTINGS) { SettingsScreen(app) }
+        }
+        composable(Routes.MAGIC) {
+            MagicMovieScreen(
+                frameApp = app,
+                onBack = { nav.popBackStack() },
+                onCreated = { projectId -> nav.navigate(Routes.editor(projectId)) { popUpTo(Routes.PROJECTS) } },
+            )
         }
         composable(
             Routes.TEMPLATE,

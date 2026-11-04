@@ -9,6 +9,7 @@ import app.frame.studio.device.DeviceProfile
 import app.frame.studio.data.ProjectRepository
 import app.frame.studio.export.ExportManager
 import app.frame.studio.pro.ProStore
+import app.frame.studio.magic.MagicMovieBuilder
 import app.frame.studio.templates.TemplateBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +34,8 @@ class FrameApp : Application() {
         private set
     lateinit var pro: ProStore
         private set
+    lateinit var magicMovie: MagicMovieBuilder
+        private set
 
     /** Outlives screens; used for last-moment saves when an editor closes. */
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -47,6 +50,7 @@ class FrameApp : Application() {
         exportManager = ExportManager(this, repository, device)
         templateBuilder = TemplateBuilder(this, repository, mediaProbe, imageNormalizer, device)
         // Entitlement is cached locally; Play is re-checked in the background on every launch.
+        magicMovie = MagicMovieBuilder(this, repository, mediaProbe, imageNormalizer, device)
         pro = ProStore(this).also { it.connect() }
         // Ads are initialized by AdsService once the user's consent status is known.
     }

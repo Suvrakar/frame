@@ -28,6 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.AutoAwesomeMosaic
+import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Cake
 import androidx.compose.material.icons.outlined.Dashboard
 import androidx.compose.material.icons.outlined.Movie
@@ -84,6 +86,7 @@ fun ProjectsScreen(
     onOpenExports: () -> Unit,
     onOpenTemplates: (TemplateCategory?) -> Unit,
     onOpenTemplate: (String) -> Unit,
+    onOpenMagic: () -> Unit = {},
 ) {
     val projects by app.repository.projects.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
@@ -103,6 +106,7 @@ fun ProjectsScreen(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) { Greeting() }
         item(span = { GridItemSpan(maxLineSpan) }) { CreateCard(onStart = ::newProject) }
+        item(span = { GridItemSpan(maxLineSpan) }) { MagicCard(onClick = onOpenMagic) }
         item(span = { GridItemSpan(maxLineSpan) }) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 SectionHeader("Quick start")
@@ -186,6 +190,54 @@ private fun Greeting() {
 }
 
 /** The hero: an indigo card with soft highlights and a "Start" pill. */
+@Composable
+private fun MagicCard(onClick: () -> Unit) {
+    val shape = RoundedCornerShape(22.dp)
+    val glass = LocalGlass.current
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(glass.fill)
+            .border(1.dp, glass.border, shape)
+            .clickable(onClick = onClick)
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(15.dp))
+                .background(Brush.linearGradient(listOf(Color(0xFF5B63F0), Color(0xFFB45BF0), Color(0xFFF07A5B)))),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = Color.White)
+        }
+        Column(Modifier.weight(1f).padding(start = 14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Magic Movie", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                Text(
+                    "PRO",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color(0xFF8E5BF0))
+                        .padding(horizontal = 6.dp, vertical = 1.dp),
+                )
+            }
+            Text(
+                "Pick photos and a song. Frame makes the movie.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
 @Composable
 private fun CreateCard(onStart: () -> Unit) {
     val shape = RoundedCornerShape(26.dp)

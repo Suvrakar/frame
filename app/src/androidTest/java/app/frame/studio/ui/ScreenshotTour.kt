@@ -242,6 +242,24 @@ class ScreenshotTour {
             }
         }
 
+        // Magic Movie and the Frame Pro sheet.
+        restartHome()
+        if (tap("Magic Movie", scrollVertically = true)) {
+            device.wait(Until.hasObject(By.text("Vibe")), 5_000)
+            Thread.sleep(600)
+            shot("20_magic_movie")
+        }
+        restartHome()
+        if (tap("Settings")) {
+            Thread.sleep(600)
+            if (tap("Get Frame Pro")) {
+                device.wait(Until.hasObject(By.text("Not now")), 5_000)
+                Thread.sleep(900)
+                shot("21_paywall")
+                device.pressBack()
+            }
+        }
+
         // Settings and dark mode.
         restartHome()
         if (tap("Settings")) {
