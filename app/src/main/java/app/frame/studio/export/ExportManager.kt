@@ -74,6 +74,11 @@ class ExportManager(
             exportFps = device.clampFrameRate(size.width, size.height, requested.exportFps),
             audioBitrateKbps = device.clampAudioBitrate(requested.audioBitrateKbps),
         )
+        runExport(project, saveToGallery, attempt = 0)
+    }
+
+    /** One Transformer run; [attempt] counts automatic retries of transient pipeline failures. */
+    private fun runExport(project: Project, saveToGallery: Boolean, attempt: Int) {
         val composition = try {
             CompositionFactory.build(project)
         } catch (e: Exception) {
@@ -98,7 +103,16 @@ class ExportManager(
             ) {
                 finishTransform()
                 file.delete()
-                Log.e(TAG, "Export failed", exportException)
+                Log.e(TAG, "Export failed (attempt ${attempt + 1})", exportException)
+                if (attempt < MAX_RETRIES && isTransient(project, exportException)) {
+                    // Media3's multi-input compositor has a rare timing race with overlays; a fresh
+                    // run almost always succeeds, so retry once before showing an error.
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        // Skip the retry if the user cancelled in the meantime.
+                        if (_state.value is ExportState.Running) runExport(project, saveToGallery, attempt + 1)
+                    }
+                    return
+                }
                 _state.value = ExportState.Failed(project.id, describe(exportException))
             }
         }
@@ -126,6 +140,10 @@ class ExportManager(
             }
         }
     }
+
+    /** Failures worth one automatic retry: frame-processing errors and any error with overlays. */
+    private fun isTransient(project: Project, e: ExportException): Boolean =
+        e.errorCode == ExportException.ERROR_CODE_VIDEO_FRAME_PROCESSING_FAILED || CompositionFactory.hasOverlays(project)
 
     fun cancel() {
         val running = _state.value as? ExportState.Running ?: return
@@ -179,6 +197,7 @@ class ExportManager(
     }
 
     companion object {
+        private const val MAX_RETRIES = 1
         private const val TAG = "ExportManager"
 
         /**

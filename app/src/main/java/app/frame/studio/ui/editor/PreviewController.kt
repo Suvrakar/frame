@@ -69,6 +69,10 @@ class PreviewController(
     private val playerHandler = Handler(thread.looper)
 
     private var renderedKey: Project? = null
+    /** Whether the current preview composites overlays (multi-input video graph). */
+    private var layered = false
+    /** When the player was last rebuilt after an error; see [RECOVERY_WINDOW_MS]. */
+    private var lastRecoveryAt = -RECOVERY_WINDOW_MS
     private var lastProject: Project? = null
     private var ended = false
     private var scrubbing = false
@@ -115,7 +119,19 @@ class PreviewController(
 
         override fun onPlayerError(e: PlaybackException) {
             Log.w(TAG, "Preview error", e)
-            main.post { error = "Preview error: ${e.errorCodeName}" }
+            main.post {
+                // Media3's composition player has rare internal failures (e.g. its compositor after
+                // reaching the end). Rebuild once at a safe position before bothering the user.
+                val project = lastProject
+                val now = android.os.SystemClock.uptimeMillis()
+                if (now - lastRecoveryAt > RECOVERY_WINDOW_MS && project != null && !released) {
+                    lastRecoveryAt = now
+                    isPlaying = false
+                    setProject(project, force = true)
+                } else {
+                    error = "Preview error: ${e.errorCodeName}"
+                }
+            }
         }
     }
 
@@ -159,8 +175,9 @@ class PreviewController(
         hasPlayer = true
         positionMs = resumeAt
         publishedPositionMs = resumeAt
-        val layered = CompositionFactory.hasOverlays(key)
-        onPlayer { buildPlayerOnThread(composition, resumeAt, resume, layered) }
+        val isLayered = CompositionFactory.hasOverlays(key)
+        layered = isLayered
+        onPlayer { buildPlayerOnThread(composition, resumeAt, resume, isLayered) }
     }
 
     private fun buildPlayerOnThread(composition: Composition, resumeAt: Long, resume: Boolean, layered: Boolean) {
@@ -247,7 +264,18 @@ class PreviewController(
             pause()
             return
         }
-        val restart = ended || positionMs >= totalMs - 50
+        val restart = ended || positionMs >= totalMs - END_GUARD_MS - 50
+        val project = lastProject
+        if (restart && layered && project != null) {
+            // A layered (overlay) player that reached the end can't seek back: its compositor has
+            // ended its inputs. Build a fresh player at the start and play.
+            positionMs = 0
+            publishedPositionMs = 0
+            ended = false
+            isPlaying = true
+            setProject(project, force = true)
+            return
+        }
         if (restart) seekTo(0)
         ended = false
         onPlayer { player?.play() }
@@ -348,6 +376,9 @@ class PreviewController(
          * overlay with the playhead at the end.
          */
         const val END_GUARD_MS = 250L
+
+        /** At most one automatic rebuild after a player error per this window; a repeat is shown. */
+        private const val RECOVERY_WINDOW_MS = 10_000L
 
         /** Where the preview may seek for a playhead at [positionMs] in a [totalMs] video. */
         fun safeResumePosition(positionMs: Long, totalMs: Long): Long =
