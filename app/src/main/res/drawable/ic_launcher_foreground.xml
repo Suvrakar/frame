@@ -1,13 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  "Fr" monogram: the F's top bar roofs the r (one ligature), framed by three viewfinder corners,
+  with a gold sparkle (AI) in the fourth. Everything sits inside the 66dp adaptive-icon safe zone.
+  Keep in sync with ic_launcher_monochrome.xml and scripts/brand/render_brand.py.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Viewfinder corners. -->
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M32,34h44c2.2,0 4,1.8 4,4v32c0,2.2 -1.8,4 -4,4H32c-2.2,0 -4,-1.8 -4,-4V38c0,-2.2 1.8,-4 4,-4z" />
-    <path
-        android:fillColor="#1A73E8"
-        android:pathData="M46,42 L68,54 L46,66 Z" />
+        android:pathData="M32,40V32H40M32,68V76H40M68,76H76V68"
+        android:strokeWidth="2.4"
+        android:strokeColor="#B3FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <!-- AI sparkle in the top-right corner. -->
+    <path android:pathData="M73,29.5Q74,34 78.5,35Q74,36 73,40.5Q72,36 67.5,35Q72,34 73,29.5Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="67.5"
+                android:startY="29.5"
+                android:endX="78.5"
+                android:endY="40.5">
+                <item android:offset="0" android:color="#FFFFF1C4" />
+                <item android:offset="1" android:color="#FFFFB938" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- The monogram, scaled about the centre. -->
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.78"
+        android:scaleY="0.78">
+        <!-- F: stem and top bar (the bar runs on over the r). -->
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M35,34H73V41.5H42.5V74H35Z" />
+        <!-- F: middle bar. -->
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M42.5,50H55V57H42.5Z" />
+        <!-- r: stem and shoulder. -->
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M58.5,74V58A10,10 0,0 1,68.5 48H73V55.5H68.5A2.5,2.5 0,0 0,66 58V74Z" />
+    </group>
 </vector>
