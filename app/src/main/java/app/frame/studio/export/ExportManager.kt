@@ -52,7 +52,7 @@ class ExportManager(
     private val repository: ProjectRepository,
     private val device: DeviceProfile,
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + app.frame.studio.BackgroundErrors)
     private val _state = MutableStateFlow<ExportState>(ExportState.Idle)
     val state: StateFlow<ExportState> = _state.asStateFlow()
 

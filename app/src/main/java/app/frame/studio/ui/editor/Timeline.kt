@@ -248,8 +248,9 @@ fun Timeline(
                                 onDragStart = { controller.pause() },
                                 onDragEnd = {
                                     val d = drag
-                                    if (d != null) {
-                                        val original = project.videoClips.first { it.id == clip.id }
+                                    // The item can vanish mid-drag (undo, delete); then there is nothing to apply.
+                                    val original = project.videoClips.firstOrNull { it.id == clip.id }
+                                    if (d != null && original != null) {
                                         val result = previewVideoTrim(original, d)
                                         if (original.isImage) onImageDuration(clip.id, result.outputDurationMs())
                                         else onTrimVideo(clip.id, result.trimStartMs, result.trimEndMs)
@@ -297,8 +298,9 @@ fun Timeline(
                                     },
                                     onDragEnd = {
                                         val d = drag
-                                        if (d != null) {
-                                            val original = project.overlays.first { it.id == o.id }
+                                        // The item can vanish mid-drag (undo, delete); then there is nothing to apply.
+                                        val original = project.overlays.firstOrNull { it.id == o.id }
+                                        if (d != null && original != null) {
                                             val r = previewOverlay(original, d)
                                             onPlaceOverlay(o.id, r.startMs, r.trimStartMs, r.trimEndMs)
                                         }
@@ -337,8 +339,9 @@ fun Timeline(
                                     },
                                     onDragEnd = {
                                         val d = drag
-                                        if (d != null) {
-                                            val original = AudioLayout.normalize(project.audioClips).first { it.id == clip.id }
+                                        // The item can vanish mid-drag (undo, delete); then there is nothing to apply.
+                                        val original = AudioLayout.normalize(project.audioClips).firstOrNull { it.id == clip.id }
+                                        if (d != null && original != null) {
                                             val r = previewAudio(original, d)
                                             onPlaceAudio(clip.id, r.startMs, r.trimStartMs, r.trimEndMs)
                                         }
@@ -371,8 +374,9 @@ fun Timeline(
                                     },
                                     onDragEnd = {
                                         val d = drag
-                                        if (d != null) {
-                                            val original = project.textOverlays.first { it.id == o.id }
+                                        // The item can vanish mid-drag (undo, delete); then there is nothing to apply.
+                                        val original = project.textOverlays.firstOrNull { it.id == o.id }
+                                        if (d != null && original != null) {
                                             val r = previewText(original, d)
                                             onTextRange(o.id, r.startMs, r.endMs)
                                         }
@@ -404,8 +408,9 @@ fun Timeline(
                                     },
                                     onDragEnd = {
                                         val d = drag
-                                        if (d != null) {
-                                            val original = project.effects.first { it.id == e.id }
+                                        // The item can vanish mid-drag (undo, delete); then there is nothing to apply.
+                                        val original = project.effects.firstOrNull { it.id == e.id }
+                                        if (d != null && original != null) {
                                             val r = previewEffect(original, d)
                                             onEffectRange(e.id, r.startMs, r.endMs)
                                         }

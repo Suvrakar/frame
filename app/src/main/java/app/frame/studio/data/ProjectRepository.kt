@@ -15,6 +15,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.util.UUID
 
 /**
@@ -76,14 +77,19 @@ class ProjectRepository(
         return project
     }
 
-    suspend fun save(project: Project) = withContext(Dispatchers.IO) {
+    /**
+     * Saves [project]. Returns false when it could not be written (e.g. storage full); the in-memory
+     * copy is still updated so the editor keeps working, and the next save retries the write.
+     */
+    suspend fun save(project: Project): Boolean = withContext(Dispatchers.IO) {
         val stamped = project.copy(updatedAtEpochMs = System.currentTimeMillis())
         mutex.withLock {
-            writeAtomically(File(root, "${stamped.id}.json"), ProjectJson.encode(stamped))
+            val written = writeAtomically(File(root, "${stamped.id}.json"), ProjectJson.encode(stamped))
             _projects.update { list ->
                 (listOf(stamped) + list.filter { it.id != stamped.id })
                     .sortedByDescending { it.updatedAtEpochMs }
             }
+            written
         }
     }
 
@@ -106,11 +112,13 @@ class ProjectRepository(
         return copy
     }
 
-    suspend fun addExport(record: ExportRecord) = withContext(Dispatchers.IO) {
+    /** Records a finished export. Returns false when the history file could not be written. */
+    suspend fun addExport(record: ExportRecord): Boolean = withContext(Dispatchers.IO) {
         mutex.withLock {
             val updated = listOf(record) + _history.value.filter { it.id != record.id }
-            writeAtomically(historyFile, ProjectJson.encodeHistory(updated))
+            val written = writeAtomically(historyFile, ProjectJson.encodeHistory(updated))
             _history.value = updated
+            written
         }
     }
 
@@ -124,15 +132,24 @@ class ProjectRepository(
         }
     }
 
-    private fun writeAtomically(target: File, content: String) {
+    /**
+     * Writes via a temp file so a crash or full disk never leaves a half-written [target].
+     * Never throws: returns false (and keeps the previous [target]) when the write fails.
+     */
+    private fun writeAtomically(target: File, content: String): Boolean {
         val tmp = File(target.parentFile, "${target.name}.tmp")
-        tmp.writeText(content)
-        if (!tmp.renameTo(target)) {
-            target.delete()
+        return try {
+            tmp.writeText(content)
             if (!tmp.renameTo(target)) {
+                // Rename over an existing file normally succeeds on Android; fall back to overwriting.
                 target.writeText(content)
                 tmp.delete()
             }
+            true
+        } catch (e: IOException) {
+            Log.w(TAG, "Could not write ${target.name}", e)
+            tmp.delete()
+            false
         }
     }
 

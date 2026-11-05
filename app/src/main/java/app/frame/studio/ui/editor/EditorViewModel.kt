@@ -188,9 +188,15 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
         saveJob?.cancel()
         saveJob = viewModelScope.launch {
             delay(400)
-            _project.value?.let { repository.save(it) }
+            val p = _project.value ?: return@launch
+            val saved = repository.save(p)
+            // Tell the user once per failure streak; edits stay in memory and the next save retries.
+            if (!saved && !saveFailureShown) messageChannel.send("Couldn't save. Your phone may be out of storage.")
+            saveFailureShown = !saved
         }
     }
+
+    private var saveFailureShown = false
 
     fun undo() {
         val current = _project.value ?: return

@@ -41,7 +41,7 @@ class FrameApp : Application() {
     val templatePreviews: TemplatePreviews by lazy { TemplatePreviews(this, device.isLowEnd) }
 
     /** Outlives screens; used for last-moment saves when an editor closes. */
-    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + BackgroundErrors)
 
     override fun onCreate() {
         super.onCreate()
