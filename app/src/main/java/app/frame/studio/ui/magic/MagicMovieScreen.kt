@@ -113,7 +113,15 @@ fun MagicMovieScreen(
         if (uri != null) music = uri
     }
     val musicName by produceState<String?>(null, music) {
-        value = music?.let { frameApp.mediaProbe.probeAudio(it)?.displayName }
+        val picked = music ?: return@produceState run { value = null }
+        val info = frameApp.mediaProbe.probeAudio(picked)
+        if (info == null) {
+            // Say so now rather than silently making a movie without the song.
+            music = null
+            snackbar.showSnackbar("That song can't be played. Pick another one.")
+        } else {
+            value = info.displayName
+        }
     }
 
     fun make() {

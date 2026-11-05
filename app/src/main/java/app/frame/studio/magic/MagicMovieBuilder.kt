@@ -124,9 +124,25 @@ class MagicMovieBuilder(
     private suspend fun analyzeMusic(uri: Uri): MagicMusic? = withContext(Dispatchers.Default) {
         probe.persistPermission(uri)
         val info = probe.probeAudio(uri) ?: return@withContext null
-        // The first 90 s is plenty to lock onto the tempo.
-        val pcm = AudioPcmReader.readMono(context, uri, 0, minOf(info.durationMs, 90_000))
-        val beats = pcm?.let { BeatDetector.detect(it.samples, it.sampleRate) }
+        // The first 90 s is plenty to lock onto the tempo. Beat finding is a bonus: if decoding or
+        // detection fails on an unusual file, keep the song and just don't cut on the beat.
+        val pcm = try {
+            AudioPcmReader.readMono(context, uri, 0, minOf(info.durationMs, 90_000))
+        } catch (e: Exception) {
+            Log.w(TAG, "Couldn't decode $uri for beats", e)
+            null
+        } catch (e: OutOfMemoryError) {
+            Log.w(TAG, "Out of memory decoding $uri for beats", e)
+            null
+        }
+        val beats = pcm?.let {
+            try {
+                BeatDetector.detect(it.samples, it.sampleRate)
+            } catch (e: Exception) {
+                Log.w(TAG, "Beat detection failed for $uri", e)
+                null
+            }
+        }
         val tempo = beats?.beatsMs?.zipWithNext { a, b -> b - a }?.sorted()?.let { it.getOrNull(it.size / 2) }
         // Extend the detected grid across the whole song so long movies stay on beat.
         val all = if (beats != null && tempo != null && tempo > 0 && beats.beatsMs.isNotEmpty()) {
