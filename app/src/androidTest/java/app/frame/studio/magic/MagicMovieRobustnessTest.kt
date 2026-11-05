@@ -190,9 +190,12 @@ class MagicMovieRobustnessTest {
     fun cancellingStopsWithoutSavingAProject() = runBlocking {
         val before = app.repository.projects.value.size
         val uris = (200 until 230).map { photo(it, 1600, 2000) }
-        val job = async { make(uris) }
-        delay(800)
-        job.cancel()
+        // Cancel from inside the build once a few photos are analysed (timing-independent).
+        val job = async {
+            app.magicMovie.create(uris, null, "Robust", MagicVibe.UPBEAT, MagicLength.ALL, CanvasAspect.R9_16) { p ->
+                if (p.done >= 3) coroutineContext[kotlinx.coroutines.Job]?.cancel()
+            }.also { created += it.id }
+        }
         try {
             job.await()
             fail("expected cancellation")

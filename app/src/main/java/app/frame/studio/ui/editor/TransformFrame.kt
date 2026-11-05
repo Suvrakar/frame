@@ -143,12 +143,14 @@ fun TransformFrame(
                 if (showGhost) {
                     Box(Modifier.fillMaxSize()) { ghost?.invoke() }
                 }
-                // Corner dots hint that the object can be resized and rotated.
+                // Corner dots hint that the object can be resized and rotated. They shrink with small
+                // boxes (e.g. one line of text on a small preview) so they never cover the object.
+                val dot = minOf(10.dp.toPx(), minOf(w, h) / 3f).coerceAtLeast(4.dp.toPx())
                 listOf(Offset(0f, 0f), Offset(w, 0f), Offset(0f, h), Offset(w, h)).forEach { p ->
                     Box(
                         Modifier
-                            .offset { IntOffset((p.x - 5.dp.toPx()).roundToInt(), (p.y - 5.dp.toPx()).roundToInt()) }
-                            .size(10.dp)
+                            .offset { IntOffset((p.x - dot / 2).roundToInt(), (p.y - dot / 2).roundToInt()) }
+                            .size(dot.toDp())
                             .background(Color.White, CircleShape),
                     )
                 }

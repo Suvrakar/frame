@@ -47,7 +47,16 @@ fun TextInputDialog(
 ) {
     var value by remember { mutableStateOf(TextFieldValue(initial, TextRange(0, initial.length))) }
     val focus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+    val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+    // The dialog's window isn't attached on the first frame, so an immediate requestFocus is
+    // ignored; wait a moment, then focus the field and open the keyboard.
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(DIALOG_FOCUS_DELAY_MS)
+        runCatching {
+            focus.requestFocus()
+            keyboard?.show()
+        }
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
@@ -98,3 +107,6 @@ fun Context.openUrl(url: String) {
         Toast.makeText(this, "No browser available", Toast.LENGTH_SHORT).show()
     }
 }
+
+/** Delay before focusing a dialog text field (its window attaches after the first frame). */
+private const val DIALOG_FOCUS_DELAY_MS = 150L

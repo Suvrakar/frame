@@ -349,9 +349,13 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
         }
     }
 
-    fun addText(text: String, sticker: Boolean = false) {
+    /**
+     * Adds text (or a sticker) at the playhead. Returns where the preview should park so the new
+     * item is fully visible (just past its fade-in), or null if nothing was added.
+     */
+    fun addText(text: String, sticker: Boolean = false): Long? {
         val total = totalMs()
-        if (total <= 0) return
+        if (total <= 0) return null
         val start = _playheadMs.value.coerceIn(0, (total - 500).coerceAtLeast(0))
         val overlay = TextOverlay(
             id = newId(),
@@ -365,6 +369,8 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
         )
         edit { p -> p.copy(textOverlays = p.textOverlays + overlay) }
         _selection.value = Selection.Text(overlay.id)
+        // Fading items are invisible on their first frame; show them at full strength instead.
+        return if (overlay.animate) minOf(start + REVEAL_AFTER_ADD_MS, overlay.endMs - 1) else start
     }
 
     private fun checkSources() {
@@ -948,6 +954,9 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     private fun newId() = UUID.randomUUID().toString().take(12)
 
     companion object {
+        /** Past the text fade-in (CompositionFactory fades text over 250 ms). */
+        const val REVEAL_AFTER_ADD_MS = 300L
+
         private const val MAX_UNDO = 100
     }
 }

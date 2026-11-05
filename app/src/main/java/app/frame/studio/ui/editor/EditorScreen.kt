@@ -499,7 +499,7 @@ private fun EditorContent(
             onDismiss = { showAddText = false },
             onConfirm = {
                 showAddText = false
-                vm.addText(it)
+                vm.addText(it)?.let(controller::seekTo)
                 tool = Tool.TEXT_STYLE
             },
         )
@@ -981,7 +981,7 @@ private fun ActivePanel(
                 onVoice = { onOpenTool(Tool.VOICE) },
             )
             Tool.VOICE -> VoicePanel(recording, recordElapsed, onToggleRecord)
-            Tool.STICKERS -> StickersPanel { vm.addText(it, sticker = true) }
+            Tool.STICKERS -> StickersPanel { s -> vm.addText(s, sticker = true)?.let(controller::seekTo) }
             Tool.TEXT_STYLE -> text?.let { o ->
                 TextStylePanel(o, onText = { vm.setText(o.id, it) }) { transform -> vm.styleText(o.id, transform) }
             }
