@@ -152,7 +152,7 @@ class PreviewController(
             error = e.message
             return
         }
-        val resumeAt = positionMs.coerceIn(0, (totalMs - 1).coerceAtLeast(0))
+        val resumeAt = safeResumePosition(positionMs, totalMs)
         val resume = isPlaying
         error = null
         ended = false
@@ -298,7 +298,7 @@ class PreviewController(
      */
     fun scrubTo(ms: Long) {
         if (!hasPlayer) return
-        val target = ms.coerceIn(0, (totalMs - 1).coerceAtLeast(0))
+        val target = safeResumePosition(ms, totalMs)
         positionMs = target
         publishedPositionMs = target
         ended = false
@@ -316,7 +316,7 @@ class PreviewController(
 
     fun seekTo(ms: Long) {
         if (!hasPlayer) return
-        val target = ms.coerceIn(0, (totalMs - 1).coerceAtLeast(0))
+        val target = safeResumePosition(ms, totalMs)
         positionMs = target
         publishedPositionMs = target
         ended = false
@@ -339,5 +339,18 @@ class PreviewController(
         private const val TAG = "PreviewController"
         private const val SURFACE_RELEASE_TIMEOUT_MS = 1_000L
         private const val SCRUB_SEEK_INTERVAL_MS = 50L
+
+        /**
+         * The preview never parks closer than this to the end. Media3 1.8's composition audio graph
+         * throws (NullPointerException in AudioGraphInputAudioSink.playToEndOfStream) when a player
+         * is prepared or seeked to the very end of a timeline whose items have no real audio, e.g.
+         * photos. That showed as "Preview error: ERROR_CODE_UNSPECIFIED" after editing text or an
+         * overlay with the playhead at the end.
+         */
+        const val END_GUARD_MS = 250L
+
+        /** Where the preview may seek for a playhead at [positionMs] in a [totalMs] video. */
+        fun safeResumePosition(positionMs: Long, totalMs: Long): Long =
+            positionMs.coerceIn(0, (totalMs - END_GUARD_MS).coerceAtLeast(0))
     }
 }
