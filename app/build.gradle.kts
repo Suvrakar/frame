@@ -69,6 +69,17 @@ android {
             resValue("string", "admob_banner_id", releaseAdmobBannerId ?: testAdmobBannerId)
             resValue("string", "admob_rewarded_id", releaseAdmobRewardedId ?: testAdmobRewardedId)
         }
+        // Release code and optimisations, signed with the debug key so it installs next to the
+        // debug app. Use it to judge real-world speed; debug builds are much slower.
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
+            applicationIdSuffix = ".bench"
+            versionNameSuffix = "-bench"
+            isDebuggable = false
+            isProfileable = true
+        }
         debug {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
