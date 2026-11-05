@@ -150,6 +150,7 @@ import app.frame.studio.export.ExportPlan
 import app.frame.studio.ui.common.TextInputDialog
 import app.frame.studio.ui.common.formatDuration
 import kotlin.math.roundToInt
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -223,11 +224,20 @@ private fun EditorContent(
         if (controller.hasPlayer && !compareOriginal) kotlinx.coroutines.delay(app.device.previewRebuildDelayMs)
         controller.setProject(shown)
     }
+    // Follow the playhead every frame only while playing. When paused, just mirror seeks and
+    // scrubs: an unconditional per-frame loop kept the editor drawing nonstop (CPU, GPU, battery).
     LaunchedEffect(controller) {
-        while (true) {
-            withFrameMillis { }
-            controller.tick()
-            vm.setPlayhead(controller.positionMs)
+        androidx.compose.runtime.snapshotFlow { controller.isPlaying }.collectLatest { playing ->
+            if (playing) {
+                while (true) {
+                    withFrameMillis { }
+                    controller.tick()
+                    vm.setPlayhead(controller.positionMs)
+                }
+            } else {
+                controller.tick()
+                androidx.compose.runtime.snapshotFlow { controller.positionMs }.collect { vm.setPlayhead(it) }
+            }
         }
     }
     val lifecycleOwner = LocalLifecycleOwner.current
