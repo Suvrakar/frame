@@ -45,6 +45,16 @@ class FrameApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        if (BuildConfig.DEBUG) {
+            // Debug builds log disk/network work on the main thread and leaked resources, the usual
+            // causes of jank and ANRs on slow phones. Release builds are unaffected.
+            android.os.StrictMode.setThreadPolicy(
+                android.os.StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().detectNetwork().penaltyLog().build(),
+            )
+            android.os.StrictMode.setVmPolicy(
+                android.os.StrictMode.VmPolicy.Builder().detectLeakedClosableObjects().detectActivityLeaks().penaltyLog().build(),
+            )
+        }
         app.frame.studio.text.TextFonts.init(this)
         device = DeviceProfile(this)
         settings = SettingsStore(this)

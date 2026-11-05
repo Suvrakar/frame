@@ -85,7 +85,16 @@ object AdsService {
 
     private fun initialize(context: Context) {
         if (initialized.compareAndSet(false, true)) {
-            MobileAds.initialize(context.applicationContext) { _canShowAds.value = true }
+            val app = context.applicationContext
+            // Google recommends initializing the Mobile Ads SDK off the main thread: it does disk
+            // work that can stall the first frames (and cause ANRs) on slow phones.
+            Thread({
+                try {
+                    MobileAds.initialize(app) { _canShowAds.value = true }
+                } catch (e: Exception) {
+                    android.util.Log.w("AdsService", "Ads SDK failed to initialize", e)
+                }
+            }, "ads-init").start()
         } else {
             _canShowAds.value = true
         }
