@@ -1,5 +1,7 @@
 package app.frame.studio.ui.magic
 
+import app.frame.studio.telemetry.AppEvents
+import app.frame.studio.telemetry.Telemetry
 import app.frame.studio.media.ImportMessages
 import app.frame.studio.ui.common.bounceClick
 import android.net.Uri
@@ -132,6 +134,8 @@ fun MagicMovieScreen(
                 try {
                     val skipped = mutableListOf<String>()
                     val project = frameApp.magicMovie.create(media.toList(), music, title, vibe, length, shape, skipped) { p -> progress = p }
+                    AppEvents.projectCreated("magic_movie")
+                    AppEvents.magicMovieCreated(media.size, skipped.size, music != null, vibe.name.lowercase(), length.name.lowercase())
                     ImportMessages.summary(skipped)?.let { msg ->
                         // Show it before leaving; the snackbar belongs to this screen.
                         scope.launch { snackbar.showSnackbar(msg) }
@@ -141,6 +145,8 @@ fun MagicMovieScreen(
                 } catch (e: kotlinx.coroutines.CancellationException) {
                     throw e
                 } catch (e: Exception) {
+                    AppEvents.magicMovieFailed(e.javaClass.simpleName)
+                    Telemetry.nonFatal("magic_movie", e)
                     snackbar.showSnackbar(e.message ?: "Couldn't make the movie")
                 } finally {
                     progress = null

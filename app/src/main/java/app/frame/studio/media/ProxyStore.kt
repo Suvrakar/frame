@@ -1,5 +1,6 @@
 package app.frame.studio.media
 
+import app.frame.studio.telemetry.Telemetry
 import android.content.Context
 import android.net.Uri
 import android.os.Handler
@@ -153,6 +154,7 @@ class ProxyStore(
 
                     override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
                         Log.w(TAG, "Proxy failed for $uri", exportException)
+                        Telemetry.nonFatal("proxy", exportException)
                         complete(uri, tmp, false)
                     }
                 })

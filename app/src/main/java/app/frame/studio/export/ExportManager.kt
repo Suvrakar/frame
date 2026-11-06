@@ -1,5 +1,7 @@
 package app.frame.studio.export
 
+import app.frame.studio.telemetry.AppEvents
+import app.frame.studio.telemetry.Telemetry
 import android.content.Context
 import android.util.Log
 import androidx.annotation.OptIn
@@ -59,6 +61,8 @@ class ExportManager(
     private var transformer: Transformer? = null
     private var progressJob: Job? = null
     private var outputFile: File? = null
+    private var startedAtMs = 0L
+    private var retries = 0
 
     val isBusy: Boolean
         get() = _state.value is ExportState.Running || _state.value is ExportState.Saving
@@ -74,6 +78,17 @@ class ExportManager(
             exportFps = device.clampFrameRate(size.width, size.height, requested.exportFps),
             audioBitrateKbps = device.clampAudioBitrate(requested.audioBitrateKbps),
         )
+        startedAtMs = android.os.SystemClock.elapsedRealtime()
+        retries = 0
+        AppEvents.exportStarted(
+            height = ExportPolicy.outputHeight(project.exportHeight),
+            fps = project.exportFps,
+            clips = project.videoClips.size,
+            overlays = project.overlays.size,
+            texts = project.textOverlays.size,
+            audioTracks = project.audioClips.size,
+            durationSec = TimelineMath.totalVideoMs(project.videoClips) / 1000,
+        )
         runExport(project, saveToGallery, attempt = 0)
     }
 
@@ -82,6 +97,7 @@ class ExportManager(
         val composition = try {
             CompositionFactory.build(project)
         } catch (e: Exception) {
+            reportFailure("build", e, e.javaClass.simpleName)
             _state.value = ExportState.Failed(project.id, e.message ?: "Could not prepare export")
             return
         }
@@ -89,6 +105,7 @@ class ExportManager(
         val file = File(repository.exportsDir, "Frame_$stamp.mp4")
         outputFile = file
         _state.value = ExportState.Running(project.id, 0)
+        retries = attempt
 
         val listener = object : Transformer.Listener {
             override fun onCompleted(composition: Composition, exportResult: ExportResult) {
@@ -113,6 +130,7 @@ class ExportManager(
                     }, RETRY_DELAY_MS) // let the failed pipeline finish releasing first
                     return
                 }
+                reportFailure("export", exportException, exportException.errorCodeName)
                 _state.value = ExportState.Failed(project.id, describe(exportException))
             }
         }
@@ -124,6 +142,7 @@ class ExportManager(
         } catch (e: Exception) {
             finishTransform()
             file.delete()
+            reportFailure("start", e, e.javaClass.simpleName)
             _state.value = ExportState.Failed(project.id, e.message ?: "Export could not start")
             return
         }
@@ -150,6 +169,7 @@ class ExportManager(
         transformer?.cancel()
         finishTransform()
         outputFile?.delete()
+        AppEvents.exportCancelled()
         _state.value = ExportState.Failed(running.projectId, CANCELLED)
     }
 
@@ -179,8 +199,23 @@ class ExportManager(
                 galleryUri = galleryUri?.toString(),
             )
             repository.addExport(record)
+            AppEvents.exportCompleted(
+                height = record.height,
+                durationSec = record.durationMs / 1000,
+                sizeMb = record.sizeBytes / 1_000_000,
+                tookSec = (android.os.SystemClock.elapsedRealtime() - startedAtMs) / 1000,
+                retries = retries,
+                savedToGallery = galleryUri != null,
+            )
             _state.value = ExportState.Done(record, savedToGallery = galleryUri != null)
         }
+    }
+
+    /** A failed export is both an Analytics event and a Crashlytics non-fatal (with the cause). */
+    private fun reportFailure(stage: String, e: Throwable, code: String) {
+        AppEvents.exportFailed(code, retries)
+        Telemetry.setKey("export_stage", stage)
+        Telemetry.nonFatal("export", e)
     }
 
     private fun describe(e: ExportException): String = when (e.errorCode) {

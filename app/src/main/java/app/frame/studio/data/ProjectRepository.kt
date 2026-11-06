@@ -1,5 +1,6 @@
 package app.frame.studio.data
 
+import app.frame.studio.telemetry.Telemetry
 import android.content.Context
 import android.util.Log
 import app.frame.studio.domain.ExportHeight
@@ -148,6 +149,7 @@ class ProjectRepository(
             true
         } catch (e: IOException) {
             Log.w(TAG, "Could not write ${target.name}", e)
+            Telemetry.nonFatal("project_save", e)
             tmp.delete()
             false
         }

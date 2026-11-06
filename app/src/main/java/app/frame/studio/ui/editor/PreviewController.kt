@@ -1,5 +1,6 @@
 package app.frame.studio.ui.editor
 
+import app.frame.studio.telemetry.Telemetry
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
@@ -119,6 +120,7 @@ class PreviewController(
 
         override fun onPlayerError(e: PlaybackException) {
             Log.w(TAG, "Preview error", e)
+            Telemetry.nonFatal("preview_playback", e)
             main.post {
                 // Media3's composition player has rare internal failures (e.g. its compositor after
                 // reaching the end). Rebuild once at a safe position before bothering the user.
@@ -177,6 +179,7 @@ class PreviewController(
             CompositionFactory.build(key, forExport = false)
         } catch (e: Exception) {
             Log.w(TAG, "Could not build preview", e)
+            Telemetry.nonFatal("preview_build", e)
             error = e.message
             return
         }
@@ -202,6 +205,7 @@ class PreviewController(
                 .build()
         } catch (e: Exception) {
             Log.w(TAG, "Could not create preview player", e)
+            Telemetry.nonFatal("preview_player", e)
             main.post { error = "Preview unavailable" }
             return
         }

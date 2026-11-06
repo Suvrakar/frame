@@ -1,5 +1,6 @@
 package app.frame.studio.ui.editor
 
+import app.frame.studio.telemetry.AppEvents
 import app.frame.studio.export.CompositionFactory
 import app.frame.studio.media.ImportMessages
 import app.frame.studio.media.VideoVerdict
@@ -289,6 +290,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             }
             _importing.value = false
             if (failed > 0) messageChannel.send("$failed item${if (failed > 1) "s" else ""} couldn't be opened")
+            if (refused.isNotEmpty()) AppEvents.importRefused("video", refused.size)
             ImportMessages.summary(refused)?.let { messageChannel.send(it) }
             if (muted.isNotEmpty()) messageChannel.send(ImportMessages.mutedAudio(muted.first()))
             if (clips.isEmpty()) return@launch
@@ -337,6 +339,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             }
             _importing.value = false
             if (failed > 0) messageChannel.send("$failed file${if (failed > 1) "s" else ""} couldn't be opened as audio")
+            if (refused.isNotEmpty()) AppEvents.importRefused("audio", refused.size)
             ImportMessages.summary(refused)?.let { messageChannel.send(it) }
             if (clips.isEmpty()) return@launch
             edit { p -> p.copy(audioClips = p.audioClips + clips) }
@@ -682,6 +685,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                 added = shifted.id
             }
             _importing.value = false
+            if (refused.isNotEmpty()) AppEvents.importRefused("overlay", refused.size)
             ImportMessages.summary(refused)?.let { messageChannel.send(it) }
             if (muted.isNotEmpty()) messageChannel.send(ImportMessages.mutedAudio(muted.first()))
             if (blocked > 0) {

@@ -38,6 +38,18 @@
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
             android:value="true" />
 
+        <!-- Firebase: on for release builds only (see app/build.gradle.kts). Analytics never uses
+             the advertising ID; usage is counted per app install. -->
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="${telemetryEnabled}" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="${telemetryEnabled}" />
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

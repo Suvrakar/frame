@@ -1,5 +1,6 @@
 package app.frame.studio.ui.projects
 
+import app.frame.studio.telemetry.AppEvents
 import app.frame.studio.ui.common.bounceClick
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -95,7 +96,11 @@ fun ProjectsScreen(
     var deleteTarget by remember { mutableStateOf<Project?>(null) }
 
     fun newProject() {
-        scope.launch { onNewProject(app.repository.create("Project ${projects.size + 1}").id) }
+        scope.launch {
+            val project = app.repository.create("Project ${projects.size + 1}")
+            AppEvents.projectCreated("blank")
+            onNewProject(project.id)
+        }
     }
 
     LazyVerticalGrid(

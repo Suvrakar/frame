@@ -1,5 +1,6 @@
 package app.frame.studio
 
+import app.frame.studio.telemetry.Telemetry
 import android.app.Application
 import android.content.ComponentCallbacks2
 import app.frame.studio.data.ImageNormalizer
@@ -57,8 +58,12 @@ class FrameApp : Application() {
                 android.os.StrictMode.VmPolicy.Builder().detectLeakedClosableObjects().detectActivityLeaks().penaltyLog().build(),
             )
         }
+        Telemetry.init(this)
         app.frame.studio.text.TextFonts.init(this)
         device = DeviceProfile(this)
+        val tier = if (device.isLowEnd) "low_end" else "standard"
+        Telemetry.setUserProperty("device_tier", tier)
+        Telemetry.setKey("device_tier", tier)
         settings = SettingsStore(this)
         repository = ProjectRepository(this, device.defaultExportHeight)
         mediaProbe = MediaProbe(this, device)

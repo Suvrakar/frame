@@ -7,6 +7,21 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+// Firebase is switched on by adding app/google-services.json (from the Firebase console). Without
+// it the app builds and runs normally and sends nothing. See docs/firebase-setup.md.
+val firebaseConfigured = file("google-services.json").exists()
+if (firebaseConfigured) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+    // The benchmark build (app.frame.studio.bench) is for speed tests only: no Firebase there,
+    // so its package doesn't need registering.
+    tasks.configureEach {
+        if (name.contains("Benchmark") && (name.contains("GoogleServices") || name.contains("Crashlytics"))) enabled = false
+    }
+}
+// Debug builds send nothing unless asked: ./gradlew installDebug -Pframe.telemetryInDebug=true
+val telemetryInDebug = (findProperty("frame.telemetryInDebug") as String?) == "true"
+
 // Release configuration comes from keystore.properties (git-ignored) or environment variables,
 // so secrets never live in the repository. See README.md.
 val keystoreProperties = Properties().apply {
@@ -68,6 +83,7 @@ android {
             resValue("string", "admob_app_id", releaseAdmobAppId ?: testAdmobAppId)
             resValue("string", "admob_banner_id", releaseAdmobBannerId ?: testAdmobBannerId)
             resValue("string", "admob_rewarded_id", releaseAdmobRewardedId ?: testAdmobRewardedId)
+            manifestPlaceholders["telemetryEnabled"] = "true"
         }
         // Release code and optimisations, signed with the debug key so it installs next to the
         // debug app. Use it to judge real-world speed; debug builds are much slower.
@@ -79,6 +95,8 @@ android {
             versionNameSuffix = "-bench"
             isDebuggable = false
             isProfileable = true
+            // Speed testing only: never mix benchmark runs into real users' numbers.
+            manifestPlaceholders["telemetryEnabled"] = "false"
         }
         debug {
             isMinifyEnabled = false
@@ -87,6 +105,7 @@ android {
             resValue("string", "admob_app_id", testAdmobAppId)
             resValue("string", "admob_banner_id", testAdmobBannerId)
             resValue("string", "admob_rewarded_id", testAdmobRewardedId)
+            manifestPlaceholders["telemetryEnabled"] = telemetryInDebug.toString()
         }
     }
 
@@ -132,6 +151,9 @@ gradle.taskGraph.whenReady {
     if (buildingRelease && (releaseAdmobAppId == null || releaseAdmobBannerId == null)) {
         logger.warn("WARNING: Release build is using Google's TEST AdMob IDs. Set admobAppId/admobBannerId before publishing.")
     }
+    if (buildingRelease && !firebaseConfigured) {
+        logger.warn("WARNING: app/google-services.json is missing; this release has no Analytics or Crashlytics.")
+    }
     if (buildingRelease && android.signingConfigs.getByName("release").storeFile == null) {
         logger.warn("WARNING: No release keystore configured; release outputs will be unsigned.")
     }
@@ -172,6 +194,12 @@ dependencies {
     implementation("com.google.android.ump:user-messaging-platform:3.2.0")
     // In-app purchase of Frame Pro (verified on the device; no server).
     implementation("com.android.billingclient:billing-ktx:7.1.1")
+
+    // Usage analytics and crash reports (inactive until google-services.json is added).
+    // BoM 34.x: 35.x needs Kotlin 2.3+ (this project is on 2.2).
+    implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")

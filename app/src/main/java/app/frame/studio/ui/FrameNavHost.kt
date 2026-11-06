@@ -1,5 +1,6 @@
 package app.frame.studio.ui
 
+import app.frame.studio.telemetry.Telemetry
 import app.frame.studio.ui.common.Motion
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideOutHorizontally
@@ -84,6 +85,13 @@ fun FrameNavHost(app: FrameApp) {
     }
 
     val nav = rememberNavController()
+    androidx.compose.runtime.DisposableEffect(nav) {
+        val listener = androidx.navigation.NavController.OnDestinationChangedListener { _, destination, _ ->
+            Telemetry.screen(destination.route)
+        }
+        nav.addOnDestinationChangedListener(listener)
+        onDispose { nav.removeOnDestinationChangedListener(listener) }
+    }
     NavHost(
         navController = nav,
         startDestination = Routes.PROJECTS,

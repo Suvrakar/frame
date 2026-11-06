@@ -1,5 +1,6 @@
 package app.frame.studio.pro
 
+import app.frame.studio.telemetry.AppEvents
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -127,7 +128,9 @@ class ProStore(private val context: Context) : PurchasesUpdatedListener {
         val params = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(listOf(BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(product).build()))
             .build()
-        return client.launchBillingFlow(activity, params).responseCode == BillingClient.BillingResponseCode.OK
+        val launched = client.launchBillingFlow(activity, params).responseCode == BillingClient.BillingResponseCode.OK
+        if (launched) AppEvents.proPurchaseStarted()
+        return launched
     }
 
     override fun onPurchasesUpdated(result: BillingResult, purchases: MutableList<Purchase>?) {
@@ -137,6 +140,7 @@ class ProStore(private val context: Context) : PurchasesUpdatedListener {
     private fun handle(purchases: List<Purchase>, fromRestore: Boolean) {
         val pro = purchases.firstOrNull { PRODUCT_ID in it.products && it.purchaseState == Purchase.PurchaseState.PURCHASED }
         if (pro != null) {
+            if (!fromRestore && !pro.isAcknowledged) AppEvents.proPurchased()
             setPro(true)
             if (!pro.isAcknowledged) {
                 client.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(pro.purchaseToken).build()) { r ->
