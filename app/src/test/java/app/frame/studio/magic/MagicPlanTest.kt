@@ -104,4 +104,13 @@ class MagicPlanTest {
         assertEquals("Mar 2025 – Jan 2026", MagicPlan.dateSpan(listOf(a, photo(1, date = 202502)), ::my, ::m, ::y))
         assertEquals(null, MagicPlan.dateSpan(listOf(photo(3)), ::my, ::m, ::y))
     }
+
+    @Test
+    fun carriesProxyFlagAndMutedAudioIntoClips() {
+        val heavy = video(0).copy(needsProxy = true, audioMuted = true)
+        val p = MagicPlan.build(
+            listOf(heavy), MagicVibe.CHILL, MagicLength.MEDIUM, "", null, null, CanvasAspect.R1_1, "pid", 0L, ::id,
+        )
+        assertTrue(p.videoClips.all { it.needsProxy && it.volume == 0f })
+    }
 }

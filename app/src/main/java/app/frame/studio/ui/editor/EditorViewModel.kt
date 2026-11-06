@@ -1,6 +1,8 @@
 package app.frame.studio.ui.editor
 
 import app.frame.studio.export.CompositionFactory
+import app.frame.studio.media.ImportMessages
+import app.frame.studio.media.VideoVerdict
 import app.frame.studio.timeline.Transform
 import app.frame.studio.timeline.OverlayLayout
 import app.frame.studio.timeline.Keyframes
@@ -239,8 +241,11 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             _importing.value = true
             val clips = mutableListOf<VideoClip>()
             var failed = 0
+            val refused = mutableListOf<String>()
+            val muted = mutableListOf<String?>()
             for (uri in uris) {
                 probe.persistPermission(uri)
+                val refusedBefore = refused.size
                 val clip = if (probe.isImage(uri)) {
                     // Oversized photos are downscaled once so editing and export stay light.
                     val name = probe.probeImage(uri)?.displayName.orEmpty()
@@ -258,6 +263,12 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                     }
                 } else {
                     probe.probeVideo(uri)?.takeIf { it.durationMs >= 100 }?.let { info ->
+                        val verdict = info.verdict
+                        if (verdict is VideoVerdict.Unsupported) {
+                            refused += verdict.message
+                            return@let null
+                        }
+                        if (!info.audioSupported) muted += info.audioCodec
                         VideoClip(
                             id = newId(),
                             sourceUri = uri.toString(),
@@ -266,13 +277,20 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                             width = info.width,
                             height = info.height,
                             displayName = info.displayName,
+                            volume = if (info.audioSupported) 1f else 0f,
+                            needsProxy = verdict is VideoVerdict.Heavy,
                         )
                     }
                 }
-                if (clip == null) failed++ else clips += clip
+                if (clip == null) {
+                    // Refused files already have a reason; only count the unreadable ones here.
+                    if (refused.size == refusedBefore) failed++
+                } else clips += clip
             }
             _importing.value = false
             if (failed > 0) messageChannel.send("$failed item${if (failed > 1) "s" else ""} couldn't be opened")
+            ImportMessages.summary(refused)?.let { messageChannel.send(it) }
+            if (muted.isNotEmpty()) messageChannel.send(ImportMessages.mutedAudio(muted.first()))
             if (clips.isEmpty()) return@launch
             edit { p ->
                 val sel = _selection.value
@@ -293,12 +311,17 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             _importing.value = true
             val clips = mutableListOf<AudioClip>()
             var failed = 0
+            val refused = mutableListOf<String>()
             var cursor = audioInsertPosition()
             for (uri in uris) {
                 probe.persistPermission(uri)
                 val info = probe.probeAudio(uri)
                 if (info == null || info.durationMs < 100) {
                     failed++
+                    continue
+                }
+                if (!info.supported) {
+                    refused += "This phone can't play the sound in ${info.displayName.ifBlank { "this file" }}."
                     continue
                 }
                 clips += AudioClip(
@@ -314,6 +337,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             }
             _importing.value = false
             if (failed > 0) messageChannel.send("$failed file${if (failed > 1) "s" else ""} couldn't be opened as audio")
+            ImportMessages.summary(refused)?.let { messageChannel.send(it) }
             if (clips.isEmpty()) return@launch
             edit { p -> p.copy(audioClips = p.audioClips + clips) }
             _selection.value = Selection.Audio(clips.first().id)
@@ -615,6 +639,8 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
             _importing.value = true
             var added: String? = null
             var blocked = 0
+            val refused = mutableListOf<String>()
+            val muted = mutableListOf<String?>()
             for (uri in uris) {
                 probe.persistPermission(uri)
                 val total = totalMs()
@@ -630,10 +656,18 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                     }
                 } else {
                     probe.probeVideo(uri)?.takeIf { it.durationMs >= 300 }?.let { info ->
+                        val verdict = info.verdict
+                        if (verdict is VideoVerdict.Unsupported) {
+                            refused += verdict.message
+                            return@let null
+                        }
+                        if (!info.audioSupported) muted += info.audioCodec
                         OverlayClip(
                             id = newId(), sourceUri = uri.toString(), sourceDurationMs = info.durationMs,
                             trimEndMs = minOf(info.durationMs, total - start), startMs = start,
                             width = info.width, height = info.height, displayName = info.displayName,
+                            volume = if (info.audioSupported) 1f else 0f,
+                            needsProxy = verdict is VideoVerdict.Heavy,
                         )
                     }
                 }) ?: continue
@@ -648,6 +682,8 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                 added = shifted.id
             }
             _importing.value = false
+            ImportMessages.summary(refused)?.let { messageChannel.send(it) }
+            if (muted.isNotEmpty()) messageChannel.send(ImportMessages.mutedAudio(muted.first()))
             if (blocked > 0) {
                 val lanes = CompositionFactory.maxOverlayLanes
                 messageChannel.send(

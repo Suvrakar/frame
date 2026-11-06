@@ -59,6 +59,10 @@ data class MagicAsset(
     val pickIndex: Int,
     /** Video only: best moment (source ms). */
     val bestMs: Long = durationMs / 3,
+    /** Video only: heavy source, preview should use a proxy. */
+    val needsProxy: Boolean = false,
+    /** Video only: the video's own sound can't be played on this phone. */
+    val audioMuted: Boolean = false,
 )
 
 data class MagicMusic(
@@ -161,7 +165,8 @@ object MagicPlan {
                     id = newId(), sourceUri = a.uri, sourceDurationMs = a.durationMs,
                     trimStartMs = start, trimEndMs = start + ms,
                     width = a.width, height = a.height, displayName = a.displayName,
-                    volume = if (music != null) 0.2f else 1f,
+                    volume = if (a.audioMuted) 0f else if (music != null) 0.2f else 1f,
+                    needsProxy = a.needsProxy,
                 )
             }
             base.copy(

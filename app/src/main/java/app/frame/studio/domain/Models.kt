@@ -122,6 +122,8 @@ data class VideoClip(
     val transitionMs: Long = 500,
     /** Mirror horizontally. */
     val flipH: Boolean = false,
+    /** Heavy source: the editor preview should use a lighter proxy. Export always uses the original. */
+    val needsProxy: Boolean = false,
 ) {
     fun outputDurationMs(): Long {
         val source = (trimEndMs - trimStartMs).coerceAtLeast(0)
@@ -242,6 +244,7 @@ data class OverlayClip(
     val volume: Float = 1f,
     val filterId: String = "none",
     val keyframes: List<Keyframe> = emptyList(),
+    val needsProxy: Boolean = false,
 ) {
     fun durationMs(): Long = (trimEndMs - trimStartMs).coerceAtLeast(0)
     fun endMs(): Long = startMs + durationMs()

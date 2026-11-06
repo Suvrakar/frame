@@ -1,5 +1,6 @@
 package app.frame.studio.templates
 
+import app.frame.studio.media.VideoVerdict
 import android.content.Context
 import android.net.Uri
 import app.frame.studio.data.ImageNormalizer
@@ -117,8 +118,11 @@ class TemplateBuilder(
             val name = probe.probeImage(uri)?.displayName.orEmpty()
             normalizer.normalize(uri)?.let { SlotMedia(it.uri.toString(), true, 0, it.width, it.height, name) }
         } else {
-            probe.probeVideo(uri)?.takeIf { it.durationMs >= 100 }?.let {
-                SlotMedia(uri.toString(), false, it.durationMs, it.width, it.height, it.displayName)
+            probe.probeVideo(uri)?.takeIf { it.durationMs >= 100 && it.verdict !is VideoVerdict.Unsupported }?.let {
+                SlotMedia(
+                    uri.toString(), false, it.durationMs, it.width, it.height, it.displayName,
+                    needsProxy = it.verdict is VideoVerdict.Heavy, audioMuted = !it.audioSupported,
+                )
             }
         }
     }

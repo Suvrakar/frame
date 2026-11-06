@@ -14,6 +14,10 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.util.LruCache
 import app.frame.studio.device.DeviceProfile
+import app.frame.studio.media.AndroidDecoderTable
+import app.frame.studio.media.ImportPolicy
+import app.frame.studio.media.MediaInspector
+import app.frame.studio.media.VideoVerdict
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
@@ -29,9 +33,16 @@ class MediaProbe(private val context: Context, device: DeviceProfile) {
         val width: Int,
         val height: Int,
         val displayName: String,
+        val verdict: VideoVerdict = VideoVerdict.Ok,
+        val audioSupported: Boolean = true,
+        val audioCodec: String? = null,
     )
 
-    data class AudioInfo(val durationMs: Long, val displayName: String)
+    data class AudioInfo(val durationMs: Long, val displayName: String, val supported: Boolean = true)
+
+    private val inspector = MediaInspector(context)
+    private val decoderTable = AndroidDecoderTable()
+    private val lowEnd = device.isLowEnd
 
     data class ImageInfo(val width: Int, val height: Int, val displayName: String)
 
@@ -121,11 +132,17 @@ class MediaProbe(private val context: Context, device: DeviceProfile) {
             val h = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 0
             val rotation = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
             val rotated = rotation % 180 != 0
+            val inspection = runCatching { inspector.inspect(uri) }.getOrNull()
+            val verdict = inspection?.video?.let { ImportPolicy.video(it, decoderTable, lowEnd) } ?: VideoVerdict.Ok
+            val audioOk = inspection?.audio?.let { ImportPolicy.audioSupported(it, decoderTable) } ?: true
             VideoInfo(
                 durationMs = duration,
                 width = if (rotated) h else w,
                 height = if (rotated) w else h,
                 displayName = displayName(uri),
+                verdict = verdict,
+                audioSupported = audioOk,
+                audioCodec = inspection?.audio?.takeIf { !audioOk }?.let { ImportPolicy.codecName(it.mime) },
             )
         }
     }
@@ -134,7 +151,8 @@ class MediaProbe(private val context: Context, device: DeviceProfile) {
         withRetriever(uri) { r ->
             val duration = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
                 ?: return@withRetriever null
-            AudioInfo(duration, displayName(uri))
+            val audio = runCatching { inspector.inspect(uri) }.getOrNull()?.audio
+            AudioInfo(duration, displayName(uri), supported = audio?.let { ImportPolicy.audioSupported(it, decoderTable) } ?: true)
         }
     }
 

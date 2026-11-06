@@ -14,6 +14,7 @@ import app.frame.studio.data.ProjectRepository
 import app.frame.studio.device.DeviceProfile
 import app.frame.studio.domain.CanvasAspect
 import app.frame.studio.domain.Project
+import app.frame.studio.media.VideoVerdict
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -101,6 +102,7 @@ class MagicMovieBuilder(
                 )
             } else {
                 val info = probe.probeVideo(uri)?.takeIf { it.durationMs >= 500 } ?: return null
+                if (info.verdict is VideoVerdict.Unsupported) return null
                 // Sample a few moments; keep the sharpest, best-exposed one.
                 val candidates = listOf(0.2f, 0.45f, 0.7f).map { (info.durationMs * it).toLong() }
                 val scored = candidates.mapNotNull { at ->
@@ -116,6 +118,8 @@ class MagicMovieBuilder(
                     hash = best?.second?.hash ?: index.toLong().inv(),
                     pickIndex = index,
                     bestMs = best?.first ?: (info.durationMs / 3),
+                    needsProxy = info.verdict is VideoVerdict.Heavy,
+                    audioMuted = !info.audioSupported,
                 )
             }
         }.onFailure { Log.w(TAG, "Couldn't analyse $uri", it) }.getOrNull()
@@ -124,6 +128,7 @@ class MagicMovieBuilder(
     private suspend fun analyzeMusic(uri: Uri): MagicMusic? = withContext(Dispatchers.Default) {
         probe.persistPermission(uri)
         val info = probe.probeAudio(uri) ?: return@withContext null
+        if (!info.supported) return@withContext null
         // The first 90 s is plenty to lock onto the tempo. Beat finding is a bonus: if decoding or
         // detection fails on an unusual file, keep the song and just don't cut on the beat.
         val pcm = try {

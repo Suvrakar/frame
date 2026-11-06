@@ -13,6 +13,8 @@ data class SlotMedia(
     val width: Int,
     val height: Int,
     val displayName: String = "",
+    val needsProxy: Boolean = false,
+    val audioMuted: Boolean = false,
 )
 
 /** Pure assembly of a [Project] from a template; card images are rendered by the caller. */
@@ -69,6 +71,7 @@ object TemplatePlan {
                     id = newId(), sourceUri = m.uri, sourceDurationMs = m.durationMs,
                     trimStartMs = start, trimEndMs = start + length,
                     width = m.width, height = m.height, displayName = m.displayName,
+                    needsProxy = m.needsProxy, volume = if (m.audioMuted) 0f else 1f,
                 )
             }.copy(
                 filterId = template.filterId,
