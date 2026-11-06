@@ -32,6 +32,12 @@ class ImportPolicyTest {
         assertEquals(VideoVerdict.Unsupported("This video's format (HEVC) isn't supported on this phone."), v)
     }
 
+    @Test fun tooLargeButVerifiedByDecodingIsHeavy() {
+        // Snapdragon 685: declares 1920x1920 for H.264 yet decodes 4K.
+        val v = ImportPolicy.video(track(3840, 2160, fps = 60f), table(dec(maxW = 1920, maxH = 1920)), false, decodeVerified = true)
+        assertTrue("expected Heavy, was $v", v is VideoVerdict.Heavy)
+    }
+
     @Test fun tooLargeNamesBothSizes() {
         val v = ImportPolicy.video(track(7680, 4320), table(dec(maxW = 4096, maxH = 2304)), false)
         assertTrue(v is VideoVerdict.Unsupported)

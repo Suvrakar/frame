@@ -15,6 +15,7 @@ import android.util.Log
 import android.util.LruCache
 import app.frame.studio.device.DeviceProfile
 import app.frame.studio.media.AndroidDecoderTable
+import app.frame.studio.media.DecodeProbe
 import app.frame.studio.media.ImportPolicy
 import app.frame.studio.media.MediaInspector
 import app.frame.studio.media.VideoVerdict
@@ -133,7 +134,12 @@ class MediaProbe(private val context: Context, device: DeviceProfile) {
             val rotation = r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
             val rotated = rotation % 180 != 0
             val inspection = runCatching { inspector.inspect(uri) }.getOrNull()
-            val verdict = inspection?.video?.let { ImportPolicy.video(it, decoderTable, lowEnd) } ?: VideoVerdict.Ok
+            val track = inspection?.video
+            var verdict = track?.let { ImportPolicy.video(it, decoderTable, lowEnd) } ?: VideoVerdict.Ok
+            // Declared limits can be wrong; if a decoder exists, believe an actual decoded frame.
+            if (verdict is VideoVerdict.Unsupported && track != null && decoderTable.video(track.mime).isNotEmpty() && DecodeProbe.decodesFirstFrame(context, uri)) {
+                verdict = ImportPolicy.video(track, decoderTable, lowEnd, decodeVerified = true)
+            }
             val audioOk = inspection?.audio?.let { ImportPolicy.audioSupported(it, decoderTable) } ?: true
             VideoInfo(
                 durationMs = duration,

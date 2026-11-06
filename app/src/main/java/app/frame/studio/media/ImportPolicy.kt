@@ -31,7 +31,12 @@ sealed interface VideoVerdict {
 object ImportPolicy {
     private const val LOW_END_BUDGET = 1920L * 1080L * 60L
 
-    fun video(track: VideoTrack, table: DecoderTable, lowEnd: Boolean): VideoVerdict {
+    /**
+     * [decodeVerified]: a real frame of this file was decoded on this phone. Declared decoder
+     * limits are conservative (a Snapdragon 685 declares 1920x1920 yet decodes 4K), so a verified
+     * decode turns "too large" into Heavy (imported, edited through a preview proxy).
+     */
+    fun video(track: VideoTrack, table: DecoderTable, lowEnd: Boolean, decodeVerified: Boolean = false): VideoVerdict {
         val decoders = table.video(track.mime)
         if (decoders.isEmpty()) {
             return VideoVerdict.Unsupported(
@@ -43,6 +48,7 @@ object ImportPolicy {
         val fps = if (track.fps > 0f) Math.round(track.fps) else 30
         val sizeOk = decoders.filter { it.supportsSize(w, h) || it.supportsSize(h, w) }
         if (sizeOk.isEmpty()) {
+            if (decodeVerified) return VideoVerdict.Heavy("This phone under-reports support for this video size.")
             val maxShort = decoders.maxOf { minOf(it.maxWidth, it.maxHeight) }
             return VideoVerdict.Unsupported(
                 "This ${friendlySize(minOf(w, h))} video is too large for this phone " +

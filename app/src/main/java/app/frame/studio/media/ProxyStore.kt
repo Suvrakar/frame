@@ -134,7 +134,7 @@ class ProxyStore(
         try {
             val tmp = tmpFor(uri)
             val edited = EditedMediaItem.Builder(MediaItem.fromUri(Uri.parse(uri)))
-                .setEffects(Effects(emptyList(), listOf(Presentation.createForHeight(HEIGHT))))
+                .setEffects(Effects(emptyList(), listOf(Presentation.createForShortSide(SHORT_SIDE))))
                 .build()
             val transformer = Transformer.Builder(context)
                 .setVideoMimeType(MimeTypes.VIDEO_H264)
@@ -210,7 +210,7 @@ class ProxyStore(
 
     companion object {
         private const val TAG = "ProxyStore"
-        const val HEIGHT = 540
+        const val SHORT_SIDE = 540
         const val BITRATE = 3_000_000
         const val MAX_BYTES = 1_500_000_000L
 
