@@ -1,5 +1,6 @@
 package app.frame.studio.ui.magic
 
+import app.frame.studio.media.ImportMessages
 import app.frame.studio.ui.common.bounceClick
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -129,7 +130,13 @@ fun MagicMovieScreen(
             frameApp.pro.consumePass(ProFeature.MAGIC_MOVIE)
             job = scope.launch {
                 try {
-                    val project = frameApp.magicMovie.create(media.toList(), music, title, vibe, length, shape) { p -> progress = p }
+                    val skipped = mutableListOf<String>()
+                    val project = frameApp.magicMovie.create(media.toList(), music, title, vibe, length, shape, skipped) { p -> progress = p }
+                    ImportMessages.summary(skipped)?.let { msg ->
+                        // Show it before leaving; the snackbar belongs to this screen.
+                        scope.launch { snackbar.showSnackbar(msg) }
+                        kotlinx.coroutines.delay(2200)
+                    }
                     onCreated(project.id)
                 } catch (e: kotlinx.coroutines.CancellationException) {
                     throw e

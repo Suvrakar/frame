@@ -1,5 +1,6 @@
 package app.frame.studio.ui.templates
 
+import app.frame.studio.media.ImportMessages
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -87,8 +88,14 @@ fun TemplateDetailScreen(
         creating = true
         scope.launch {
             try {
-                val project = app.templateBuilder.create(template, values.toMap(), uris)
+                val skipped = mutableListOf<String>()
+                val project = app.templateBuilder.create(template, values.toMap(), uris, skipped)
                 if (template.pro) app.pro.consumePass(ProFeature.PREMIUM_TEMPLATES)
+                ImportMessages.summary(skipped)?.let { msg ->
+                    // Show it before leaving; the snackbar belongs to this screen.
+                    scope.launch { snackbar.showSnackbar(msg) }
+                    kotlinx.coroutines.delay(2200)
+                }
                 onCreated(project.id)
             } catch (e: Exception) {
                 snackbar.showSnackbar(e.message ?: "Couldn't create the video")

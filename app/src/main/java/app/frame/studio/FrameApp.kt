@@ -38,6 +38,8 @@ class FrameApp : Application() {
         private set
     lateinit var magicMovie: MagicMovieBuilder
         private set
+    lateinit var proxies: app.frame.studio.media.ProxyStore
+        private set
     val templatePreviews: TemplatePreviews by lazy { TemplatePreviews(this, device.isLowEnd) }
 
     /** Outlives screens; used for last-moment saves when an editor closes. */
@@ -66,6 +68,8 @@ class FrameApp : Application() {
         // Entitlement is cached locally; Play is re-checked in the background on every launch.
         magicMovie = MagicMovieBuilder(this, repository, mediaProbe, imageNormalizer, device)
         pro = ProStore(this).also { it.connect() }
+        proxies = app.frame.studio.media.ProxyStore(this, applicationScope)
+        CompositionFactory.proxyResolver = proxies::proxyFor
         CompositionFactory.maxOverlayLanes = if (device.isLowEnd) 1 else 2
         applicationScope.launch(kotlinx.coroutines.Dispatchers.IO) { CompositionFactory.blankFrameUri = blankFrame() }
         // Ads are initialized by AdsService once the user's consent status is known.

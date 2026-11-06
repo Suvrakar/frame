@@ -49,6 +49,8 @@ class MagicMovieBuilder(
         vibe: MagicVibe,
         length: MagicLength,
         aspect: CanvasAspect,
+        /** Filled with the reason for each video left out because this phone can't play it. */
+        skipped: MutableList<String> = mutableListOf(),
         onProgress: (Progress) -> Unit,
     ): Project {
         val total = uris.size + (if (musicUri != null) 1 else 0) + 1
@@ -57,7 +59,7 @@ class MagicMovieBuilder(
         uris.forEachIndexed { index, uri ->
             coroutineContext.ensureActive()
             onProgress(Progress(done, total, "Finding your best moments"))
-            analyze(uri, index)?.let { assets += it }
+            analyze(uri, index, skipped)?.let { assets += it }
             done++
         }
         require(assets.isNotEmpty()) { "Those files couldn't be opened" }
@@ -85,7 +87,7 @@ class MagicMovieBuilder(
         return project
     }
 
-    private suspend fun analyze(uri: Uri, index: Int): MagicAsset? {
+    private suspend fun analyze(uri: Uri, index: Int, skipped: MutableList<String>): MagicAsset? {
         probe.persistPermission(uri)
         return runCatching {
             if (probe.isImage(uri)) {
@@ -102,7 +104,7 @@ class MagicMovieBuilder(
                 )
             } else {
                 val info = probe.probeVideo(uri)?.takeIf { it.durationMs >= 500 } ?: return null
-                if (info.verdict is VideoVerdict.Unsupported) return null
+                (info.verdict as? VideoVerdict.Unsupported)?.let { skipped += it.message; return null }
                 // Sample a few moments; keep the sharpest, best-exposed one.
                 val candidates = listOf(0.2f, 0.45f, 0.7f).map { (info.durationMs * it).toLong() }
                 val scored = candidates.mapNotNull { at ->

@@ -24,8 +24,8 @@ class TemplateBuilder(
     private val device: DeviceProfile,
 ) {
 
-    suspend fun create(template: VideoTemplate, values: Map<TemplateField, String>, uris: List<Uri>): Project {
-        val media = uris.mapNotNull { uri -> probeSlot(uri) }
+    suspend fun create(template: VideoTemplate, values: Map<TemplateField, String>, uris: List<Uri>, skipped: MutableList<String> = mutableListOf()): Project {
+        val media = uris.mapNotNull { uri -> probeSlot(uri, skipped) }
         require(media.isNotEmpty()) { "Those files couldn't be opened" }
 
         // Cards are rendered at a resolution the device handles comfortably.
@@ -112,13 +112,15 @@ class TemplateBuilder(
         result
     }
 
-    private suspend fun probeSlot(uri: Uri): SlotMedia? {
+    private suspend fun probeSlot(uri: Uri, skipped: MutableList<String>): SlotMedia? {
         probe.persistPermission(uri)
         return if (probe.isImage(uri)) {
             val name = probe.probeImage(uri)?.displayName.orEmpty()
             normalizer.normalize(uri)?.let { SlotMedia(it.uri.toString(), true, 0, it.width, it.height, name) }
         } else {
-            probe.probeVideo(uri)?.takeIf { it.durationMs >= 100 && it.verdict !is VideoVerdict.Unsupported }?.let {
+            probe.probeVideo(uri)?.takeIf { it.durationMs >= 100 }?.also { info ->
+                (info.verdict as? VideoVerdict.Unsupported)?.let { skipped += it.message }
+            }?.takeIf { it.verdict !is VideoVerdict.Unsupported }?.let {
                 SlotMedia(
                     uri.toString(), false, it.durationMs, it.width, it.height, it.displayName,
                     needsProxy = it.verdict is VideoVerdict.Heavy, audioMuted = !it.audioSupported,

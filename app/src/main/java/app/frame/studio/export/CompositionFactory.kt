@@ -67,6 +67,17 @@ object CompositionFactory {
     @Volatile
     var maxOverlayLanes: Int = 2
 
+    /**
+     * Preview-only seam: maps a source to its smaller proxy (when one is ready). Export never
+     * consults it.
+     */
+    @Volatile
+    var proxyResolver: ((String) -> String?)? = null
+
+    /** The uri to read for a clip: the proxy in the preview of a heavy clip, otherwise the original. */
+    fun sourceFor(uri: String, needsProxy: Boolean, forExport: Boolean): String =
+        if (forExport || !needsProxy) uri else proxyResolver?.invoke(uri) ?: uri
+
     fun hasOverlays(project: Project): Boolean =
         blankFrameUri != null && OverlayLayout.clampTo(project.overlays, TimelineMath.totalVideoMs(project.videoClips)).isNotEmpty()
 
@@ -85,7 +96,7 @@ object CompositionFactory {
         val blank = blankFrameUri
         val lanes = if (blank == null) emptyList() else OverlayLayout.lanes(OverlayLayout.clampTo(project.overlays, totalMs), maxOverlayLanes)
         val sequences = mutableListOf<EditedMediaItemSequence>()
-        lanes.forEach { lane -> sequences += overlayLane(lane, totalMs, size, blank!!, project.exportFps) }
+        lanes.forEach { lane -> sequences += overlayLane(lane, totalMs, size, blank!!, project.exportFps, forExport) }
         sequences += videoSequence
 
         AudioLayout.byLane(AudioLayout.clampTo(project.audioClips, totalMs)).forEach { lane ->
@@ -125,7 +136,7 @@ object CompositionFactory {
     }
 
     /** One overlay lane: its clips, with transparent stills in the gaps, spanning [totalMs]. */
-    private fun overlayLane(lane: List<OverlayClip>, totalMs: Long, size: ExportPlan.Size, blank: String, fps: Int): EditedMediaItemSequence {
+    private fun overlayLane(lane: List<OverlayClip>, totalMs: Long, size: ExportPlan.Size, blank: String, fps: Int, forExport: Boolean): EditedMediaItemSequence {
         val items = mutableListOf<EditedMediaItem>()
         var cursor = 0L
         fun gap(ms: Long) {
@@ -135,14 +146,14 @@ object CompositionFactory {
         }
         lane.forEach { o ->
             gap(o.startMs - cursor)
-            items += overlayItem(o, size, fps)
+            items += overlayItem(o, size, fps, forExport)
             cursor = o.endMs()
         }
         gap(totalMs - cursor)
         return EditedMediaItemSequence.Builder(items).experimentalSetForceAudioTrack(true).build()
     }
 
-    private fun overlayItem(o: OverlayClip, canvas: ExportPlan.Size, fps: Int): EditedMediaItem {
+    private fun overlayItem(o: OverlayClip, canvas: ExportPlan.Size, fps: Int, forExport: Boolean): EditedMediaItem {
         val video = mutableListOf<Effect>()
         val audio = mutableListOf<AudioProcessor>()
         val color = Filters.transformFor(o.filterId, 1f, app.frame.studio.domain.ColorAdjust())
@@ -158,7 +169,7 @@ object CompositionFactory {
             val item = MediaItem.Builder().setUri(Uri.parse(o.sourceUri)).setImageDurationMs(o.durationMs()).build()
             EditedMediaItem.Builder(item).setDurationUs(o.durationMs() * 1000).setFrameRate(fps.coerceIn(24, 60))
         } else {
-            EditedMediaItem.Builder(clipped(o.sourceUri, o.trimStartMs, o.trimEndMs)).setDurationUs(o.sourceDurationMs.coerceAtLeast(1) * 1000)
+            EditedMediaItem.Builder(clipped(sourceFor(o.sourceUri, o.needsProxy, forExport), o.trimStartMs, o.trimEndMs)).setDurationUs(o.sourceDurationMs.coerceAtLeast(1) * 1000)
         }
         return builder
             .setRemoveAudio(o.isImage || o.volume <= 0f)
@@ -232,7 +243,7 @@ object CompositionFactory {
             if (clip.volume != 1f || clip.fadeInMs > 0 || clip.fadeOutMs > 0) {
                 audio += GainAudioProcessor(clip.volume, clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs())
             }
-            EditedMediaItem.Builder(clipped(clip.sourceUri, clip.trimStartMs, clip.trimEndMs))
+            EditedMediaItem.Builder(clipped(sourceFor(clip.sourceUri, clip.needsProxy, forExport), clip.trimStartMs, clip.trimEndMs))
                 .setDurationUs(clip.sourceDurationMs.coerceAtLeast(1) * 1000)
         }
 

@@ -239,6 +239,28 @@ private fun EditorContent(
         if (controller.hasPlayer && !compareOriginal) kotlinx.coroutines.delay(app.device.previewRebuildDelayMs)
         controller.setProject(shown)
     }
+    // Heavy videos get a small proxy for smooth preview; export always uses the originals.
+    val heavySources = remember(project.videoClips, project.overlays) {
+        (project.videoClips.filter { it.needsProxy && !it.isImage }.map { it.sourceUri } +
+            project.overlays.filter { it.needsProxy && !it.isImage }.map { it.sourceUri }).toSet()
+    }
+    LaunchedEffect(heavySources) {
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            heavySources.forEach { if (app.proxies.proxyFor(it) == null) app.proxies.request(it) }
+        }
+    }
+    val proxyVersion by app.proxies.readyVersion.collectAsStateWithLifecycle()
+    var shownProxyVersion by remember { androidx.compose.runtime.mutableIntStateOf(proxyVersion) }
+    val latestProject by androidx.compose.runtime.rememberUpdatedState(project)
+    LaunchedEffect(proxyVersion) {
+        if (proxyVersion != shownProxyVersion) {
+            shownProxyVersion = proxyVersion
+            if (heavySources.isNotEmpty()) controller.setProject(latestProject, force = true)
+        }
+    }
+    val proxyPending by app.proxies.pending.collectAsStateWithLifecycle()
+    val preparingPreview = heavySources.any { it in proxyPending }
+
     // Follow the playhead every frame only while playing. When paused, just mirror seeks and
     // scrubs: an unconditional per-frame loop kept the editor drawing nonstop (CPU, GPU, battery).
     LaunchedEffect(controller) {
@@ -385,6 +407,20 @@ private fun EditorContent(
                     EmptyPreview(onAdd = ::launchMediaPicker)
                 } else {
                     PreviewArea(controller, project, selection, onTransform = vm::transformSelected)
+                }
+                if (preparingPreview) {
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = Color.Black.copy(alpha = 0.6f),
+                        contentColor = Color.White,
+                        modifier = Modifier.align(Alignment.TopCenter).padding(top = 12.dp),
+                    ) {
+                        Text(
+                            "Preparing smooth preview\u2026",
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        )
+                    }
                 }
             }
 
