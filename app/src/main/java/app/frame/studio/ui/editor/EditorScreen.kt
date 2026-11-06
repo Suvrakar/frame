@@ -204,6 +204,21 @@ private fun EditorContent(
 
     // ---- Preview ----------------------------------------------------------------------------
     val controller = remember { PreviewController(context.applicationContext, app.device.previewHeight) }
+    // Selecting text or an overlay that isn't on screen at the playhead moves the playhead into it,
+    // so the item shows on the preview and can be dragged, pinched and rotated straight away.
+    LaunchedEffect(selection) {
+        val p = project ?: return@LaunchedEffect
+        val range = when (val s = selection) {
+            is Selection.Overlay -> p.overlays.firstOrNull { it.id == s.id }?.let { it.startMs to it.endMs() }
+            is Selection.Text -> p.textOverlays.firstOrNull { it.id == s.id }?.let { it.startMs to it.endMs }
+            else -> null
+        } ?: return@LaunchedEffect
+        val (start, end) = range
+        val playhead = controller.positionMs
+        if (end > start && (playhead < start || playhead >= end)) {
+            controller.seekTo(minOf(start + EditorViewModel.REVEAL_AFTER_ADD_MS, start + (end - start) / 2))
+        }
+    }
     DisposableEffect(controller) {
         onDispose {
             controller.release()

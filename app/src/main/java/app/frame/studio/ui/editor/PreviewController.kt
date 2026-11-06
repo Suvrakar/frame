@@ -135,8 +135,20 @@ class PreviewController(
         }
     }
 
+    /**
+     * Runs [block] on the player thread. A failure there must never take the app down: it is
+     * logged and shown as a preview error instead (the editor and the user's work stay intact).
+     */
     private fun onPlayer(block: () -> Unit) {
-        if (!released) playerHandler.post(block)
+        if (released) return
+        playerHandler.post {
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.w(TAG, "Preview player call failed", e)
+                main.post { error = "Preview error: ${e.javaClass.simpleName}" }
+            }
+        }
     }
 
     /** Rebuilds the preview when anything that affects rendering changed. */
@@ -221,8 +233,13 @@ class PreviewController(
 
     fun attachSurface(newSurface: Surface, width: Int, height: Int) {
         onPlayer {
+            val resized = newSurface === surface && surfaceSize != Size(width, height)
             surface = newSurface
             surfaceSize = Size(width, height)
+            // The player ignores a new size for the same Surface object and keeps rendering at the
+            // old one; the system then rejects every frame (wrong buffer size) and the preview
+            // freezes, drawn small in a corner. Re-attach so the new size is taken.
+            if (resized) player?.clearVideoSurface(newSurface)
             player?.setVideoSurface(newSurface, Size(width, height))
             // Redraw the current frame at the new size when paused.
             player?.let { if (!it.isPlaying) it.seekTo(it.currentPosition) }
@@ -348,6 +365,13 @@ class PreviewController(
         positionMs = target
         publishedPositionMs = target
         ended = false
+        val project = lastProject
+        if (layered && !isPlaying && project != null) {
+            // A paused layered (overlay) player doesn't redraw after a seek: the old frame stays
+            // and the overlay/text at the new time never appear. Rebuild at the target instead.
+            setProject(project, force = true)
+            return
+        }
         onPlayer { player?.seekTo(target) }
     }
 
