@@ -1,6 +1,9 @@
 package app.frame.studio.export
 
 import android.graphics.Bitmap
+import android.media.MediaCodec
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Handler
@@ -162,5 +165,93 @@ class OverlayDeviceTest {
         read.await(10, TimeUnit.SECONDS)
         assertNull("layered preview failed: ${err?.errorCodeName} ${err?.cause}", err)
         assertTrue("layered preview did not advance (${position.get()} ms)", position.get() > 500)
+    }
+
+    /** The overlay's own sound is mixed in at its place on the timeline (main video muted). */
+    @Test
+    fun overlaySoundIsMixedAtItsTime() {
+        val main = sample("sample.mp4")
+        val p = Project(
+            id = "ovs", name = "Overlay sound", createdAtEpochMs = 0,
+            videoClips = listOf(VideoClip(id = "m", sourceUri = main, sourceDurationMs = 4_000, trimEndMs = 4_000, width = 1280, height = 720, volume = 0f)),
+            overlays = listOf(
+                OverlayClip(
+                    id = "red", sourceUri = redPhoto(), sourceDurationMs = VideoClip.MAX_IMAGE_MS, trimEndMs = 3_000, startMs = 0,
+                    width = 400, height = 400, isImage = true, scale = 0.3f,
+                ),
+                OverlayClip(
+                    id = "pip", sourceUri = sample("sample.mp4"), sourceDurationMs = 4_000, trimEndMs = 2_000, startMs = 1_000,
+                    width = 1280, height = 720, x = 0.75f, y = 0.25f, scale = 0.35f,
+                ),
+            ),
+            aspect = CanvasAspect.R16_9,
+            exportHeight = ExportHeight.SD_480,
+        )
+        val output = File(context.cacheDir, "overlay_sound.mp4").apply { delete() }
+        val done = CountDownLatch(1)
+        var error: ExportException? = null
+        Handler(Looper.getMainLooper()).post {
+            val listener = object : Transformer.Listener {
+                override fun onCompleted(composition: Composition, exportResult: ExportResult) = done.countDown()
+                override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
+                    error = exportException
+                    done.countDown()
+                }
+            }
+            ExportManager.newTransformer(context, frameApp.device, p, listener).start(CompositionFactory.build(p), output.absolutePath)
+        }
+        assertTrue("export timed out", done.await(5, TimeUnit.MINUTES))
+        assertNull("export failed: ${error?.errorCodeName} ${error?.cause}", error)
+        try {
+            val quiet = rms(output, 100_000, 800_000)
+            val loud = rms(output, 1_300_000, 2_700_000)
+            android.util.Log.i("OverlaySound", "rms outside=$quiet inside=$loud")
+            assertTrue("overlay sound missing (rms $loud)", loud > 500)
+            assertTrue("sound before the overlay starts (rms $quiet, muted main)", quiet < loud / 10)
+        } finally {
+            output.delete()
+        }
+    }
+
+    /** RMS of 16-bit PCM decoded from [file]'s audio between [fromUs] and [toUs]. */
+    private fun rms(file: File, fromUs: Long, toUs: Long): Double {
+        val ex = MediaExtractor().apply { setDataSource(file.absolutePath) }
+        val track = (0 until ex.trackCount).first { ex.getTrackFormat(it).getString(MediaFormat.KEY_MIME)!!.startsWith("audio/") }
+        ex.selectTrack(track)
+        val format = ex.getTrackFormat(track)
+        val codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
+        var sum = 0.0
+        var n = 0L
+        try {
+            codec.configure(format, null, null, 0)
+            codec.start()
+            val info = MediaCodec.BufferInfo()
+            var inDone = false
+            while (true) {
+                if (!inDone) {
+                    val i = codec.dequeueInputBuffer(10_000)
+                    if (i >= 0) {
+                        val size = ex.readSampleData(codec.getInputBuffer(i)!!, 0)
+                        if (size < 0) {
+                            codec.queueInputBuffer(i, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM); inDone = true
+                        } else {
+                            codec.queueInputBuffer(i, 0, size, ex.sampleTime, 0); ex.advance()
+                        }
+                    }
+                }
+                val o = codec.dequeueOutputBuffer(info, 10_000)
+                if (o >= 0) {
+                    if (info.presentationTimeUs in fromUs..toUs && info.size > 0) {
+                        val pcm = codec.getOutputBuffer(o)!!.order(java.nio.ByteOrder.nativeOrder()).asShortBuffer()
+                        while (pcm.hasRemaining()) { val s = pcm.get().toDouble(); sum += s * s; n++ }
+                    }
+                    codec.releaseOutputBuffer(o, false)
+                    if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) break
+                }
+            }
+        } finally {
+            codec.release(); ex.release()
+        }
+        return if (n == 0L) 0.0 else kotlin.math.sqrt(sum / n)
     }
 }

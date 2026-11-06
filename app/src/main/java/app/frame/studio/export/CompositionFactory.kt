@@ -98,6 +98,11 @@ object CompositionFactory {
         val sequences = mutableListOf<EditedMediaItemSequence>()
         lanes.forEach { lane -> sequences += overlayLane(lane, totalMs, size, blank!!, project.exportFps, forExport) }
         sequences += videoSequence
+        // Overlay sound plays from its own audio-only sequences, after the main video. Overlay lanes
+        // are picture-only so the main video is always the audio "primary" sequence: Media3 1.8
+        // crashes (SequenceAssetLoader.onOutputFormat checkStateNotNull) when a forced-audio overlay
+        // lane asks for the audio mixer before the lane that owns it has created it.
+        lanes.forEach { lane -> overlayAudioLane(lane, forExport)?.let { sequences += it } }
 
         AudioLayout.byLane(AudioLayout.clampTo(project.audioClips, totalMs)).forEach { lane ->
             if (lane.isEmpty()) return@forEach
@@ -150,12 +155,33 @@ object CompositionFactory {
             cursor = o.endMs()
         }
         gap(totalMs - cursor)
-        return EditedMediaItemSequence.Builder(items).experimentalSetForceAudioTrack(true).build()
+        return EditedMediaItemSequence.Builder(items).build()
+    }
+
+    /** The audible video overlays of one lane, at their timeline positions; null when silent. */
+    private fun overlayAudioLane(lane: List<OverlayClip>, forExport: Boolean): EditedMediaItemSequence? {
+        val audible = lane.filter { !it.isImage && it.volume > 0f }
+        if (audible.isEmpty()) return null
+        val builder = EditedMediaItemSequence.Builder()
+        var cursorMs = 0L
+        audible.forEach { o ->
+            val gap = o.startMs - cursorMs
+            if (gap > 0) builder.addGap(gap * 1000)
+            val audio = if (o.volume != 1f) listOf<AudioProcessor>(GainAudioProcessor(o.volume, 0, 0, o.durationMs())) else emptyList()
+            builder.addItem(
+                EditedMediaItem.Builder(clipped(sourceFor(o.sourceUri, o.needsProxy, forExport), o.trimStartMs, o.trimEndMs))
+                    .setDurationUs(o.sourceDurationMs.coerceAtLeast(1) * 1000)
+                    .setRemoveVideo(true)
+                    .setEffects(Effects(audio, emptyList()))
+                    .build(),
+            )
+            cursorMs = o.startMs + o.durationMs()
+        }
+        return builder.experimentalSetForceAudioTrack(true).build()
     }
 
     private fun overlayItem(o: OverlayClip, canvas: ExportPlan.Size, fps: Int, forExport: Boolean): EditedMediaItem {
         val video = mutableListOf<Effect>()
-        val audio = mutableListOf<AudioProcessor>()
         val color = Filters.transformFor(o.filterId, 1f, app.frame.studio.domain.ColorAdjust())
         if (!color.isIdentity) {
             val matrix = color.toGl()
@@ -164,7 +190,6 @@ object CompositionFactory {
         // Scale 1 = the overlay fits the frame; the compositor scales it down from there.
         val fit = OverlayGeometry.fitSize(o.width, o.height, canvas.width, canvas.height)
         video += Presentation.createForWidthAndHeight(fit.first, fit.second, Presentation.LAYOUT_SCALE_TO_FIT)
-        if (o.volume != 1f) audio += GainAudioProcessor(o.volume, 0, 0, o.durationMs())
         val builder = if (o.isImage) {
             val item = MediaItem.Builder().setUri(Uri.parse(o.sourceUri)).setImageDurationMs(o.durationMs()).build()
             EditedMediaItem.Builder(item).setDurationUs(o.durationMs() * 1000).setFrameRate(fps.coerceIn(24, 60))
@@ -172,8 +197,8 @@ object CompositionFactory {
             EditedMediaItem.Builder(clipped(sourceFor(o.sourceUri, o.needsProxy, forExport), o.trimStartMs, o.trimEndMs)).setDurationUs(o.sourceDurationMs.coerceAtLeast(1) * 1000)
         }
         return builder
-            .setRemoveAudio(o.isImage || o.volume <= 0f)
-            .setEffects(Effects(audio, video))
+            .setRemoveAudio(true) // sound comes from overlayAudioLane
+            .setEffects(Effects(emptyList(), video))
             .build()
     }
 
