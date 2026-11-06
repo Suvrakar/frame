@@ -11,7 +11,8 @@ it the app builds and runs normally and sends nothing. The file is git-ignored.
 4. Download `google-services.json` (it contains both apps) → put it at `app/google-services.json`.
 5. Console → **Crashlytics** → "Enable Crashlytics".
 
-The benchmark build (`app.frame.studio.bench`) never uses Firebase; don't register it.
+Any build type whose package is not in the file (the benchmark build `app.frame.studio.bench`,
+or debug until `app.frame.studio.debug` is registered) builds without Firebase and sends nothing.
 
 ## What is sent
 

@@ -13,12 +13,12 @@ val firebaseConfigured = file("google-services.json").exists()
 if (firebaseConfigured) {
     apply(plugin = "com.google.gms.google-services")
     apply(plugin = "com.google.firebase.crashlytics")
-    // The benchmark build (app.frame.studio.bench) is for speed tests only: no Firebase there,
-    // so its package doesn't need registering.
-    tasks.configureEach {
-        if (name.contains("Benchmark") && (name.contains("GoogleServices") || name.contains("Crashlytics"))) enabled = false
-    }
 }
+// Packages registered in google-services.json. A build type whose package isn't there (e.g. the
+// .bench speed-test build) builds without Firebase instead of failing, and sends nothing.
+val firebasePackages: Set<String> = if (!firebaseConfigured) emptySet() else
+    Regex("\"package_name\"\\s*:\\s*\"([^\"]+)\"").findAll(file("google-services.json").readText())
+        .map { it.groupValues[1] }.toSet()
 // Debug builds send nothing unless asked: ./gradlew installDebug -Pframe.telemetryInDebug=true
 val telemetryInDebug = (findProperty("frame.telemetryInDebug") as String?) == "true"
 
@@ -137,6 +137,19 @@ android {
 
     testOptions {
         unitTests.isReturnDefaultValues = true
+    }
+}
+
+if (firebaseConfigured) {
+    tasks.configureEach {
+        if (!name.contains("GoogleServices") && !name.contains("Crashlytics")) return@configureEach
+        val buildType = android.buildTypes.firstOrNull { name.contains(it.name.replaceFirstChar(Char::uppercase)) }
+            ?: return@configureEach
+        val pkg = android.defaultConfig.applicationId + (buildType.applicationIdSuffix ?: "")
+        if (pkg !in firebasePackages) {
+            logger.info("Firebase off for ${buildType.name}: $pkg is not in google-services.json")
+            enabled = false
+        }
     }
 }
 
