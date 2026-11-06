@@ -107,10 +107,10 @@ class ExportManager(
                 if (attempt < MAX_RETRIES && isTransient(project, exportException)) {
                     // Media3's multi-input compositor has a rare timing race with overlays; a fresh
                     // run almost always succeeds, so retry once before showing an error.
-                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                         // Skip the retry if the user cancelled in the meantime.
                         if (_state.value is ExportState.Running) runExport(project, saveToGallery, attempt + 1)
-                    }
+                    }, RETRY_DELAY_MS) // let the failed pipeline finish releasing first
                     return
                 }
                 _state.value = ExportState.Failed(project.id, describe(exportException))
@@ -197,7 +197,9 @@ class ExportManager(
     }
 
     companion object {
-        private const val MAX_RETRIES = 1
+        private const val MAX_RETRIES = 2
+        /** A retry started immediately collided with the failed export's teardown. */
+        private const val RETRY_DELAY_MS = 750L
         private const val TAG = "ExportManager"
 
         /**
