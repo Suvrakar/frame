@@ -115,7 +115,7 @@ fun FilterBrowser(
                     if (sections.isEmpty()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             Text(
-                                if (tab == 1 && query.isBlank()) "Tap ☆ on a filter to keep it here." else "No filters match \"$query\".",
+                                if (tab == 1 && query.isBlank()) "Tap the star on a filter to keep it here." else "No filters match \"$query\".",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(vertical = 32.dp),
                             )

@@ -13,7 +13,6 @@ import app.frame.studio.timeline.BeatSync
 /** The look and pacing of a Magic Movie. */
 enum class MagicVibe(
     val label: String,
-    val emoji: String,
     val filterId: String,
     val transition: TransitionType,
     val transitionMs: Long,
@@ -28,11 +27,11 @@ enum class MagicVibe(
     /** True: the effect runs through the whole movie; false: only over the title. */
     val effectWholeMovie: Boolean,
 ) {
-    UPBEAT("Upbeat", "⚡", "punch", TransitionType.FADE_WHITE, 160, 2, 4, 480, SceneEffectType.SPARKLE, 0.7f, false),
-    CHILL("Chill", "🌿", "pastel", TransitionType.FADE_BLACK, 500, 4, 8, 600, SceneEffectType.BOKEH, 0.35f, true),
-    CINEMATIC("Cinematic", "🎬", "teal", TransitionType.FADE_BLACK, 600, 4, 8, 650, SceneEffectType.LIGHT_LEAK, 0.6f, false),
-    PARTY("Party", "🎉", "vivid", TransitionType.FADE_WHITE, 200, 2, 4, 460, SceneEffectType.CONFETTI, 0.8f, false),
-    MEMORIES("Memories", "📼", "faded_film", TransitionType.FADE_BLACK, 500, 4, 8, 620, SceneEffectType.OLD_FILM, 0.45f, true),
+    UPBEAT("Upbeat", "punch", TransitionType.FADE_WHITE, 160, 2, 4, 480, SceneEffectType.SPARKLE, 0.7f, false),
+    CHILL("Chill", "pastel", TransitionType.FADE_BLACK, 500, 4, 8, 600, SceneEffectType.BOKEH, 0.35f, true),
+    CINEMATIC("Cinematic", "teal", TransitionType.FADE_BLACK, 600, 4, 8, 650, SceneEffectType.LIGHT_LEAK, 0.6f, false),
+    PARTY("Party", "vivid", TransitionType.FADE_WHITE, 200, 2, 4, 460, SceneEffectType.CONFETTI, 0.8f, false),
+    MEMORIES("Memories", "faded_film", TransitionType.FADE_BLACK, 500, 4, 8, 620, SceneEffectType.OLD_FILM, 0.45f, true),
 }
 
 enum class MagicLength(val label: String, val targetMs: Long?) {

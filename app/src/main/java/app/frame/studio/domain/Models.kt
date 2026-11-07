@@ -268,19 +268,19 @@ enum class EffectGroup(val label: String) { WEATHER("Weather"), PARTY("Party"), 
 
 /** Animated, procedurally drawn scene effects (rendered by a GPU shader, no assets). */
 @Serializable
-enum class SceneEffectType(val label: String, val emoji: String, val group: EffectGroup) {
-    RAIN("Rain", "🌧️", EffectGroup.WEATHER),
-    SNOW("Snow", "❄️", EffectGroup.WEATHER),
-    FOG("Fog", "🌫️", EffectGroup.WEATHER),
-    CONFETTI("Confetti", "🎊", EffectGroup.PARTY),
-    SPARKLE("Sparkle", "✨", EffectGroup.PARTY),
-    HEARTS("Hearts", "💗", EffectGroup.PARTY),
-    BOKEH("Bokeh", "🔆", EffectGroup.PARTY),
-    LIGHT_LEAK("Light leak", "🌅", EffectGroup.FILM),
-    OLD_FILM("Old film", "🎞️", EffectGroup.FILM),
-    GLITCH("Glitch", "📺", EffectGroup.FILM),
-    SHAKE("Shake", "📳", EffectGroup.MOTION),
-    PULSE("Beat pulse", "💓", EffectGroup.MOTION),
+enum class SceneEffectType(val label: String, val group: EffectGroup) {
+    RAIN("Rain", EffectGroup.WEATHER),
+    SNOW("Snow", EffectGroup.WEATHER),
+    FOG("Fog", EffectGroup.WEATHER),
+    CONFETTI("Confetti", EffectGroup.PARTY),
+    SPARKLE("Sparkle", EffectGroup.PARTY),
+    HEARTS("Hearts", EffectGroup.PARTY),
+    BOKEH("Bokeh", EffectGroup.PARTY),
+    LIGHT_LEAK("Light leak", EffectGroup.FILM),
+    OLD_FILM("Old film", EffectGroup.FILM),
+    GLITCH("Glitch", EffectGroup.FILM),
+    SHAKE("Shake", EffectGroup.MOTION),
+    PULSE("Beat pulse", EffectGroup.MOTION),
 }
 
 /** A scene effect placed on the timeline. */

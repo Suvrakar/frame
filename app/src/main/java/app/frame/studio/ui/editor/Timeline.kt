@@ -1,5 +1,6 @@
 package app.frame.studio.ui.editor
 
+import app.frame.studio.ui.common.icon
 import androidx.compose.material.icons.filled.PictureInPicture
 import app.frame.studio.domain.OverlayClip
 import androidx.compose.foundation.Canvas
@@ -393,8 +394,8 @@ fun Timeline(
                             effects.filter { effectLanes[it.id] == lane }.forEach { e ->
                                 val selected = selection is Selection.Effect && selection.id == e.id
                                 LaneItem(
-                                    label = "${e.type.emoji} ${e.type.label}",
-                                    icon = null,
+                                    label = e.type.label,
+                                    icon = e.type.icon,
                                     color = TrackColors.effect,
                                     width = dp((e.endMs - e.startMs).toFloat()),
                                     selected = selected,

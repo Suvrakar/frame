@@ -2,6 +2,7 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.ui.common.icon
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -446,7 +447,8 @@ fun BeatSyncPanel(clip: AudioClip, detecting: Boolean, onDetect: () -> Unit, onS
             }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("♩ ${clip.bpm.roundToInt()} BPM", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                Icon(Icons.Filled.MusicNote, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Text(" ${clip.bpm.roundToInt()} BPM", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                 Text(
                     "  ·  ${clip.beatsMs.size} beats",
                     style = MaterialTheme.typography.bodyMedium,
@@ -486,7 +488,7 @@ private fun EffectTile(type: SceneEffectType, selected: Boolean, onClick: () -> 
                 .then(if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp)) else Modifier),
             contentAlignment = Alignment.Center,
         ) {
-            Text(type.emoji, fontSize = 26.sp)
+            Icon(type.icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
         }
         Text(
             type.label,

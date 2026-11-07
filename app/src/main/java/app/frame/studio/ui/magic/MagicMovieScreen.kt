@@ -1,5 +1,6 @@
 package app.frame.studio.ui.magic
 
+import app.frame.studio.ui.common.icon
 import app.frame.studio.telemetry.AppEvents
 import app.frame.studio.telemetry.Telemetry
 import app.frame.studio.media.ImportMessages
@@ -407,7 +408,12 @@ private fun VibeChip(vibe: MagicVibe, selected: Boolean, enabled: Boolean, onCli
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(vibe.emoji, style = MaterialTheme.typography.headlineSmall)
+        Icon(
+            vibe.icon,
+            contentDescription = null,
+            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(26.dp),
+        )
         Text(
             vibe.label,
             style = MaterialTheme.typography.labelMedium,
