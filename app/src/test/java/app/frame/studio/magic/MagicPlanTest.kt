@@ -93,6 +93,40 @@ class MagicPlanTest {
     }
 
     @Test
+    fun onePhotoWithAShortSongFillsTheSong() {
+        // Reported: 30 s chosen, one photo, a 20 s song -> the movie was ~1 s long.
+        val music = MagicMusic("m", 20_000, "song", (0 until 40).map { it * 500L }, 120f)
+        val p = MagicPlan.build(listOf(photo(0)), MagicVibe.UPBEAT, MagicLength.MEDIUM, "Hi", null, music, CanvasAspect.R9_16, "pid", 0L, ::id)
+        val total = p.videoClips.sumOf { it.outputDurationMs() }
+        assertTrue("movie should follow the 20 s song, was $total ms", total in 19_000..20_000)
+        assertEquals(total, p.audioClips.single().outputDurationMs())
+    }
+
+    @Test
+    fun onePhotoWithALongSongStopsAtTheChosenLength() {
+        val music = MagicMusic("m", 120_000, "song", (0 until 240).map { it * 500L }, 120f)
+        val p = MagicPlan.build(listOf(photo(0)), MagicVibe.CHILL, MagicLength.MEDIUM, "", null, music, CanvasAspect.R9_16, "pid", 0L, ::id)
+        val total = p.videoClips.sumOf { it.outputDurationMs() }
+        assertTrue("30 s chosen, was $total ms", total in 29_000..30_500)
+    }
+
+    @Test
+    fun fewPhotosWithoutMusicFillTheChosenLength() {
+        val p = MagicPlan.build(listOf(photo(0), photo(1)), MagicVibe.UPBEAT, MagicLength.SHORT, "", null, null, CanvasAspect.R9_16, "pid", 0L, ::id)
+        assertEquals(15_000L, p.videoClips.sumOf { it.outputDurationMs() })
+        // Shared evenly.
+        assertEquals(p.videoClips[0].outputDurationMs(), p.videoClips[1].outputDurationMs())
+    }
+
+    @Test
+    fun shortVideosNeverStretchPastTheirOwnLength() {
+        val p = MagicPlan.build(listOf(video(0, durationMs = 3_000), photo(1)), MagicVibe.UPBEAT, MagicLength.SHORT, "", null, null, CanvasAspect.R9_16, "pid", 0L, ::id)
+        val v = p.videoClips.first { !it.isImage }
+        assertTrue(v.trimEndMs <= 3_000 && v.trimStartMs >= 0)
+        assertEquals(15_000L, p.videoClips.sumOf { it.outputDurationMs() })
+    }
+
+    @Test
     fun dateSpanFormats() {
         val months = listOf("Jan", "Feb", "Mar")
         fun my(ms: Long) = "${months[(ms % 100).toInt()]} ${ms / 100}"

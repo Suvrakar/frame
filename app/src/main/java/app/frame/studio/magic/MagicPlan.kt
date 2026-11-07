@@ -134,6 +134,39 @@ object MagicPlan {
         return chronological(chosen)
     }
 
+    /**
+     * Lengthens shots evenly until they total [fillMs]: videos only up to their own length (kept
+     * centred on their best moment), photos up to the photo limit. Never shortens anything.
+     */
+    fun fillTo(clips: List<VideoClip>, fillMs: Long): List<VideoClip> {
+        var out = clips
+        repeat(6) {
+            val missing = fillMs - out.sumOf { it.outputDurationMs() }
+            if (missing <= 0) return out
+            val growable = out.indices.filter { room(out[it]) > 0 }
+            if (growable.isEmpty()) return out
+            val share = missing / growable.size
+            val extraFirst = missing - share * growable.size
+            out = out.mapIndexed { i, c ->
+                if (i !in growable) return@mapIndexed c
+                val add = minOf(room(c), share + if (i == growable.first()) extraFirst else 0)
+                if (add <= 0) c else lengthen(c, add)
+            }
+        }
+        return out
+    }
+
+    private fun room(c: VideoClip): Long =
+        if (c.isImage) VideoClip.MAX_IMAGE_MS - c.outputDurationMs() else c.sourceDurationMs - c.outputDurationMs()
+
+    private fun lengthen(c: VideoClip, addMs: Long): VideoClip {
+        val length = c.outputDurationMs() + addMs
+        if (c.isImage) return c.copy(trimStartMs = 0, trimEndMs = length)
+        val middle = (c.trimStartMs + c.trimEndMs) / 2
+        val start = (middle - length / 2).coerceIn(0, (c.sourceDurationMs - length).coerceAtLeast(0))
+        return c.copy(trimStartMs = start, trimEndMs = (start + length).coerceAtMost(c.sourceDurationMs))
+    }
+
     fun build(
         assets: List<MagicAsset>,
         vibe: MagicVibe,
@@ -177,6 +210,10 @@ object MagicPlan {
             )
         }
 
+        // Too few shots for the chosen length (e.g. one photo and a song): stretch them to fill it,
+        // stopping at the song's end so the movie never runs on in silence.
+        length.targetMs?.let { target -> clips = fillTo(clips, minOf(target, music?.durationMs ?: target)) }
+
         val audio = mutableListOf<AudioClip>()
         if (music != null) {
             val total = clips.sumOf { it.outputDurationMs() }
@@ -187,7 +224,20 @@ object MagicPlan {
             )
             // Land every cut on a beat.
             val every = vibe.beatsPerPhoto.coerceAtLeast(1)
+            val filledMs = clips.sumOf { it.outputDurationMs() }
             clips = BeatSync.retime(clips, BeatSync.cutPoints(BeatSync.timelineBeats(track), every))
+            // The movie's end isn't a cut: give the last shot back whatever beat-snapping took.
+            val short = filledMs - clips.sumOf { it.outputDurationMs() }
+            if (short > 0) clips = clips.dropLast(1) + lengthen(clips.last(), minOf(short, room(clips.last())))
+            // ...and never run past the song.
+            val over = clips.sumOf { it.outputDurationMs() } - music.durationMs
+            if (over > 0) {
+                val last = clips.last()
+                val keep = (last.outputDurationMs() - over).coerceAtLeast(MIN_SHOT_MS)
+                clips = clips.dropLast(1) + last.copy(trimEndMs = last.trimStartMs + keep).let { c ->
+                    c.copy(fadeOutMs = c.fadeOutMs.coerceAtMost(keep / 2), fadeInMs = c.fadeInMs.coerceAtMost(keep / 2))
+                }
+            }
             val retimedTotal = clips.sumOf { it.outputDurationMs() }
             audio += track.copy(trimEndMs = minOf(music.durationMs, retimedTotal))
         }
