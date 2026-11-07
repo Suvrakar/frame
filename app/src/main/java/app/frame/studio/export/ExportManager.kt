@@ -247,7 +247,7 @@ class ExportManager(
          * only a few at once) another one is tried instead of failing. Emulator-only "goldfish"
          * decoders, which stall on long timelines, are tried last.
          */
-        private fun robustDecoderFactory(context: Context) = DefaultDecoderFactory.Builder(context)
+        internal fun robustDecoderFactory(context: Context) = DefaultDecoderFactory.Builder(context)
             .setEnableDecoderFallback(true)
             .setMediaCodecSelector { mimeType, secure, tunneling ->
                 MediaCodecUtil.getDecoderInfos(mimeType, secure, tunneling)

@@ -1,5 +1,7 @@
 package app.frame.studio.ui.export
 
+import app.frame.studio.ui.common.ShareSheet
+import app.frame.studio.domain.ExportRecord
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.BackHandler
@@ -95,6 +97,8 @@ fun ExportScreen(
     onOpenExports: () -> Unit,
 ) {
     val context = LocalContext.current
+    var sharing by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<ExportRecord?>(null) }
+    sharing?.let { r -> ShareSheet(r, onDismiss = { sharing = null }) }
     val projects by app.repository.projects.collectAsStateWithLifecycle()
     val project = projects.firstOrNull { it.id == projectId }
     val state by app.exportManager.state.collectAsStateWithLifecycle()
@@ -234,7 +238,7 @@ fun ExportScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                 )
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    Button(onClick = { shareExport(context, s.record) }, modifier = Modifier.weight(1f).height(52.dp)) {
+                                    Button(onClick = { sharing = s.record }, modifier = Modifier.weight(1f).height(52.dp)) {
                                         Icon(Icons.Filled.Share, contentDescription = null)
                                         Spacer(Modifier.width(8.dp))
                                         Text("Share")

@@ -1,5 +1,6 @@
 package app.frame.studio.ui.exports
 
+import app.frame.studio.ui.common.ShareSheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +55,8 @@ import kotlinx.coroutines.launch
 fun ExportsScreen(app: FrameApp, onBack: (() -> Unit)?) {
     val history by app.repository.history.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var sharing by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<ExportRecord?>(null) }
+    sharing?.let { r -> ShareSheet(r, onDismiss = { sharing = null }) }
     val scope = rememberCoroutineScope()
     var deleteTarget by remember { mutableStateOf<ExportRecord?>(null) }
 
@@ -109,7 +112,7 @@ fun ExportsScreen(app: FrameApp, onBack: (() -> Unit)?) {
                         IconButton(onClick = { playExport(context, record) }) {
                             Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
                         }
-                        IconButton(onClick = { shareExport(context, record) }) {
+                        IconButton(onClick = { sharing = record }) {
                             Icon(Icons.Filled.Share, contentDescription = "Share")
                         }
                         IconButton(onClick = { deleteTarget = record }) {
