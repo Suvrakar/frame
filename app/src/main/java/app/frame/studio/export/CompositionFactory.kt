@@ -87,7 +87,7 @@ object CompositionFactory {
 
     fun build(project: Project, forExport: Boolean = true): Composition {
         require(project.videoClips.isNotEmpty()) { "Add at least one clip" }
-        val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect)
+        val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect, project.customRatio)
 
         val videoSequence = EditedMediaItemSequence.Builder(project.videoClips.let { clips -> val starts = TimelineMath.videoStarts(clips); clips.mapIndexed { i, c -> videoItem(c, size, forExport, starts[i], project.canvasFill) } })
             // Clips without an audio track (and photos) still contribute silence so the mix stays in sync.

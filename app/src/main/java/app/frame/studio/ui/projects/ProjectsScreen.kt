@@ -1,5 +1,9 @@
 package app.frame.studio.ui.projects
 
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import app.frame.studio.domain.CanvasAspect
 import app.frame.studio.export.SocialPresets
 import app.frame.studio.domain.CanvasFill
 import app.frame.studio.telemetry.Telemetry
@@ -92,11 +96,11 @@ fun ProjectsScreen(
     onOpenTemplates: (TemplateCategory?) -> Unit,
     onOpenTemplate: (String) -> Unit,
     onOpenMagic: () -> Unit = {},
+    onSeeAllProjects: () -> Unit = {},
 ) {
     val projects by app.repository.projects.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    var renameTarget by remember { mutableStateOf<Project?>(null) }
-    var deleteTarget by remember { mutableStateOf<Project?>(null) }
+    val actions = remember { ProjectActions() }
 
     var choosingCanvas by remember { mutableStateOf(false) }
     fun newProject() {
@@ -106,16 +110,20 @@ fun ProjectsScreen(
         NewProjectSheet(
             lastChoiceKey = app.settings.lastCanvas,
             onDismiss = { choosingCanvas = false },
-        ) { choice ->
+        ) { choice, customRatio ->
             choosingCanvas = false
-            app.settings.lastCanvas = choice.key
+            val key = choice?.key ?: CUSTOM_KEY
+            app.settings.lastCanvas = key
             scope.launch {
                 val blank = app.repository.create("Project ${projects.size + 1}")
-                val shaped = (choice.preset?.let { SocialPresets.apply(blank, it, app.device::clampExportHeight) } ?: blank)
-                    .copy(canvasFill = CanvasFill.BLUR)
+                val shaped = when {
+                    customRatio != null -> blank.copy(aspect = CanvasAspect.CUSTOM, customRatio = customRatio)
+                    choice?.preset != null -> SocialPresets.apply(blank, choice.preset, app.device::clampExportHeight)
+                    else -> blank
+                }.copy(canvasFill = CanvasFill.BLUR)
                 app.repository.save(shaped)
                 AppEvents.projectCreated("blank")
-                Telemetry.event("canvas_chosen", "canvas" to choice.key)
+                Telemetry.event("canvas_chosen", "canvas" to key)
                 onNewProject(shaped.id)
             }
         }
@@ -153,47 +161,42 @@ fun ProjectsScreen(
             }
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
-            SectionHeader(if (projects.isEmpty()) "Your projects" else "Recent projects · ${projects.size}")
+            if (projects.isEmpty()) {
+                SectionHeader("Your projects")
+            } else {
+                SectionHeader(
+                    "Recent projects",
+                    action = if (projects.size > RECENT_ON_HOME) "See all · ${projects.size}" else "See all",
+                    onAction = onSeeAllProjects,
+                )
+            }
         }
         if (projects.isEmpty()) {
             item(span = { GridItemSpan(maxLineSpan) }) { EmptyProjects(onStart = ::newProject) }
-        }
-        items(projects, key = { it.id }) { project ->
-            ProjectCard(
-                app = app,
-                project = project,
-                onOpen = { onOpenProject(project.id) },
-                onRename = { renameTarget = project },
-                onDuplicate = { scope.launch { app.repository.duplicate(project.id) } },
-                onDelete = { deleteTarget = project },
-            )
+        } else {
+            // Home stays short: the newest few scroll sideways; everything else is under "See all".
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(vertical = 4.dp)) {
+                    rowItems(projects.take(RECENT_ON_HOME), key = { it.id }) { project ->
+                        ProjectCard(
+                            app = app,
+                            project = project,
+                            onOpen = { onOpenProject(project.id) },
+                            onRename = { actions.rename = project },
+                            onDuplicate = { scope.launch { app.repository.duplicate(project.id) } },
+                            onDelete = { actions.delete = project },
+                            modifier = Modifier.width(168.dp),
+                        )
+                    }
+                    if (projects.size > RECENT_ON_HOME) {
+                        item { SeeAllTile(projects.size - RECENT_ON_HOME, onSeeAllProjects) }
+                    }
+                }
+            }
         }
     }
 
-    renameTarget?.let { project ->
-        TextInputDialog(
-            title = "Rename project",
-            initial = project.name,
-            confirmLabel = "Rename",
-            onDismiss = { renameTarget = null },
-            onConfirm = { name ->
-                renameTarget = null
-                scope.launch { app.repository.save(project.copy(name = name)) }
-            },
-        )
-    }
-    deleteTarget?.let { project ->
-        ConfirmDialog(
-            title = "Delete \"${project.name}\"?",
-            message = "The project will be removed. Your original videos and finished exports are not affected.",
-            confirmLabel = "Delete",
-            onDismiss = { deleteTarget = null },
-            onConfirm = {
-                deleteTarget = null
-                scope.launch { app.repository.delete(project.id) }
-            },
-        )
-    }
+    ProjectActionDialogs(app, actions)
 }
 
 @Composable
@@ -342,10 +345,11 @@ private fun ProjectCard(
     onRename: () -> Unit,
     onDuplicate: () -> Unit,
     onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var menu by remember { mutableStateOf(false) }
     val first = project.videoClips.firstOrNull()
-    GlassCard(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), elevation = 6.dp, onClick = onOpen) {
+    GlassCard(modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), elevation = 6.dp, onClick = onOpen) {
         Box(Modifier.padding(6.dp).fillMaxWidth().aspectRatio(4f / 3f).clip(RoundedCornerShape(15.dp))) {
             VideoThumbnail(
                 probe = app.mediaProbe,
@@ -385,4 +389,136 @@ private fun ProjectCard(
             }
         }
     }
+}
+
+/** How many projects Home shows before "See all". */
+private const val RECENT_ON_HOME = 10
+
+/** Rename / delete prompts shared by Home and All projects. */
+class ProjectActions {
+    var rename by mutableStateOf<Project?>(null)
+    var delete by mutableStateOf<Project?>(null)
+}
+
+@Composable
+fun ProjectActionDialogs(app: FrameApp, actions: ProjectActions) {
+    val scope = rememberCoroutineScope()
+    actions.rename?.let { project ->
+        TextInputDialog(
+            title = "Rename project",
+            initial = project.name,
+            confirmLabel = "Rename",
+            onDismiss = { actions.rename = null },
+            onConfirm = { name ->
+                actions.rename = null
+                scope.launch { app.repository.save(project.copy(name = name)) }
+            },
+        )
+    }
+    actions.delete?.let { project ->
+        ConfirmDialog(
+            title = "Delete \"${project.name}\"?",
+            message = "The project will be removed. Your original videos and finished exports are not affected.",
+            confirmLabel = "Delete",
+            onDismiss = { actions.delete = null },
+            onConfirm = {
+                actions.delete = null
+                scope.launch { app.repository.delete(project.id) }
+            },
+        )
+    }
+}
+
+/** The last tile of the Recent row: how many more, and a way to see them. */
+@Composable
+private fun SeeAllTile(more: Int, onClick: () -> Unit) {
+    GlassCard(Modifier.width(120.dp), shape = RoundedCornerShape(20.dp), elevation = 6.dp, onClick = onClick) {
+        Column(
+            Modifier.fillMaxWidth().padding(vertical = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Text("+$more more", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 8.dp))
+            Text("See all", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+private enum class ProjectSort(val label: String) { RECENT("Recent"), NAME("A–Z") }
+
+/** Every project: search, sort, and the same card menu as Home. */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+fun AllProjectsScreen(app: FrameApp, onBack: () -> Unit, onOpenProject: (String) -> Unit) {
+    val projects by app.repository.projects.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    val actions = remember { ProjectActions() }
+    var query by remember { mutableStateOf("") }
+    var sort by remember { mutableStateOf(ProjectSort.RECENT) }
+    val shown = remember(projects, query, sort) {
+        val q = query.trim()
+        projects.filter { q.isEmpty() || it.name.contains(q, ignoreCase = true) }
+            .let { list -> if (sort == ProjectSort.NAME) list.sortedBy { it.name.lowercase() } else list }
+    }
+    androidx.compose.material3.Scaffold(
+        containerColor = androidx.compose.ui.graphics.Color.Transparent,
+        topBar = {
+            androidx.compose.material3.TopAppBar(
+                title = { Text("All projects · ${projects.size}") },
+                navigationIcon = {
+                    androidx.compose.material3.IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
+            )
+        },
+    ) { padding ->
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 160.dp),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = padding.calculateTopPadding(), bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    androidx.compose.material3.OutlinedTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        placeholder = { Text("Search projects") },
+                        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ProjectSort.entries.forEach { s ->
+                            androidx.compose.material3.FilterChip(selected = sort == s, onClick = { sort = s }, label = { Text(s.label) })
+                        }
+                    }
+                }
+            }
+            if (shown.isEmpty()) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Text(
+                        if (projects.isEmpty()) "No projects yet." else "No projects match \"$query\".",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 32.dp),
+                    )
+                }
+            }
+            items(shown, key = { it.id }) { project ->
+                ProjectCard(
+                    app = app,
+                    project = project,
+                    onOpen = { onOpenProject(project.id) },
+                    onRename = { actions.rename = project },
+                    onDuplicate = { scope.launch { app.repository.duplicate(project.id) } },
+                    onDelete = { actions.delete = project },
+                )
+            }
+        }
+    }
+    ProjectActionDialogs(app, actions)
 }

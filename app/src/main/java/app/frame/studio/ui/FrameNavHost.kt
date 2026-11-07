@@ -1,5 +1,6 @@
 package app.frame.studio.ui
 
+import app.frame.studio.ui.projects.AllProjectsScreen
 import app.frame.studio.telemetry.Telemetry
 import app.frame.studio.ui.common.Motion
 import androidx.compose.animation.core.tween
@@ -62,6 +63,7 @@ object Routes {
     const val TEMPLATES = "templates?category={category}"
     const val SETTINGS = "settings"
     const val MAGIC = "magic"
+    const val ALL_PROJECTS = "projects/all"
 
     fun templates(category: TemplateCategory? = null) = "templates?category=${category?.name.orEmpty()}"
     const val TEMPLATE = "template/{templateId}"
@@ -122,6 +124,7 @@ fun FrameNavHost(app: FrameApp, onReady: () -> Unit = {}) {
                     onOpenProject = { nav.navigate(Routes.editor(it)) },
                     onNewProject = { nav.navigate(Routes.editor(it, autoImport = true)) },
                     onOpenExports = { nav.switchTab(Routes.EXPORTS) },
+                    onSeeAllProjects = { nav.navigate(Routes.ALL_PROJECTS) },
                     onOpenTemplates = { nav.switchTab(Routes.templates(it)) },
                     onOpenTemplate = { nav.navigate(Routes.template(it)) },
                     onOpenMagic = { nav.navigate(Routes.MAGIC) },
@@ -142,6 +145,11 @@ fun FrameNavHost(app: FrameApp, onReady: () -> Unit = {}) {
                 ?.let { runCatching { TemplateCategory.valueOf(it) }.getOrNull() }
             TabShell(nav, Routes.TEMPLATES) {
                 TemplatesScreen(previews = app.templatePreviews, onBack = null, onOpen = { nav.navigate(Routes.template(it)) }, initialCategory = category)
+            }
+        }
+        composable(Routes.ALL_PROJECTS) {
+            GlassBackground {
+                AllProjectsScreen(app = app, onBack = { nav.popBackStack() }, onOpenProject = { nav.navigate(Routes.editor(it)) })
             }
         }
         composable(Routes.EXPORTS) {

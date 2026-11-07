@@ -980,6 +980,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
 
     fun setAspect(aspect: CanvasAspect) = edit { it.copy(aspect = aspect) }
     fun setCanvasFill(fill: app.frame.studio.domain.CanvasFill) = edit { it.copy(canvasFill = fill) }
+    fun setCustomCanvas(ratio: Float) = edit { it.copy(aspect = CanvasAspect.CUSTOM, customRatio = ratio) }
 
     /** One-tap Instagram format: canvas shape plus matching export settings. */
     fun applySocialPreset(preset: SocialPreset) = edit { SocialPresets.apply(it, preset, app.device::clampExportHeight) }

@@ -170,7 +170,7 @@ fun ExportScreen(
                 Text("Project not found", modifier = Modifier.padding(padding).padding(24.dp))
                 return@Scaffold
             }
-            val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect)
+            val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect, project.customRatio)
             val durationMs = TimelineMath.totalVideoMs(project.videoClips)
             Column(
                 Modifier

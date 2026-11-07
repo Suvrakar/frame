@@ -31,6 +31,8 @@ enum class CanvasAspect(val ratio: Float?, val label: String) {
     R3_4(3f / 4f, "3:4"),
     R4_3(4f / 3f, "4:3"),
     R21_9(21f / 9f, "21:9"),
+    /** Any width:height, stored in [Project.customRatio]. */
+    CUSTOM(null, "Custom"),
 }
 
 @Serializable
@@ -357,6 +359,8 @@ data class Project(
     val duckMusic: Boolean = false,
     /** How clips of a different shape sit in the canvas. Old projects keep black bars. */
     val canvasFill: CanvasFill = CanvasFill.FIT,
+    /** Width / height when [aspect] is [CanvasAspect.CUSTOM]. */
+    val customRatio: Float? = null,
 )
 
 /** How a clip whose shape differs from the canvas is placed in it. */

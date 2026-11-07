@@ -567,14 +567,20 @@ fun CanvasPanel(
     onAspect: (CanvasAspect) -> Unit,
     onPreset: (SocialPreset) -> Unit,
     onFill: (app.frame.studio.domain.CanvasFill) -> Unit = {},
+    onCustom: (Float) -> Unit = {},
 ) {
     val aspect = project.aspect
+    var askCustom by remember { mutableStateOf(false) }
+    if (askCustom) CustomSizeDialog(project.customRatio, onDismiss = { askCustom = false }) { r -> askCustom = false; onCustom(r) }
     Column {
         SocialPresetPicker(project, onPreset, Modifier.padding(bottom = 10.dp))
         Text("Shape", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CanvasAspect.entries.forEach { a ->
-                ShapeCard(label = a.label, ratio = a.ratio ?: (16f / 9f), selected = aspect == a, dashed = a.ratio == null) { onAspect(a) }
+                val ratio = if (a == CanvasAspect.CUSTOM) project.customRatio ?: 1f else a.ratio ?: (16f / 9f)
+                ShapeCard(label = a.label, ratio = ratio, selected = aspect == a, dashed = a.ratio == null) {
+                    if (a == CanvasAspect.CUSTOM) askCustom = true else onAspect(a)
+                }
             }
         }
         Text(
@@ -583,6 +589,7 @@ fun CanvasPanel(
                 CanvasAspect.R16_9 -> "YouTube, TV"
                 CanvasAspect.R1_1, CanvasAspect.R4_5 -> "Instagram feed"
                 CanvasAspect.ORIGINAL -> "Follows your first clip"
+                CanvasAspect.CUSTOM -> "Custom shape — tap Custom to change it"
                 else -> "Clips are fitted inside the frame"
             },
             style = MaterialTheme.typography.bodySmall,
@@ -1171,4 +1178,20 @@ fun SoundCleanupPanel(
             }
         }
     }
+}
+
+/** Width × height for a custom canvas (prefilled from the current custom shape). */
+@Composable
+private fun CustomSizeDialog(current: Float?, onDismiss: () -> Unit, onDone: (Float) -> Unit) {
+    val startH = 1920
+    var w by remember { mutableStateOf(((current ?: (1080f / 1920f)) * startH).roundToInt().toString()) }
+    var h by remember { mutableStateOf(startH.toString()) }
+    val size = app.frame.studio.ui.projects.CustomSize.parse(w, h)
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Custom size") },
+        text = { app.frame.studio.ui.projects.CustomSizeFields(w, h, { w = it }, { h = it }) },
+        confirmButton = { TextButton(onClick = { size?.let { onDone(it.ratio) } }, enabled = size != null) { Text("Apply") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
 }

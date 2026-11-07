@@ -655,7 +655,7 @@ private fun PreviewArea(
     selection: Selection,
     onTransform: (Transform) -> Unit,
 ) {
-    val outputSize = ExportPlan.outputSize(project.videoClips, ExportHeight.HD_720, project.aspect)
+    val outputSize = ExportPlan.outputSize(project.videoClips, ExportHeight.HD_720, project.aspect, project.customRatio)
     val aspect = outputSize.width.toFloat() / outputSize.height
     Box(Modifier.fillMaxSize().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
         BoxWithConstraints(
@@ -1061,7 +1061,7 @@ private fun ActivePanel(
                     },
                 )
             }
-            Tool.CANVAS -> CanvasPanel(project, vm::setAspect, vm::applySocialPreset, vm::setCanvasFill)
+            Tool.CANVAS -> CanvasPanel(project, vm::setAspect, vm::applySocialPreset, vm::setCanvasFill, vm::setCustomCanvas)
             Tool.AUDIO -> AddAudioPanel(
                 onMusic = { onPickAudio(AudioKind.MUSIC) },
                 onSound = { onPickAudio(AudioKind.SOUND) },

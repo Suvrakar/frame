@@ -53,8 +53,10 @@ object ExportPlan {
         clips: List<VideoClip>,
         target: ExportHeight,
         aspect: CanvasAspect = CanvasAspect.ORIGINAL,
+        /** Width / height for [CanvasAspect.CUSTOM]. */
+        customRatio: Float? = null,
     ): Size {
-        val ratio = aspect.ratio
+        val ratio = if (aspect == CanvasAspect.CUSTOM) customRatio?.coerceIn(MIN_CUSTOM_RATIO, MAX_CUSTOM_RATIO) else aspect.ratio
         val (w, h) = when {
             ratio != null -> ratio to 1f
             else -> clips.firstOrNull()?.let(::clipFrame)
@@ -64,6 +66,10 @@ object ExportPlan {
         val scale = shortSide / min(w, h)
         return Size(even(w * scale), even(h * scale))
     }
+
+    /** Custom canvases stay within 1:4 .. 4:1 (what encoders and players handle well). */
+    const val MIN_CUSTOM_RATIO = 0.25f
+    const val MAX_CUSTOM_RATIO = 4f
 
     private fun even(value: Float): Int = max(2, (value / 2f).roundToInt() * 2)
 

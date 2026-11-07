@@ -72,7 +72,7 @@ class ExportManager(
         if (isBusy) return
         // Never ask the encoder for a size, frame rate or audio bitrate it can't produce.
         val height = device.clampExportHeight(requested.exportHeight)
-        val size = ExportPlan.outputSize(requested.videoClips, height, requested.aspect)
+        val size = ExportPlan.outputSize(requested.videoClips, height, requested.aspect, requested.customRatio)
         val project = requested.copy(
             exportHeight = height,
             exportFps = device.clampFrameRate(size.width, size.height, requested.exportFps),
@@ -277,7 +277,7 @@ class ExportManager(
                         VideoEncoderSettings.Builder()
                             .setBitrate(
                                 ExportPlan.bitrate(
-                                    ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect),
+                                    ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect, project.customRatio),
                                     project.exportFps,
                                     project.exportQuality,
                                 ),
