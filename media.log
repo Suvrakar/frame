@@ -1,0 +1,600 @@
+11-07 07:05:41.715  5957  5980 I FramePerf: ui.editor.99th percentile=550ms
+11-07 07:05:41.816  5957  5980 I FramePerf: ui.totalPssMb=418
+11-07 07:05:42.326  5957 25686 I ExoPlayerImpl: Release 3a04521 [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1048)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:263)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1044)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:626)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2608)
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-07 07:05:42.830  5957 25686 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:   androidx.media3.common.PlaybackException: error from player 0
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.maybeUpdatePlaybackError(CompositionPlayer.java:1088)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.access$1800(CompositionPlayer.java:106)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer$PlayerListener.onPlayerError(CompositionPlayer.java:1271)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:263)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1044)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:626)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2608)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1048)
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-07 07:05:42.834  5957 25686 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:05:42.838  5957 25686 I ExoPlayerImpl: Release b71a2c4 [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1048)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:263)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1044)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:626)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2608)
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-07 07:05:43.340  5957 25686 E CompositionPlayer-1:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1048)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:263)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1044)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:626)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2608)
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-07 07:05:43.344  5957 25686 W CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:05:43.477   485 25892 D CCodec  : allocate(c2.android.avc.decoder)
+11-07 07:05:43.479   485 25892 I CCodec  : setting up 'default' as default (vendor) store
+11-07 07:05:43.480   485 25892 I CCodec  : Created component [c2.android.avc.decoder]
+11-07 07:05:43.480   485 25892 D CCodecConfig: read media type: video/avc
+11-07 07:05:43.483   485 25892 D CCodecConfig: ignoring local param raw.size (0xd2001800) as it is already supported
+11-07 07:05:43.483   485 25892 D CCodecConfig: ignoring local param default.color (0x5200180b) as it is already supported
+11-07 07:05:43.485   485 25892 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:43.485   485 25892 D CCodecConfig: c2 config diff is Dict {
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 coded.pl.level = 20496
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 coded.pl.profile = 20481
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 coded.vui.color.matrix = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 coded.vui.color.primaries = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 coded.vui.color.range = 2
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 coded.vui.color.transfer = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 default.color.matrix = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 default.color.primaries = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 default.color.range = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 default.color.transfer = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 2097152
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 input.delay.value = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   string input.media-type.value = "video/avc"
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 output.delay.value = 8
+11-07 07:05:43.485   485 25892 D CCodecConfig:   string output.media-type.value = "video/raw"
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.color.matrix = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.color.primaries = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.color.range = 2
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.color.transfer = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.max-size.height = 240
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.max-size.width = 320
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.pixel-format.value = 35
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::i32 raw.rotation.flip = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::i32 raw.rotation.value = 0
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.sar.height = 1
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.sar.width = 1
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.size.height = 240
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2::u32 raw.size.width = 320
+11-07 07:05:43.485   485 25892 D CCodecConfig:   c2:
+11-07 07:05:43.486   485 25891 D MediaCodec: flushMediametrics
+11-07 07:05:43.486   485 25892 D CCodec  : [c2.android.avc.decoder] buffers are bound to CCodec for this session
+11-07 07:05:43.486   485 25892 D CCodecConfig: no c2 equivalents for thumbnail-time
+11-07 07:05:43.486   485 25892 D CCodecConfig: no c2 equivalents for durationUs
+11-07 07:05:43.486   485 25892 D CCodecConfig: no c2 equivalents for frame-count
+11-07 07:05:43.486   485 25892 D CCodecConfig: no c2 equivalents for track-id
+11-07 07:05:43.486   485 25892 D CCodecConfig: no c2 equivalents for language
+11-07 07:05:43.486   485 25892 D CCodecConfig: no c2 equivalents for display-width
+11-07 07:05:43.487   485 25892 D CCodecConfig: no c2 equivalents for display-height
+11-07 07:05:43.487   485 25892 D CCodecConfig: no c2 equivalents for csd-1
+11-07 07:05:43.487   485 25892 D CCodecConfig: no c2 equivalents for color-format
+11-07 07:05:43.487   485 25892 D CCodecConfig: no c2 equivalents for android._num-input-buffers
+11-07 07:05:43.487   485 25892 D CCodecConfig: no c2 equivalents for android._num-output-buffers
+11-07 07:05:43.487   485 25892 D CCodecConfig: no c2 equivalents for flags
+11-07 07:05:43.487   485 25892 D CCodecConfig: c2 config diff is   c2::u32 coded.pl.level = 20489
+11-07 07:05:43.487   485 25892 D CCodecConfig:   c2::u32 coded.pl.profile = 20484
+11-07 07:05:43.487   485 25892 D CCodecConfig:   c2::u32 raw.size.height = 720
+11-07 07:05:43.487   485 25892 D CCodecConfig:   c2::u32 raw.size.width = 1280
+11-07 07:05:43.487   485 25892 W Codec2Client: query -- param skipped: index = 1107298332.
+11-07 07:05:43.487   485 25892 D CCodec  : client requested max input size 8821, which is smaller than what component recommended (2097152); overriding with component recommendation.
+11-07 07:05:43.487   485 25892 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-07 07:05:43.488   485 25892 D CCodec  : encoding statistics level = 0
+11-07 07:05:43.488   485 25892 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t height = 720
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t level = 512
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t max-input-size = 2097152
+11-07 07:05:43.488   485 25892 D CCodec  :   string mime = "video/avc"
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t profile = 8
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t width = 1280
+11-07 07:05:43.488   485 25892 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:43.488   485 25892 D CCodec  : }
+11-07 07:05:43.488   485 25892 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t android._color-format = 2135033992
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t android._video-scaling = 1
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t rotation-degrees = 0
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t color-standard = 0
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t color-range = 2
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t color-transfer = 0
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t sar-height = 1
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t sar-width = 1
+11-07 07:05:43.488   485 25892 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t width = 1280
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t height = 720
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t max-height = 240
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t max-width = 320
+11-07 07:05:43.488   485 25892 D CCodec  :   string mime = "video/raw"
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t android._dataspace = 268435456
+11-07 07:05:43.488   485 25892 D CCodec  :   int32_t color-format = 2135033992
+11-07 07:05:43.488   485 25892 D CCodec  : }
+11-07 07:05:43.488   485 25892 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:43.488   485 25892 D CCodecConfig: c2 config diff is   c2::u32 raw.max-size.height = 720
+11-07 07:05:43.488   485 25892 D CCodecConfig:   c2::u32 raw.max-size.width = 1280
+11-07 07:05:43.495   485 25892 W Codec2Client: query -- param skipped: index = 1342179345.
+11-07 07:05:43.495   485 25892 W Codec2Client: query -- param skipped: index = 2415921170.
+11-07 07:05:43.495   485 25892 W Codec2Client: query -- param skipped: index = 1610614798.
+11-07 07:05:43.496   485 25892 D CCodecBufferChannel: [c2.android.avc.decoder#223] Created input block pool with allocatorID 16 => poolID 68 - OK (0)
+11-07 07:05:43.496   485 25892 D CCodecBufferChannel: [c2.android.avc.decoder#223] Configured output block pool ids 1 => OK
+11-07 07:05:43.500   485  7820 D CCodecBufferChannel: [c2.android.avc.decoder#223] Ignoring stale input buffer done callback: last flush index = 0, frameIndex = 0
+11-07 07:05:43.501   485 25892 D CCodecConfig: c2 config diff is   c2::u32 output.delay.value = 5
+11-07 07:05:43.501   485 25892 D Codec2-OutputBufferQueue: set max dequeue count 15 from update
+11-07 07:05:43.525   485 25892 D CCodecConfig: c2 config diff is   c2::u32 raw.crop.height = 720
+11-07 07:05:43.525   485 25892 D CCodecConfig:   c2::u32 raw.crop.left = 0
+11-07 07:05:43.525   485 25892 D CCodecConfig:   c2::u32 raw.crop.top = 0
+11-07 07:05:43.525   485 25892 D CCodecConfig:   c2::u32 raw.crop.width = 1280
+11-07 07:05:43.525   485 25892 D CCodecBuffers: [c2.android.avc.decoder#223:2D-BB-Output] updating image-data
+11-07 07:05:43.525   485 25892 D CCodecBuffers: [c2.android.avc.decoder#223:2D-BB-Output] updating stride = 1280, width: 1280, height: 720
+11-07 07:05:43.525   485 25892 D CCodecBuffers: [c2.android.avc.decoder#223:2D-BB-Output] updating vstride = 900
+11-07 07:05:43.529   485 25891 D CCodecBufferChannel: [c2.android.avc.decoder#223] MediaCodec discarded an unknown buffer
+11-07 07:05:43.529   485 25891 D CCodecBufferChannel: [c2.android.avc.decoder#223] MediaCodec discarded an unknown buffer
+11-07 07:05:43.535   485   485 D MediaCodec: flushMediametrics
+11-07 07:05:43.682   485 25904 D CCodec  : allocate(c2.android.avc.decoder)
+11-07 07:05:43.684   485 25904 I CCodec  : setting up 'default' as default (vendor) store
+11-07 07:05:43.687   485 25904 I CCodec  : Created component [c2.android.avc.decoder]
+11-07 07:05:43.687   485 25904 D CCodecConfig: read media type: video/avc
+11-07 07:05:43.690   485 25904 D CCodecConfig: ignoring local param raw.size (0xd2001800) as it is already supported
+11-07 07:05:43.690   485 25904 D CCodecConfig: ignoring local param default.color (0x5200180b) as it is already supported
+11-07 07:05:43.691   485 25904 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:43.691   485 25904 D CCodecConfig: c2 config diff is Dict {
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 coded.pl.level = 20496
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 coded.pl.profile = 20481
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 coded.vui.color.matrix = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 coded.vui.color.primaries = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 coded.vui.color.range = 2
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 coded.vui.color.transfer = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 default.color.matrix = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 default.color.primaries = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 default.color.range = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 default.color.transfer = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 2097152
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 input.delay.value = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   string input.media-type.value = "video/avc"
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 output.delay.value = 8
+11-07 07:05:43.691   485 25904 D CCodecConfig:   string output.media-type.value = "video/raw"
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.color.matrix = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.color.primaries = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.color.range = 2
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.color.transfer = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.max-size.height = 240
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.max-size.width = 320
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.pixel-format.value = 35
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::i32 raw.rotation.flip = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::i32 raw.rotation.value = 0
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.sar.height = 1
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.sar.width = 1
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.size.height = 240
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2::u32 raw.size.width = 320
+11-07 07:05:43.691   485 25904 D CCodecConfig:   c2:
+11-07 07:05:43.692   485 25903 D MediaCodec: flushMediametrics
+11-07 07:05:43.692   485 25904 D CCodec  : [c2.android.avc.decoder] buffers are bound to CCodec for this session
+11-07 07:05:43.692   485 25904 D CCodecConfig: no c2 equivalents for thumbnail-time
+11-07 07:05:43.692   485 25904 D CCodecConfig: no c2 equivalents for durationUs
+11-07 07:05:43.692   485 25904 D CCodecConfig: no c2 equivalents for frame-count
+11-07 07:05:43.692   485 25904 D CCodecConfig: no c2 equivalents for track-id
+11-07 07:05:43.692   485 25904 D CCodecConfig: no c2 equivalents for language
+11-07 07:05:43.692   485 25904 D CCodecConfig: no c2 equivalents for display-width
+11-07 07:05:43.692   485 25904 D CCodecConfig: no c2 equivalents for display-height
+11-07 07:05:43.693   485 25904 D CCodecConfig: no c2 equivalents for csd-1
+11-07 07:05:43.693   485 25904 D CCodecConfig: no c2 equivalents for color-format
+11-07 07:05:43.693   485 25904 D CCodecConfig: no c2 equivalents for android._num-input-buffers
+11-07 07:05:43.693   485 25904 D CCodecConfig: no c2 equivalents for android._num-output-buffers
+11-07 07:05:43.693   485 25904 D CCodecConfig: no c2 equivalents for flags
+11-07 07:05:43.693   485 25904 D CCodecConfig: c2 config diff is   c2::u32 coded.pl.level = 20489
+11-07 07:05:43.693   485 25904 D CCodecConfig:   c2::u32 coded.pl.profile = 20484
+11-07 07:05:43.693   485 25904 D CCodecConfig:   c2::u32 raw.size.height = 720
+11-07 07:05:43.693   485 25904 D CCodecConfig:   c2::u32 raw.size.width = 1280
+11-07 07:05:43.693   485 25904 W Codec2Client: query -- param skipped: index = 1107298332.
+11-07 07:05:43.693   485 25904 D CCodec  : client requested max input size 8821, which is smaller than what component recommended (2097152); overriding with component recommendation.
+11-07 07:05:43.693   485 25904 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-07 07:05:43.693   485 25904 D CCodec  : encoding statistics level = 0
+11-07 07:05:43.693   485 25904 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t height = 720
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t level = 512
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t max-input-size = 2097152
+11-07 07:05:43.693   485 25904 D CCodec  :   string mime = "video/avc"
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t profile = 8
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t width = 1280
+11-07 07:05:43.693   485 25904 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:43.693   485 25904 D CCodec  : }
+11-07 07:05:43.693   485 25904 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t android._color-format = 2135033992
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t android._video-scaling = 1
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t rotation-degrees = 0
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t color-standard = 0
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t color-range = 2
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t color-transfer = 0
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t sar-height = 1
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t sar-width = 1
+11-07 07:05:43.693   485 25904 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t width = 1280
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t height = 720
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t max-height = 240
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t max-width = 320
+11-07 07:05:43.693   485 25904 D CCodec  :   string mime = "video/raw"
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t android._dataspace = 268435456
+11-07 07:05:43.693   485 25904 D CCodec  :   int32_t color-format = 2135033992
+11-07 07:05:43.693   485 25904 D CCodec  : }
+11-07 07:05:43.694   485 25904 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:43.694   485 25904 D CCodecConfig: c2 config diff is   c2::u32 raw.max-size.height = 720
+11-07 07:05:43.694   485 25904 D CCodecConfig:   c2::u32 raw.max-size.width = 1280
+11-07 07:05:43.701   485 25904 W Codec2Client: query -- param skipped: index = 1342179345.
+11-07 07:05:43.701   485 25904 W Codec2Client: query -- param skipped: index = 2415921170.
+11-07 07:05:43.701   485 25904 W Codec2Client: query -- param skipped: index = 1610614798.
+11-07 07:05:43.702   485 25904 D CCodecBufferChannel: [c2.android.avc.decoder#813] Created input block pool with allocatorID 16 => poolID 69 - OK (0)
+11-07 07:05:43.703   485 25904 D CCodecBufferChannel: [c2.android.avc.decoder#813] Configured output block pool ids 1 => OK
+11-07 07:05:43.709   485  7820 D CCodecBufferChannel: [c2.android.avc.decoder#813] Ignoring stale input buffer done callback: last flush index = 0, frameIndex = 0
+11-07 07:05:43.709   485 25904 D CCodecConfig: c2 config diff is   c2::u32 output.delay.value = 5
+11-07 07:05:43.709   485 25904 D Codec2-OutputBufferQueue: set max dequeue count 15 from update
+11-07 07:05:43.733   485 25904 D CCodecConfig: c2 config diff is   c2::u32 raw.crop.height = 720
+11-07 07:05:43.733   485 25904 D CCodecConfig:   c2::u32 raw.crop.left = 0
+11-07 07:05:43.733   485 25904 D CCodecConfig:   c2::u32 raw.crop.top = 0
+11-07 07:05:43.733   485 25904 D CCodecConfig:   c2::u32 raw.crop.width = 1280
+11-07 07:05:43.733   485 25904 D CCodecBuffers: [c2.android.avc.decoder#813:2D-BB-Output] updating image-data
+11-07 07:05:43.733   485 25904 D CCodecBuffers: [c2.android.avc.decoder#813:2D-BB-Output] updating stride = 1280, width: 1280, height: 720
+11-07 07:05:43.733   485 25904 D CCodecBuffers: [c2.android.avc.decoder#813:2D-BB-Output] updating vstride = 900
+11-07 07:05:43.737   485 25903 D CCodecBufferChannel: [c2.android.avc.decoder#813] MediaCodec discarded an unknown buffer
+11-07 07:05:43.737   485 25903 D CCodecBufferChannel: [c2.android.avc.decoder#813] MediaCodec discarded an unknown buffer
+11-07 07:05:43.741   485  2902 D MediaCodec: flushMediametrics
+11-07 07:05:43.871   485 25918 D CCodec  : allocate(c2.android.avc.decoder)
+11-07 07:05:43.872   485 25918 I CCodec  : setting up 'default' as default (vendor) store
+11-07 07:05:43.874   485 25918 I CCodec  : Created component [c2.android.avc.decoder]
+11-07 07:05:43.874   485 25918 D CCodecConfig: read media type: video/avc
+11-07 07:05:43.876   485 25918 D CCodecConfig: ignoring local param raw.size (0xd2001800) as it is already supported
+11-07 07:05:43.876   485 25918 D CCodecConfig: ignoring local param default.color (0x5200180b) as it is already supported
+11-07 07:05:43.878   485 25918 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:43.878   485 25918 D CCodecConfig: c2 config diff is Dict {
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 coded.pl.level = 20496
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 coded.pl.profile = 20481
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 coded.vui.color.matrix = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 coded.vui.color.primaries = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 coded.vui.color.range = 2
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 coded.vui.color.transfer = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 default.color.matrix = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 default.color.primaries = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 default.color.range = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 default.color.transfer = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 2097152
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 input.delay.value = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   string input.media-type.value = "video/avc"
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 output.delay.value = 8
+11-07 07:05:43.878   485 25918 D CCodecConfig:   string output.media-type.value = "video/raw"
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.color.matrix = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.color.primaries = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.color.range = 2
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.color.transfer = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.max-size.height = 240
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.max-size.width = 320
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.pixel-format.value = 35
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::i32 raw.rotation.flip = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::i32 raw.rotation.value = 0
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.sar.height = 1
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.sar.width = 1
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.size.height = 240
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2::u32 raw.size.width = 320
+11-07 07:05:43.878   485 25918 D CCodecConfig:   c2:
+11-07 07:05:43.879   485 25917 D MediaCodec: flushMediametrics
+11-07 07:05:43.879   485 25918 D CCodec  : [c2.android.avc.decoder] buffers are bound to CCodec for this session
+11-07 07:05:43.879   485 25918 D CCodecConfig: no c2 equivalents for thumbnail-time
+11-07 07:05:43.879   485 25918 D CCodecConfig: no c2 equivalents for durationUs
+11-07 07:05:43.879   485 25918 D CCodecConfig: no c2 equivalents for frame-count
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for track-id
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for language
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for display-width
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for display-height
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for csd-1
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for color-format
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for android._num-input-buffers
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for android._num-output-buffers
+11-07 07:05:43.880   485 25918 D CCodecConfig: no c2 equivalents for flags
+11-07 07:05:43.880   485 25918 D CCodecConfig: c2 config diff is   c2::u32 coded.pl.level = 20489
+11-07 07:05:43.880   485 25918 D CCodecConfig:   c2::u32 coded.pl.profile = 20484
+11-07 07:05:43.880   485 25918 D CCodecConfig:   c2::u32 raw.size.height = 720
+11-07 07:05:43.880   485 25918 D CCodecConfig:   c2::u32 raw.size.width = 1280
+11-07 07:05:43.881   485 25918 W Codec2Client: query -- param skipped: index = 1107298332.
+11-07 07:05:43.881   485 25918 D CCodec  : client requested max input size 8821, which is smaller than what component recommended (2097152); overriding with component recommendation.
+11-07 07:05:43.881   485 25918 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-07 07:05:43.881   485 25918 D CCodec  : encoding statistics level = 0
+11-07 07:05:43.881   485 25918 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t height = 720
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t level = 512
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t max-input-size = 2097152
+11-07 07:05:43.881   485 25918 D CCodec  :   string mime = "video/avc"
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t profile = 8
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t width = 1280
+11-07 07:05:43.881   485 25918 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:43.881   485 25918 D CCodec  : }
+11-07 07:05:43.881   485 25918 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t android._color-format = 2135033992
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t android._video-scaling = 1
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t rotation-degrees = 0
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t color-standard = 0
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t color-range = 2
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t color-transfer = 0
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t sar-height = 1
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t sar-width = 1
+11-07 07:05:43.881   485 25918 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t width = 1280
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t height = 720
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t max-height = 240
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t max-width = 320
+11-07 07:05:43.881   485 25918 D CCodec  :   string mime = "video/raw"
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t android._dataspace = 268435456
+11-07 07:05:43.881   485 25918 D CCodec  :   int32_t color-format = 2135033992
+11-07 07:05:43.881   485 25918 D CCodec  : }
+11-07 07:05:43.881   485 25918 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:43.882   485 25918 D CCodecConfig: c2 config diff is   c2::u32 raw.max-size.height = 720
+11-07 07:05:43.882   485 25918 D CCodecConfig:   c2::u32 raw.max-size.width = 1280
+11-07 07:05:43.890   485 25918 W Codec2Client: query -- param skipped: index = 1342179345.
+11-07 07:05:43.890   485 25918 W Codec2Client: query -- param skipped: index = 2415921170.
+11-07 07:05:43.890   485 25918 W Codec2Client: query -- param skipped: index = 1610614798.
+11-07 07:05:43.891   485 25918 D CCodecBufferChannel: [c2.android.avc.decoder#813] Created input block pool with allocatorID 16 => poolID 70 - OK (0)
+11-07 07:05:43.891   485 25918 D CCodecBufferChannel: [c2.android.avc.decoder#813] Configured output block pool ids 1 => OK
+11-07 07:05:43.895   485  7820 D CCodecBufferChannel: [c2.android.avc.decoder#813] Ignoring stale input buffer done callback: last flush index = 0, frameIndex = 0
+11-07 07:05:43.896   485 25918 D CCodecConfig: c2 config diff is   c2::u32 output.delay.value = 5
+11-07 07:05:43.896   485 25918 D Codec2-OutputBufferQueue: set max dequeue count 15 from update
+11-07 07:05:43.921   485 25918 D CCodecConfig: c2 config diff is   c2::u32 raw.crop.height = 720
+11-07 07:05:43.921   485 25918 D CCodecConfig:   c2::u32 raw.crop.left = 0
+11-07 07:05:43.921   485 25918 D CCodecConfig:   c2::u32 raw.crop.top = 0
+11-07 07:05:43.921   485 25918 D CCodecConfig:   c2::u32 raw.crop.width = 1280
+11-07 07:05:43.921   485 25918 D CCodecBuffers: [c2.android.avc.decoder#813:2D-BB-Output] updating image-data
+11-07 07:05:43.922   485 25918 D CCodecBuffers: [c2.android.avc.decoder#813:2D-BB-Output] updating stride = 1280, width: 1280, height: 720
+11-07 07:05:43.922   485 25918 D CCodecBuffers: [c2.android.avc.decoder#813:2D-BB-Output] updating vstride = 900
+11-07 07:05:43.925   485 25917 D CCodecBufferChannel: [c2.android.avc.decoder#813] MediaCodec discarded an unknown buffer
+11-07 07:05:43.925   485 25917 D CCodecBufferChannel: [c2.android.avc.decoder#813] MediaCodec discarded an unknown buffer
+11-07 07:05:43.929   485  2902 D MediaCodec: flushMediametrics
+11-07 07:05:44.480   485 25941 D CCodec  : allocate(c2.android.avc.decoder)
+11-07 07:05:44.480   485 25941 I CCodec  : setting up 'default' as default (vendor) store
+11-07 07:05:44.483   485 25941 I CCodec  : Created component [c2.android.avc.decoder]
+11-07 07:05:44.483   485 25941 D CCodecConfig: read media type: video/avc
+11-07 07:05:44.488   485 25941 D CCodecConfig: ignoring local param raw.size (0xd2001800) as it is already supported
+11-07 07:05:44.488   485 25941 D CCodecConfig: ignoring local param default.color (0x5200180b) as it is already supported
+11-07 07:05:44.488   485 25941 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:44.488   485 25941 D CCodecConfig: c2 config diff is Dict {
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 coded.pl.level = 20496
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 coded.pl.profile = 20481
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 coded.vui.color.matrix = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 coded.vui.color.primaries = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 coded.vui.color.range = 2
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 coded.vui.color.transfer = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 default.color.matrix = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 default.color.primaries = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 default.color.range = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 default.color.transfer = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 2097152
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 input.delay.value = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   string input.media-type.value = "video/avc"
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 output.delay.value = 8
+11-07 07:05:44.488   485 25941 D CCodecConfig:   string output.media-type.value = "video/raw"
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.color.matrix = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.color.primaries = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.color.range = 2
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.color.transfer = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.max-size.height = 240
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.max-size.width = 320
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.pixel-format.value = 35
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::i32 raw.rotation.flip = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::i32 raw.rotation.value = 0
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.sar.height = 1
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.sar.width = 1
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.size.height = 240
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2::u32 raw.size.width = 320
+11-07 07:05:44.488   485 25941 D CCodecConfig:   c2:
+11-07 07:05:44.489   485 25940 D MediaCodec: flushMediametrics
+11-07 07:05:44.489   485 25941 D CCodec  : [c2.android.avc.decoder] buffers are bound to CCodec for this session
+11-07 07:05:44.490   485 25941 D CCodecConfig: no c2 equivalents for thumbnail-time
+11-07 07:05:44.490   485 25941 D CCodecConfig: no c2 equivalents for durationUs
+11-07 07:05:44.490   485 25941 D CCodecConfig: no c2 equivalents for frame-count
+11-07 07:05:44.490   485 25941 D CCodecConfig: no c2 equivalents for track-id
+11-07 07:05:44.490   485 25941 D CCodecConfig: no c2 equivalents for language
+11-07 07:05:44.491   485 25941 D CCodecConfig: no c2 equivalents for display-width
+11-07 07:05:44.491   485 25941 D CCodecConfig: no c2 equivalents for display-height
+11-07 07:05:44.491   485 25941 D CCodecConfig: no c2 equivalents for csd-1
+11-07 07:05:44.491   485 25941 D CCodecConfig: no c2 equivalents for color-format
+11-07 07:05:44.491   485 25941 D CCodecConfig: no c2 equivalents for android._num-input-buffers
+11-07 07:05:44.491   485 25941 D CCodecConfig: no c2 equivalents for android._num-output-buffers
+11-07 07:05:44.491   485 25941 D CCodecConfig: no c2 equivalents for flags
+11-07 07:05:44.491   485 25941 D CCodecConfig: c2 config diff is   c2::u32 coded.pl.level = 20489
+11-07 07:05:44.491   485 25941 D CCodecConfig:   c2::u32 coded.pl.profile = 20484
+11-07 07:05:44.491   485 25941 D CCodecConfig:   c2::u32 raw.size.height = 720
+11-07 07:05:44.491   485 25941 D CCodecConfig:   c2::u32 raw.size.width = 1280
+11-07 07:05:44.492   485 25941 W Codec2Client: query -- param skipped: index = 1107298332.
+11-07 07:05:44.492   485 25941 D CCodec  : client requested max input size 8821, which is smaller than what component recommended (2097152); overriding with component recommendation.
+11-07 07:05:44.492   485 25941 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-07 07:05:44.492   485 25941 D CCodec  : encoding statistics level = 0
+11-07 07:05:44.492   485 25941 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t height = 720
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t level = 512
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t max-input-size = 2097152
+11-07 07:05:44.492   485 25941 D CCodec  :   string mime = "video/avc"
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t profile = 8
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t width = 1280
+11-07 07:05:44.492   485 25941 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:44.492   485 25941 D CCodec  : }
+11-07 07:05:44.492   485 25941 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t android._color-format = 2135033992
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t android._video-scaling = 1
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t rotation-degrees = 0
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t color-standard = 0
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t color-range = 2
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t color-transfer = 0
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t sar-height = 1
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t sar-width = 1
+11-07 07:05:44.492   485 25941 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t width = 1280
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t height = 720
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t max-height = 240
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t max-width = 320
+11-07 07:05:44.492   485 25941 D CCodec  :   string mime = "video/raw"
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t android._dataspace = 268435456
+11-07 07:05:44.492   485 25941 D CCodec  :   int32_t color-format = 2135033992
+11-07 07:05:44.492   485 25941 D CCodec  : }
+11-07 07:05:44.492   485 25941 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:44.492   485 25941 D CCodecConfig: c2 config diff is   c2::u32 raw.max-size.height = 720
+11-07 07:05:44.492   485 25941 D CCodecConfig:   c2::u32 raw.max-size.width = 1280
+11-07 07:05:44.502   485 25941 W Codec2Client: query -- param skipped: index = 1342179345.
+11-07 07:05:44.502   485 25941 W Codec2Client: query -- param skipped: index = 2415921170.
+11-07 07:05:44.502   485 25941 W Codec2Client: query -- param skipped: index = 1610614798.
+11-07 07:05:44.503   485 25941 D CCodecBufferChannel: [c2.android.avc.decoder#634] Created input block pool with allocatorID 16 => poolID 71 - OK (0)
+11-07 07:05:44.503   485 25941 D CCodecBufferChannel: [c2.android.avc.decoder#634] Configured output block pool ids 1 => OK
+11-07 07:05:44.507   485 25777 D CCodecBufferChannel: [c2.android.avc.decoder#634] Ignoring stale input buffer done callback: last flush index = 0, frameIndex = 0
+11-07 07:05:44.507   485 25941 D CCodecConfig: c2 config diff is   c2::u32 output.delay.value = 5
+11-07 07:05:44.507   485 25941 D Codec2-OutputBufferQueue: set max dequeue count 15 from update
+11-07 07:05:44.525   485 25941 D CCodecConfig: c2 config diff is   c2::u32 raw.crop.height = 720
+11-07 07:05:44.525   485 25941 D CCodecConfig:   c2::u32 raw.crop.left = 0
+11-07 07:05:44.525   485 25941 D CCodecConfig:   c2::u32 raw.crop.top = 0
+11-07 07:05:44.525   485 25941 D CCodecConfig:   c2::u32 raw.crop.width = 1280
+11-07 07:05:44.526   485 25941 D CCodecBuffers: [c2.android.avc.decoder#634:2D-BB-Output] updating image-data
+11-07 07:05:44.526   485 25941 D CCodecBuffers: [c2.android.avc.decoder#634:2D-BB-Output] updating stride = 1280, width: 1280, height: 720
+11-07 07:05:44.526   485 25941 D CCodecBuffers: [c2.android.avc.decoder#634:2D-BB-Output] updating vstride = 900
+11-07 07:05:44.530   485 25940 D CCodecBufferChannel: [c2.android.avc.decoder#634] MediaCodec discarded an unknown buffer
+11-07 07:05:44.530   485 25940 D CCodecBufferChannel: [c2.android.avc.decoder#634] MediaCodec discarded an unknown buffer
+11-07 07:05:44.534   485 25940 D MediaCodec: flushMediametrics
+11-07 07:05:44.551   485 25947 D CCodec  : allocate(c2.android.avc.decoder)
+11-07 07:05:44.552   485 25947 I CCodec  : setting up 'default' as default (vendor) store
+11-07 07:05:44.553   485 25947 I CCodec  : Created component [c2.android.avc.decoder]
+11-07 07:05:44.553   485 25947 D CCodecConfig: read media type: video/avc
+11-07 07:05:44.557   485 25947 D CCodecConfig: ignoring local param raw.size (0xd2001800) as it is already supported
+11-07 07:05:44.557   485 25947 D CCodecConfig: ignoring local param default.color (0x5200180b) as it is already supported
+11-07 07:05:44.557   485 25947 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:44.557   485 25947 D CCodecConfig: c2 config diff is Dict {
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 coded.pl.level = 20496
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 coded.pl.profile = 20481
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 coded.vui.color.matrix = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 coded.vui.color.primaries = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 coded.vui.color.range = 2
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 coded.vui.color.transfer = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 default.color.matrix = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 default.color.primaries = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 default.color.range = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 default.color.transfer = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 input.buffers.max-size.value = 2097152
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 input.delay.value = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   string input.media-type.value = "video/avc"
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 output.delay.value = 8
+11-07 07:05:44.557   485 25947 D CCodecConfig:   string output.media-type.value = "video/raw"
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.color.matrix = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.color.primaries = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.color.range = 2
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.color.transfer = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.max-size.height = 240
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.max-size.width = 320
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.pixel-format.value = 35
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::i32 raw.rotation.flip = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::i32 raw.rotation.value = 0
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.sar.height = 1
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.sar.width = 1
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.size.height = 240
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2::u32 raw.size.width = 320
+11-07 07:05:44.557   485 25947 D CCodecConfig:   c2:
+11-07 07:05:44.558   485 25946 D MediaCodec: flushMediametrics
+11-07 07:05:44.559   485 25947 D CCodec  : [c2.android.avc.decoder] buffers are bound to CCodec for this session
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for thumbnail-time
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for durationUs
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for frame-count
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for track-id
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for language
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for display-width
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for display-height
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for csd-1
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for color-format
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for android._num-input-buffers
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for android._num-output-buffers
+11-07 07:05:44.559   485 25947 D CCodecConfig: no c2 equivalents for flags
+11-07 07:05:44.560   485 25947 D CCodecConfig: c2 config diff is   c2::u32 coded.pl.level = 20489
+11-07 07:05:44.560   485 25947 D CCodecConfig:   c2::u32 coded.pl.profile = 20484
+11-07 07:05:44.560   485 25947 D CCodecConfig:   c2::u32 raw.size.height = 720
+11-07 07:05:44.560   485 25947 D CCodecConfig:   c2::u32 raw.size.width = 1280
+11-07 07:05:44.561   485 25947 W Codec2Client: query -- param skipped: index = 1107298332.
+11-07 07:05:44.561   485 25947 D CCodec  : client requested max input size 8821, which is smaller than what component recommended (2097152); overriding with component recommendation.
+11-07 07:05:44.561   485 25947 W CCodec  : This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+11-07 07:05:44.561   485 25947 D CCodec  : encoding statistics level = 0
+11-07 07:05:44.561   485 25947 D CCodec  : setup formats input: AMessage(what = 0x00000000) = {
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t height = 720
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t level = 512
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t max-input-size = 2097152
+11-07 07:05:44.561   485 25947 D CCodec  :   string mime = "video/avc"
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t profile = 8
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t width = 1280
+11-07 07:05:44.561   485 25947 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:44.561   485 25947 D CCodec  : }
+11-07 07:05:44.561   485 25947 D CCodec  : setup formats output: AMessage(what = 0x00000000) = {
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t android._color-format = 2135033992
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t android._video-scaling = 1
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t rotation-degrees = 0
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t color-standard = 0
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t color-range = 2
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t color-transfer = 0
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t sar-height = 1
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t sar-width = 1
+11-07 07:05:44.561   485 25947 D CCodec  :   Rect crop(0, 0, 1279, 719)
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t width = 1280
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t height = 720
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t max-height = 240
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t max-width = 320
+11-07 07:05:44.561   485 25947 D CCodec  :   string mime = "video/raw"
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t android._dataspace = 268435456
+11-07 07:05:44.561   485 25947 D CCodec  :   int32_t color-format = 2135033992
+11-07 07:05:44.561   485 25947 D CCodec  : }
+11-07 07:05:44.561   485 25947 I CCodecConfig: query failed after returning 12 values (BAD_INDEX)
+11-07 07:05:44.561   485 25947 D CCodecConfig: c2 config diff is   c2::u32 raw.max-size.height = 720
+11-07 07:05:44.561   485 25947 D CCodecConfig:   c2::u32 raw.max-size.width = 1280
+11-07 07:05:44.567   485 25947 W Codec2Client: query -- param skipped: index = 1342179345.
+11-07 07:05:44.567   485 25947 W Codec2Client: query -- param skipped: index = 2415921170.
+11-07 07:05:44.567   485 25947 W Codec2Client: query -- param skipped: index = 1610614798.
+11-07 07:05:44.569   485 25947 D CCodecBufferChannel: [c2.android.avc.decoder#49] Created input block pool with allocatorID 16 => poolID 72 - OK (0)
+11-07 07:05:44.570   485 25947 D CCodecBufferChannel: [c2.android.avc.decoder#49] Configured output block pool ids 1 => OK
+11-07 07:05:44.575   485 25947 D CCodecConfig: c2 config diff is   c2::u32 output.delay.value = 5
+11-07 07:05:44.575   485 25947 D Codec2-OutputBufferQueue: set max dequeue count 15 from update
+11-07 07:05:44.595   485 25947 D CCodecConfig: c2 config diff is   c2::u32 raw.crop.height = 720
+11-07 07:05:44.595   485 25947 D CCodecConfig:   c2::u32 raw.crop.left = 0
+11-07 07:05:44.595   485 25947 D CCodecConfig:   c2::u32 raw.crop.top = 0
+11-07 07:05:44.595   485 25947 D CCodecConfig:   c2::u32 raw.crop.width = 1280
+11-07 07:05:44.595   485 25947 D CCodecBuffers: [c2.android.avc.decoder#49:2D-BB-Output] updating image-data
+11-07 07:05:44.595   485 25947 D CCodecBuffers: [c2.android.avc.decoder#49:2D-BB-Output] updating stride = 1280, width: 1280, height: 720
+11-07 07:05:44.595   485 25947 D CCodecBuffers: [c2.android.avc.decoder#49:2D-BB-Output] updating vstride = 900
+11-07 07:05:44.599   485 25946 D CCodecBufferChannel: [c2.android.avc.decoder#49] MediaCodec discarded an unknown buffer
+11-07 07:05:44.599   485 25946 D CCodecBufferChannel: [c2.android.avc.decoder#49] MediaCodec discarded an unknown buffer
+11-07 07:05:44.602   485 25946 D MediaCodec: flushMediametrics
+11-07 07:07:49.188  5957 26173 I ExoPlayerImpl: Init 4ddc2a [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-07 07:08:04.607  5957 26173 I ExoPlayerImpl: Release 4ddc2a [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:08:14.894  5957 26265 I ExoPlayerImpl: Init 5a6cc1e [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+11-07 07:08:33.375  5957 26265 I ExoPlayerImpl: Release 5a6cc1e [AndroidXMedia3/1.8.0] [emu64xa, sdk_gphone64_x86_64, Google, 34] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:10:20.221  5937  5937 I AndroidRuntime: VM exiting with result code 0.

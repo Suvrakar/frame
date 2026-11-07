@@ -1,0 +1,51 @@
+--------- beginning of main
+11-07 06:58:29.773  5957  5980 I FramePerf: beats.ms=836 bpm=119.76989 count=23
+11-07 06:58:29.773  5957  5980 I FramePerf: beats.signed=[-59, -48, -38, -50, -39, -52, -41, -53, -42, -55, -44, -56, -45, -58, -47, -59, -48, -38, -50, -39, -52, -41, -53] encoderDelay=1024
+11-07 06:58:30.033  5957  5980 I FramePerf: captions.supported=true result=Unavailable Unavailable(message=Your phone's on-device speech pack for this language isn't installed. Add it in Settings › System › Languages › Speech, or type captions instead.)
+11-07 07:02:00.700  5957  5980 I FramePerf: magic.create ms=755
+11-07 07:02:25.635  5957  5980 I FramePerf: magic.robust items=4 ms=35
+11-07 07:02:25.678  5957  5980 I FramePerf: magic.robust items=1 ms=7
+11-07 07:02:54.598  5957  5980 I FramePerf: magic.robust items=6 ms=35
+11-07 07:03:03.723  5957  5980 I FramePerf: magic.robust items=45 ms=2800
+11-07 07:03:03.815  5957  5980 I FramePerf: magic.robust items=3 ms=33
+11-07 07:03:12.605  5957  5980 I FramePerf: device.lowEnd=true
+11-07 07:03:12.605  5957  5980 I FramePerf: device.cores=4
+11-07 07:03:12.605  5957  5980 I FramePerf: device.memoryClassMb=192
+11-07 07:03:12.605  5957  5980 I FramePerf: device.previewHeight=SD_480
+11-07 07:03:12.605  5957  5980 I FramePerf: device.supportedExport=480p, 720p, 1080p
+11-07 07:03:12.710  5957  5980 I FramePerf: import.bigPhotoMs=92
+11-07 07:03:12.710  5957  5980 I FramePerf: import.bigPhotoSize=1920x1440
+11-07 07:03:14.314  5957  5980 I FramePerf: preview.readyMs=1602
+11-07 07:03:19.438  5957  5957 I FramePerf: preview.releaseMs=116
+11-07 07:03:19.439  5957  5980 I FramePerf: preview.advancedMsIn5s=4622
+11-07 07:03:29.441  5957  5957 I FramePerf: export.progressAt10s=2:21
+11-07 07:03:39.445  5957  5957 I FramePerf: export.progressAt20s=2:49
+11-07 07:03:49.450  5957  5957 I FramePerf: export.progressAt30s=2:65
+11-07 07:03:59.452  5957  5957 I FramePerf: export.progressAt40s=2:70
+11-07 07:04:09.452  5957  5957 I FramePerf: export.progressAt50s=2:75
+11-07 07:04:19.457  5957  5957 I FramePerf: export.progressAt60s=2:80
+11-07 07:04:29.460  5957  5957 I FramePerf: export.progressAt70s=2:85
+11-07 07:04:39.465  5957  5957 I FramePerf: export.progressAt80s=2:90
+11-07 07:04:49.465  5957  5957 I FramePerf: export.progressAt90s=2:95
+11-07 07:04:57.450  5957  5980 I FramePerf: export.ms=98010
+11-07 07:04:57.450  5957  5980 I FramePerf: export.timelineMs=31665
+11-07 07:04:57.450  5957  5980 I FramePerf: export.bytes=16277061
+11-07 07:05:07.073  5957  5980 I FramePerf: ui.home.Total frames rendered=117
+11-07 07:05:07.073  5957  5980 I FramePerf: ui.home.Janky frames=37 (31.62%)
+11-07 07:05:07.073  5957  5980 I FramePerf: ui.home.50th percentile=32ms
+11-07 07:05:07.074  5957  5980 I FramePerf: ui.home.90th percentile=101ms
+11-07 07:05:07.074  5957  5980 I FramePerf: ui.home.95th percentile=150ms
+11-07 07:05:07.074  5957  5980 I FramePerf: ui.home.99th percentile=750ms
+11-07 07:05:14.117  5957  5980 I FramePerf: ui.templates.Total frames rendered=138
+11-07 07:05:14.117  5957  5980 I FramePerf: ui.templates.Janky frames=35 (25.36%)
+11-07 07:05:14.117  5957  5980 I FramePerf: ui.templates.50th percentile=34ms
+11-07 07:05:14.117  5957  5980 I FramePerf: ui.templates.90th percentile=61ms
+11-07 07:05:14.118  5957  5980 I FramePerf: ui.templates.95th percentile=81ms
+11-07 07:05:14.118  5957  5980 I FramePerf: ui.templates.99th percentile=200ms
+11-07 07:05:41.714  5957  5980 I FramePerf: ui.editor.Total frames rendered=257
+11-07 07:05:41.714  5957  5980 I FramePerf: ui.editor.Janky frames=113 (43.97%)
+11-07 07:05:41.714  5957  5980 I FramePerf: ui.editor.50th percentile=32ms
+11-07 07:05:41.714  5957  5980 I FramePerf: ui.editor.90th percentile=200ms
+11-07 07:05:41.715  5957  5980 I FramePerf: ui.editor.95th percentile=250ms
+11-07 07:05:41.715  5957  5980 I FramePerf: ui.editor.99th percentile=550ms
+11-07 07:05:41.816  5957  5980 I FramePerf: ui.totalPssMb=418

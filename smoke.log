@@ -1,0 +1,572 @@
+Performing Streamed Install
+Success
+Starting: Intent { cmp=app.frame.studio.debug/app.frame.studio.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: app.frame.studio.debug/app.frame.studio.MainActivity
+TotalTime: 4569
+WaitTime: 4602
+Complete
+Starting: Intent { cmp=app.frame.studio.debug/app.frame.studio.MainActivity }
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{58ceff2 com.android.systemui.auto_generated_rro_product__/10029} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{54a1643 com.google.android.soundpicker/10137} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e2614c0 com.google.android.marvin.talkbackoverlay/10075} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{d0985f9 com.google.android.configupdater/10129} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{b76193e com.android.internal.emulation.pixel_3a_xl/10044} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{edd39f com.android.internal.emulation.pixel_6_pro/10016} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{7b7bcec com.android.internal.emulation.pixel_7_pro/10002} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{f5388b5 com.android.internal.emulation.pixel_8_pro/10058} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{b368b4a com.android.internal.emulation.pixel_3a/10053} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{9e60abb com.android.internal.emulation.pixel_4a/10009} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{5d9bbd8 com.android.internal.emulation.pixel_6a/10022} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{600fb31 com.android.internal.emulation.pixel_7a/10030} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{3da1216 com.google.android.overlay.googlewebview/10049} BLOCKED
+11-07 06:57:36.567   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8609797 com.google.android.hotspot2.osulogin/10182} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{51abd84 com.android.simappdialog/10112} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{a39196d com.android.internal.display.cutout.emulation.hole/10074} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{75d39a2 com.android.internal.display.cutout.emulation.tall/10065} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{f8d1633 com.android.internal.systemui.navbar.threebutton/10068} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{2823824 com.android.camera2/10142} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{65adf69 com.android.systemui.auto_generated_rro_vendor__/10077} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8f94dee com.google.android.deskclock/10153} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{bf8e28f com.android.internal.systemui.navbar.twobutton/10018} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{79a391c com.google.android.as/10125} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{1b90925 com.android.internal.systemui.navbar.gestural_extra_wide_back/10045} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{4305afa com.android.systemui.emulation.pixel_3/10014} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{bab18ab com.android.systemui.emulation.pixel_4/10035} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{89fcb08 com.android.systemui.emulation.pixel_5/10071} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{c1612a1 com.android.systemui.emulation.pixel_6/10073} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8992cc6 com.android.systemui.emulation.pixel_7/10072} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{c009487 com.android.systemui.emulation.pixel_8/10070} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{ea8fb4 com.android.nfc.auto_generated_rro_product__/10024} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{4e037dd com.android.printspooler/10102} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{66b4f52 com.android.emergency.auto_generated_rro_product__/10041} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{947f223 com.google.android.connectivity.resources.goldfish.overlay/10080} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{97af320 com.android.dreams.basic/10106} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{a2d74d9 com.google.android.networkstack.tethering.emulator/10020} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{7cb0e9e com.android.providers.settings.auto_generated_rro_product__/10010} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{c1d8d7f com.google.android.as.oss/10121} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8ec214c com.android.traceur.auto_generated_rro_product__/10008} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{5f09ff2 com.google.android.devicelockcontroller/10178} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{2d576aa com.android.internal.emulation.pixel_3/10043} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{87829b com.android.internal.emulation.pixel_4/10060} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{2600638 com.android.internal.emulation.pixel_5/10013} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{c17e611 com.android.internal.emulation.pixel_6/10038} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{6c5376 com.android.internal.emulation.pixel_7/10067} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{2d1ad77 com.android.internal.emulation.pixel_8/10039} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{72b4de4 com.google.android.captiveportallogin/10116} BLOCKED
+11-07 06:57:36.568   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{183d24d com.android.musicfx/10088} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{3c23102 com.google.android.modulemetadata/10146} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e29aa13 com.google.android.markup/10135} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{7416450 com.android.providers.settings.auto_generated_rro_vendor__/10079} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{4f3fdee com.google.android.rkpdapp/10174} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{ea65b4e com.google.android.contacts/10155} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8fad46f com.android.server.telecom.auto_generated_rro_product__/10037} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{c60757c com.google.android.overlay.googleconfig/10055} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{2c5fe05 com.android.bips.auto_generated_rro_product__/10032} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e90de5a com.google.android.apps.customization.pixel/10143} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{b0a488b com.google.android.tag/10082} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{bfd6d68 com.google.android.overlay.permissioncontroller/10007} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8ad7581 com.google.android.partnersetup/10124} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e6e8626 com.google.android.apps.wallpaper.nexus/10141} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{952e267 com.google.android.apps.nexuslauncher/10169} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{beff814 com.google.android.nearby.halfsheet/10191} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{63ae8bd com.android.theme.font.notoserifsource/10066} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{92cdeb2 com.google.android.safetycenter.resources/10172} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{3a13e03 com.android.internal.display.cutout.emulation.waterfall/10040} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{5de8180 com.android.internal.systemui.navbar.transparent/10034} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{43253b9 com.google.android.connectivity.resources/10190} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{90633fe com.android.providers.contacts.auto_generated_rro_product__/10017} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{fefb75f com.google.android.feedback/10163} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{56a35ac com.google.android.printservice.recommendation/10109} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e5a36dd com.google.android.documentsui/10099} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{f8d920a com.android.systemui.emulation.pixel_3a_xl/10019} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{f826a7b com.android.systemui.emulation.pixel_6_pro/10064} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{d1b0098 com.android.systemui.emulation.pixel_7_pro/10054} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{c3dc0f1 com.android.systemui.emulation.pixel_8_pro/10001} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{27ac4d6 com.google.mainline.telemetry/10151} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{9c33357 com.android.carrierconfig.auto_generated_rro_product__/10063} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e0b8e44 com.android.providers.partnerbookmarks/10101} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{cdc7b2d com.android.wallpaper.livepicker/10089} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{9365862 com.android.providers.telephony.auto_generated_rro_product__/10062} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8ddadf3 com.android.phone.auto_generated_rro_vendor__/10081} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e554ab0 com.google.mainline.adservices/10136} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{b329d29 com.android.imsserviceentitlement/10118} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{72598ae com.google.android.healthconnect.controller/10186} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{41b364f com.android.internal.emulation.pixel_2_xl/10015} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{a3c61dc com.android.internal.emulation.pixel_3_xl/10056} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{daee2e5 com.android.internal.emulation.pixel_4_xl/10047} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{eb691ba com.android.internal.emulation.pixel_fold/10003} BLOCKED
+11-07 06:57:36.576   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{3fee86b com.android.bookmarkprovider/10113} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{c1bbfc8 com.google.android.overlay.pixelconfigcommon/10028} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8efc861 com.android.systemui.accessibility.accessibilitymenu.auto_generated_rro_product__/10050} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{92c0f86 com.android.systemui.emulation.pixel_3a/10012} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{c21a047 com.android.systemui.emulation.pixel_4a/10000} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{7111074 com.android.systemui.emulation.pixel_6a/10042} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{2ff899d com.android.systemui.emulation.pixel_7a/10026} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{f299e12 com.google.android.settings.intelligence/10117} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{7347e3b com.google.android.projection.gearhead/10123} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{6cdf9e3 com.google.android.uwb.resources/10180} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{84eca04 com.android.cts.ctsshim/10176} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{68bfe0 com.google.android.wifi.resources/10181} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e502299 com.google.android.wifi.dialog/10183} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{dff895e com.google.android.apps.wallpaper/10161} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e5c513f com.google.android.odad/10122} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{3c9fa0c com.android.settings.auto_generated_rro_product__/10027} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8774f55 com.android.internal.systemui.navbar.gestural/10051} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{3bcb290 com.google.android.apps.youtube.music/10156} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{4ec25b com.android.bluetoothmidiservice/10107} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{e22aaf8 com.android.storagemanager.auto_generated_rro_product__/10025} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{8aa8bd1 com.google.android.cellbroadcastreceiver/10185} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{bdd6636 com.android.phone.auto_generated_rro_product__/10061} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{62d2937 android.auto_generated_rro_product__/10069} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{b537ea4 com.android.internal.systemui.navbar.gestural_narrow_back/10052} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{9fb140d com.google.android.inputmethod.latin/10144} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{f11afc2 android.auto_generated_rro_vendor__/10076} BLOCKED
+11-07 06:57:36.577   542  2921 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{2121d3 com.google.android.apps.restore/10120} BLOCKED
+11-07 06:57:36.582   542   558 D ConnectivityService: requestNetwork for uid/pid:10192/3065 activeRequest: null callbackRequest: 108 [NetworkRequest [ REQUEST id=109, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647
+11-07 06:57:36.590   542   830 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=109, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]
+11-07 06:57:36.590   542   830 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=109, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]
+11-07 06:57:36.590   542   830 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=109, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]
+11-07 06:57:36.590   542   830 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=109, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]
+11-07 06:57:36.630   542  2921 D ConnectivityService: requestNetwork for uid/pid:10192/3065 activeRequest: null callbackRequest: 110 [NetworkRequest [ REQUEST id=111, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647
+11-07 06:57:36.633   542   830 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=111, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]
+11-07 06:57:36.636   542   830 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=111, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]
+11-07 06:57:36.636   542   830 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=111, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]
+11-07 06:57:36.636   542   830 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=111, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: app.frame.studio.debug UnderlyingNetworks: Null] ]
+11-07 06:57:36.870  3065  4023 W Ads     : Not retrying to fetch app settings
+11-07 06:57:36.877   542  2469 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{7393d69 com.google.android.settings.intelligence/10117} BLOCKED
+11-07 06:57:36.880   542   557 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{de686ab com.google.android.settings.intelligence/10117} BLOCKED
+11-07 06:57:36.882  3065  4169 W GooglePlayServicesUtil: Google Play services out of date for app.frame.studio.debug.  Requires 243734000 but found 231818047
+11-07 06:57:36.888  3065  4051 I Ads     : This request is sent from a test device.
+11-07 06:57:37.146  3065  3899 W Ads     : Not retrying to fetch app settings
+11-07 06:57:37.184  3065  4209 D ProfileInstaller: Installing profile for app.frame.studio.debug
+11-07 06:57:37.192  3065  3276 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.photoOrPlaceholder(FrameRenderer.kt:126)
+11-07 06:57:37.192  3065  3276 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.invite(FrameRenderer.kt:279)
+11-07 06:57:37.192  3065  3276 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer.draw(FrameRenderer.kt:77)
+11-07 06:57:37.226  3065  4195 W GooglePlayServicesUtil: Google Play services out of date for app.frame.studio.debug.  Requires 243734000 but found 231818047
+11-07 06:57:37.279  3065  4214 I Phlogger: Unable to retrieve flag snapshot for com.google.android.gms.measurement#app.frame.studio.debug, using defaults.
+11-07 06:57:37.536  3065  4157 I FA      :   adb shell setprop debug.firebase.analytics.app app.frame.studio.debug
+11-07 06:57:37.711  1694  1694 I AiAiEcho: AppFetcherImpl onPackageChanged app.frame.studio.debug.
+11-07 06:57:37.712  1694  2539 I AiAiEcho: AppIndexer Package:[app.frame.studio.debug] UserProfile:[0] Enabled:[true].
+11-07 06:57:37.712  1694  2539 I AiAiEcho: AppFetcherImplV2 updateApps package:[app.frame.studio.debug], userId:[0], reason:[package is updated.].
+11-07 06:57:37.821  3065  3065 I Ads     : JS: The jsLoaded GMSG has been sent (https://googleads.g.doubleclick.net/mads/static/mad/sdk/native/production/sdk-core-v40-impl.js?n=true&lv=sdk_20190107_RC02:1101)
+11-07 06:57:37.835  3065  3065 I Ads     : Received log message: <Google:HTML> You are currently using version 252530000.252530000.0 of the SDK, which is out of date. Please consider updating your SDK to the most recent SDK version to get the latest features and bug fixes. The latest SDK can be installed from https://goo.gle/android-install-instructions. More information about the SDK deprecation schedule is available at https://developers.google.com/admob/android/deprecation.
+11-07 06:57:37.927  3065  4043 I Ads     : SDK version: afma-sdk-a-v252530000.252530000.0
+11-07 06:57:37.928  3065  4043 I Ads     : HTTP timeout: 60000 milliseconds.
+11-07 06:57:38.049  3065  3940 I Ads     : SDK version: afma-sdk-a-v252530000.252530000.0
+11-07 06:57:38.049  3065  3940 I Ads     : HTTP timeout: 60000 milliseconds.
+11-07 06:57:38.598  1518  2748 I HeterodyneSyncScheduler: Scheduling Phenotype for a PhenotypeSyncImmediately(6, com.google.android.gms.measurement#app.frame.studio.debug) one off with window [1, 2] in seconds [CONTEXT service_id=51 ]
+11-07 06:57:42.043  2007  4709 I ModuleSetMgr: Computing pending module set with APKs: [[AdsFdrDynamite.integ:231004600100000], [Cronetdynamite:231818190800], [Dynamiteloader:231818190000], [Dynamitemodulesa:231818190000], [Dynamitemodulesc:231818190000], [Googlecertificates:231818190000], [Mapsdynamite:231818190000], [Measurementdynamite:231818190000]]
+11-07 06:57:42.118  2007  4709 W PackageParser: Unknown element under <manifest>: queries at /data/user_de/0/com.google.android.gms/app_chimera/m/00000000/AdsDynamite.apk Binary XML file line #15
+11-07 06:57:42.368  3065  3065 I Ads     : JS: The jsLoaded GMSG has been sent (https://googleads.g.doubleclick.net/mads/static/sdk/native/sdk-core-v40.html:1108)
+11-07 06:57:42.675  2007  4709 I BlockstoreStorage: Clearing Blockstore Data for package app.frame.studio.debug [CONTEXT service_id=258 ]
+11-07 06:57:43.483  2007  3201 W PackageParser: Unknown element under <manifest>: queries at /data/user_de/0/com.google.android.gms/app_chimera/m/00000000/AdsDynamite.apk Binary XML file line #15
+11-07 06:57:44.044  2007  3201 I ModuleSetMgr: Computing pending module set with APKs: [[AdsFdrDynamite.integ:231004600100000], [Cronetdynamite:231818190800], [Dynamiteloader:231818190000], [Dynamitemodulesa:231818190000], [Dynamitemodulesc:231818190000], [Googlecertificates:231818190000], [Mapsdynamite:231818190000], [Measurementdynamite:231818190000]]
+11-07 06:57:44.163  2007  3201 W PackageParser: Unknown element under <manifest>: queries at /data/user_de/0/com.google.android.gms/app_chimera/m/00000000/AdsDynamite.apk Binary XML file line #15
+11-07 06:57:44.929   542   596 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{216d0eb com.google.android.googlequicksearchbox/10132} BLOCKED
+11-07 06:57:44.933   542   596 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{5f09ff2 com.google.android.devicelockcontroller/10178} BLOCKED
+11-07 06:57:44.934   542   596 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{820be48 com.google.android.rkpdapp/10174} BLOCKED
+11-07 06:57:44.934   542   596 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{39b24e1 com.google.android.settings.intelligence/10117} BLOCKED
+11-07 06:57:44.934   542   596 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{7347e3b com.google.android.projection.gearhead/10123} BLOCKED
+11-07 06:57:45.438  3065  4054 I OpenGLRenderer: Davey! duration=1123ms; Flags=0, FrameTimelineVsyncId=5064, IntendedVsync=50375215021, Vsync=50458548351, InputEventId=0, HandleInputStart=50472170850, AnimationStart=50472173443, PerformTraversalsStart=50474029228, DrawStart=50474234137, FrameDeadline=50508548349, FrameInterval=50472132603, FrameStartTime=16666666, SyncQueued=50482854988, SyncStart=50483284385, IssueDrawCommandsStart=50483423768, SwapBuffers=51495380811, FrameCompleted=51499113330, DequeueBufferDuration=6073, QueueBufferDuration=1102315, GpuCompleted=51498980421, SwapBuffersCompleted=51499113330, DisplayPresentTime=72904454231884001, CommandSubmissionCompleted=51495380811, 
+11-07 06:57:45.530  3065  4054 I OpenGLRenderer: Davey! duration=1076ms; Flags=0, FrameTimelineVsyncId=5080, IntendedVsync=50508548349, Vsync=51491881643, InputEventId=0, HandleInputStart=51506913216, AnimationStart=51506917064, PerformTraversalsStart=51513309661, DrawStart=51513438944, FrameDeadline=51658548303, FrameInterval=51505026338, FrameStartTime=16666666, SyncQueued=51514863157, SyncStart=51632895027, IssueDrawCommandsStart=51638405076, SwapBuffers=51700963236, FrameCompleted=51703248375, DequeueBufferDuration=4278, QueueBufferDuration=367522, GpuCompleted=51703188701, SwapBuffersCompleted=51703248375, DisplayPresentTime=0, CommandSubmissionCompleted=51700963236, 
+11-07 06:57:45.663  3065  3065 E Ads     : JS: Refused to get unsafe header "X-Afma-Gcache-IsGcacheHit" (https://www.gstatic.com/mysidia/1cec40efff96c3a49249fe7c8358c810.js?tag=addon/rewarded_video:479)
+11-07 06:57:45.685  3065  3065 E Ads     : JS: Refused to get unsafe header "X-Afma-Gcache-IsGcacheHit" (https://www.gstatic.com/mysidia/1cec40efff96c3a49249fe7c8358c810.js?tag=addon/rewarded_video:479)
+11-07 06:57:45.913  3065  3464 D AudioStreamTrack: open(), request notificationFrames = 0, frameCount = 0
+11-07 06:57:45.941   414   438 D AudioFlinger: Client defaulted notificationFrames to 2006 for frameCount 4012
+11-07 06:57:54.048   905   953 V WindowManagerShell: Transition requested: android.os.BinderProxy@d82ba72 TransitionRequestInfo { type = CLOSE, triggerTask = TaskInfo{userId=0 taskId=8 displayId=0 isRunning=false baseIntent=Intent { flg=0x10000000 cmp=app.frame.studio.debug/app.frame.studio.MainActivity } baseActivity=null topActivity=null origActivity=null realActivity=ComponentInfo{app.frame.studio.debug/app.frame.studio.MainActivity} numActivities=0 lastActiveTime=36105 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@ba44ec3} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=null launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=true isVisibleRequested=true isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
+11-07 06:57:54.655   542   561 V WindowManager: Sent Transition #7 createdAt=11-07 06:57:54.047 via request=TransitionRequestInfo { type = CLOSE, triggerTask = TaskInfo{userId=0 taskId=8 displayId=0 isRunning=false baseIntent=Intent { flg=0x10000000 cmp=app.frame.studio.debug/app.frame.studio.MainActivity } baseActivity=null topActivity=null origActivity=null realActivity=ComponentInfo{app.frame.studio.debug/app.frame.studio.MainActivity} numActivities=0 lastActiveTime=36105 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{56de8b7 Task{b22e20c #8 type=standard A=10192:app.frame.studio.debug}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=null launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=true isVisibleRequested=true isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
+11-07 06:57:54.656   542   561 V WindowManager:     info={id=7 t=CLOSE f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{RemoteToken{dbc9f8d Task{8fc45ea #1 type=home}}} m=TO_FRONT f=SHOW_WALLPAPER leash=Surface(name=Task=1)/@0x35ba42b sb=Rect(0, 0 - 320, 640) eb=Rect(0, 0 - 320, 640) d=0},{WCT{RemoteToken{56de8b7 Task{b22e20c #8 type=standard A=10192:app.frame.studio.debug}}} m=CLOSE f=NONE leash=Surface(name=Task=8)/@0xd7f12ea sb=Rect(0, 0 - 320, 640) eb=Rect(0, 0 - 320, 640) d=0},{null m=TO_FRONT f=IS_WALLPAPER leash=Surface(name=WallpaperWindowToken{fddd560 token=android.os.Binder@43bf563})/@0xb865315 sb=Rect(0, 0 - 320, 640) eb=Rect(0, 0 - 320, 640) d=0}]}
+11-07 06:57:55.362   542  2361 D CoreBackPreview: Window{2979ced u0 app.frame.studio.debug/app.frame.studio.MainActivity}: Setting back callback null
+11-07 06:57:55.377  1183  1183 W FrameTracker: Missed App frame:UNKNOWN: 76, 8667, 0, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME>
+11-07 06:57:55.377  1183  1183 W FrameTracker: Missed SF frame:UNKNOWN: 76, 8667, 0, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME>
+11-07 06:57:55.377  1183  1183 W FrameTracker: Missing HWUI jank callback for vsyncId: 8667, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME>
+11-07 06:57:55.377  1183  1183 W FrameTracker: Missed App frame:UNKNOWN: 88, 8711, 483473944, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME>
+11-07 06:57:55.377  1183  1183 W FrameTracker: Missed SF frame:UNKNOWN: 88, 8711, 483473944, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME>
+11-07 06:57:55.377  1183  1183 W FrameTracker: Missed SF frame:UNKNOWN: 80, 8733, 276995725, CUJ=J<LAUNCHER_APP_CLOSE_TO_HOME>
+11-07 06:57:55.378   542   621 W InputManager-JNI: Input channel object '2979ced app.frame.studio.debug/app.frame.studio.MainActivity (client)' was disposed without first being removed with the input manager!
+11-07 06:57:56.107   905   953 V WindowManagerShell: Transition requested: android.os.BinderProxy@ebe1a58 TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=9 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=app.frame.studio.debug/app.frame.studio.MainActivity } baseActivity=ComponentInfo{app.frame.studio.debug/app.frame.studio.MainActivity} topActivity=ComponentInfo{app.frame.studio.debug/app.frame.studio.MainActivity} origActivity=null realActivity=ComponentInfo{app.frame.studio.debug/app.frame.studio.MainActivity} numActivities=1 lastActiveTime=62292 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@b0837b1} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=ActivityInfo{75dd496 app.frame.studio.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
+11-07 06:57:56.108   542  2920 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=app.frame.studio.debug/app.frame.studio.MainActivity} with LAUNCH_MULTIPLE from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+11-07 06:57:56.155   542   561 V WindowManager: Sent Transition #8 createdAt=11-07 06:57:56.101 via request=TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=9 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=app.frame.studio.debug/app.frame.studio.MainActivity } baseActivity=ComponentInfo{app.frame.studio.debug/app.frame.studio.MainActivity} topActivity=ComponentInfo{app.frame.studio.debug/app.frame.studio.MainActivity} origActivity=null realActivity=ComponentInfo{app.frame.studio.debug/app.frame.studio.MainActivity} numActivities=1 lastActiveTime=62292 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{8aa61c3 Task{647b6f8 #9 type=standard A=10192:app.frame.studio.debug}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=ActivityInfo{a273a40 app.frame.studio.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
+11-07 06:57:56.155   542   561 V WindowManager:     info={id=8 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{RemoteToken{8aa61c3 Task{647b6f8 #9 type=standard A=10192:app.frame.studio.debug}}} m=OPEN f=NONE leash=Surface(name=Task=9)/@0xfbd4a27 sb=Rect(0, 0 - 320, 640) eb=Rect(0, 0 - 320, 640) d=0},{WCT{RemoteToken{dbc9f8d Task{8fc45ea #1 type=home}}} m=TO_BACK f=SHOW_WALLPAPER leash=Surface(name=Task=1)/@0x35ba42b sb=Rect(0, 0 - 320, 640) eb=Rect(0, 0 - 320, 640) d=0}]}
+11-07 06:57:56.162   542  1209 D CoreBackPreview: Window{c422741 u0 app.frame.studio.debug/app.frame.studio.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@3f37d79, mPriority=-1, mIsAnimationCallback=false}
+11-07 06:57:56.282  3065  4051 I Ads     : This request is sent from a test device.
+11-07 06:57:56.330  3065  5039 W GooglePlayServicesUtil: Google Play services out of date for app.frame.studio.debug.  Requires 243734000 but found 231818047
+11-07 06:57:56.526  3065  3065 I Ads     : Received log message: <Google:HTML> You are currently using version 252530000.252530000.0 of the SDK, which is out of date. Please consider updating your SDK to the most recent SDK version to get the latest features and bug fixes. The latest SDK can be installed from https://goo.gle/android-install-instructions. More information about the SDK deprecation schedule is available at https://developers.google.com/admob/android/deprecation.
+11-07 06:57:56.551  3065  4987 I Ads     : SDK version: afma-sdk-a-v252530000.252530000.0
+11-07 06:57:56.551  3065  4987 I Ads     : HTTP timeout: 60000 milliseconds.
+11-07 06:57:57.948   542   561 W ziparchive: Unable to open '/data/app/~~dAmytA_-tlY4TSa0hBw5jQ==/app.frame.studio.debug-0jTGEnuiSDcVTWsEpPcHkw==/base.dm': No such file or directory
+11-07 06:57:57.949   542   561 I ActivityTaskManager: Displayed app.frame.studio.debug/app.frame.studio.MainActivity for user 0: +1s846ms
+11-07 06:57:58.177  3065  3275 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.photoOrPlaceholder(FrameRenderer.kt:126)
+11-07 06:57:58.177  3065  3275 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.invite(FrameRenderer.kt:279)
+11-07 06:57:58.177  3065  3275 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer.draw(FrameRenderer.kt:77)
+11-07 06:57:58.177  3065  3115 I OpenGLRenderer: Davey! duration=1233ms; Flags=1, FrameTimelineVsyncId=9274, IntendedVsync=63125214511, Vsync=63125214511, InputEventId=0, HandleInputStart=63126670920, AnimationStart=63126673253, PerformTraversalsStart=63126674891, DrawStart=63128557744, FrameDeadline=63141881177, FrameInterval=63126647527, FrameStartTime=16666666, SyncQueued=63279795548, SyncStart=63280025793, IssueDrawCommandsStart=63281206085, SwapBuffers=64255069592, FrameCompleted=64358711837, DequeueBufferDuration=5617, QueueBufferDuration=1790549, GpuCompleted=64358711837, SwapBuffersCompleted=64349413487, DisplayPresentTime=1, CommandSubmissionCompleted=64255069592, 
+11-07 06:57:58.180   542   619 I ImeTracker: app.frame.studio.debug:74d0a332: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+11-07 06:57:58.180   542   619 I ImeTracker: app.frame.studio.debug:74d0a332: onCancelled at PHASE_SERVER_SHOULD_HIDE
+11-07 06:57:58.182  1574  1574 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=app.frame.studio.debug fieldId=0 fieldName=null extras=null}, false)
+11-07 06:57:58.761   542   621 W InputManager-JNI: Input channel object '7be5dd3 Splash Screen app.frame.studio.debug (client)' was disposed without first being removed with the input manager!
+11-07 06:58:00.207   542   596 I AppsFilter: interaction: PackageSetting{b702178 app.frame.studio.debug/10192} -> PackageSetting{a6e61a7 com.google.android.as/10125} BLOCKED
+11-07 06:58:01.052  2007  5076 I Ads     : Initialized AdMob in container 23.18.18 (190800-535401451)
+SMOKE: LAUNCH OK
+/tmp/sample.mp4: 1 file pushed, 0 skipped. 2.5 MB/s (100233 bytes in 0.039s)
+/tmp/sample.m4a: 1 file pushed, 0 skipped. 96.1 MB/s (36473 bytes in 0.000s)
+/tmp/sample.png: 1 file pushed, 0 skipped. 81.7 MB/s (33510 bytes in 0.000s)
+/tmp/big.jpg: 1 file pushed, 0 skipped. 253.0 MB/s (1765678 bytes in 0.007s)
+/tmp/beats.m4a: 1 file pushed, 0 skipped. 35.0 MB/s (47922 bytes in 0.001s)
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:processDebugAndroidTestManifest
+> Task :app:generateDebugAndroidTestBuildConfig
+> Task :app:checkDebugAndroidTestAarMetadata
+> Task :app:processDebugAndroidTestNavigationResources
+> Task :app:compileDebugAndroidTestNavigationResources FROM-CACHE
+> Task :app:generateDebugAndroidTestResValues FROM-CACHE
+> Task :app:mapDebugAndroidTestSourceSetPaths
+> Task :app:generateDebugAndroidTestResources
+> Task :app:javaPreCompileDebugAndroidTest FROM-CACHE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:mergeDebugAndroidTestResources
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:packageDebug UP-TO-DATE
+> Task :app:processDebugAndroidTestResources
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:mergeDebugAndroidTestShaders
+> Task :app:compileDebugAndroidTestShaders NO-SOURCE
+> Task :app:generateDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergeDebugAndroidTestAssets
+> Task :app:compressDebugAndroidTestAssets
+> Task :app:desugarDebugAndroidTestFileDependencies FROM-CACHE
+> Task :app:checkDebugAndroidTestDuplicateClasses
+> Task :app:mergeDebugAndroidTestJniLibFolders
+> Task :app:mergeDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:mergeLibDexDebugAndroidTest FROM-CACHE
+> Task :app:stripDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebugAndroidTest
+> Task :app:writeDebugAndroidTestSigningConfigVersions
+> Task :app:mergeExtDexDebugAndroidTest
+
+> Task :app:compileDebugAndroidTestKotlin
+w: file:///home/runner/work/frame/frame/app/src/androidTest/java/app/frame/studio/media/HeavyMediaDeviceTest.kt:81:54 Check for instance is always 'true'.
+
+> Task :app:compileDebugAndroidTestJavaWithJavac
+> Task :app:dexBuilderDebugAndroidTest
+> Task :app:mergeDebugAndroidTestGlobalSynthetics FROM-CACHE
+> Task :app:processDebugAndroidTestJavaRes
+> Task :app:mergeDebugAndroidTestJavaResource
+> Task :app:mergeProjectDexDebugAndroidTest
+> Task :app:packageDebugAndroidTest
+> Task :app:createDebugAndroidTestApkListingFileRedirect
+[EmulatorConsole]: Failed to start Emulator console for 5554
+
+> Task :app:connectedDebugAndroidTest
+Starting 40 tests on emulator-5554 - 14
+
+emulator-5554 - 14 Tests 2/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 14 Tests 3/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 14 Tests 4/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 14 Tests 5/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 14 Tests 7/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 14 Tests 8/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 14 Tests 9/40 completed. (0 skipped) (0 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.export.OverlayDeviceTest > overlaySoundIsMixedAtItsTime[emulator-5554 - 14] [31mFAILED [0m
+	java.lang.AssertionError: overlay sound missing (rms 0.0)
+	at org.junit.Assert.fail(Assert.java:89)
+
+emulator-5554 - 14 Tests 11/40 completed. (0 skipped) (1 failed)
+emulator-5554 - 14 Tests 13/40 completed. (0 skipped) (1 failed)
+emulator-5554 - 14 Tests 15/40 completed. (0 skipped) (1 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.export.ShareOptimizerDeviceTest > fourKSixtyBecomesInstagramReady[emulator-5554 - 14] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+emulator-5554 - 14 Tests 18/40 completed. (0 skipped) (2 failed)
+emulator-5554 - 14 Tests 19/40 completed. (0 skipped) (2 failed)
+emulator-5554 - 14 Tests 20/40 completed. (0 skipped) (2 failed)
+emulator-5554 - 14 Tests 22/40 completed. (0 skipped) (2 failed)
+emulator-5554 - 14 Tests 23/40 completed. (0 skipped) (2 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.magic.MagicMovieRobustnessTest > veryShortAndVeryLongVideos[emulator-5554 - 14] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/short.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+app.frame.studio.magic.MagicMovieRobustnessTest > silentMusicHasNoBeatsButStillWorks[emulator-5554 - 14] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/short.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+emulator-5554 - 14 Tests 28/40 completed. (0 skipped) (4 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.media.HeavyMediaDeviceTest > verdictsMatchThePhonesDecoders[emulator-5554 - 14] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v8k.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+app.frame.studio.media.HeavyMediaDeviceTest > heavyClipStillExportsAtFullResolution[emulator-5554 - 14] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+app.frame.studio.media.HeavyMediaDeviceTest > proxyIsMadeAtShortSide540[emulator-5554 - 14] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+app.frame.studio.media.HeavyMediaDeviceTest > eightKIsRefusedWithAClearReasonWhenNoDecoderFits[emulator-5554 - 14] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v8k.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+emulator-5554 - 14 Tests 34/40 completed. (0 skipped) (8 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.templates.CollageTemplateTest > everyCollageTemplateBuilds[emulator-5554 - 14] [31mFAILED [0m
+	java.lang.IllegalArgumentException: Cannot coerce value to an empty range: maximum 0.49999994 is less than minimum 0.50000006.
+	at kotlin.ranges.RangesKt___RangesKt.coerceIn(_Ranges.kt:1476)
+
+emulator-5554 - 14 Tests 39/40 completed. (0 skipped) (9 failed)
+Finished 40 tests on emulator-5554 - 14
+
+> Task :app:connectedDebugAndroidTest
+Tests on emulator-5554 - 14 failed: There was 9 failure(s).
+
+> Task :app:connectedDebugAndroidTest FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__reactivecircus_android-emulator-runner-1794034683423.json
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:connectedDebugAndroidTest'.
+> There were failing tests. See the report at: file:///home/runner/work/frame/frame/app/build/reports/androidTests/connected/debug/index.html
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 12m 20s
+71 actionable tasks: 26 executed, 6 from cache, 39 up-to-date
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="app.frame.studio.audio.BeatDetectionDeviceTest" tests="40" failures="9" errors="0" skipped="0" time="711.989" timestamp="2026-11-07T07:10:21" hostname="localhost">
+  <properties>
+    <property name="device" value="emulator-5554 - 14" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="findsTheBeatOfARealAacFile" classname="app.frame.studio.audio.BeatDetectionDeviceTest" time="0.481" />
+  <testcase name="autoCaptionsFinishCleanly" classname="app.frame.studio.captions.CaptionsDeviceTest" time="0.209" />
+  <testcase name="exportsEveryCaptionStyle" classname="app.frame.studio.captions.CaptionsDeviceTest" time="12.301" />
+  <testcase name="movedZoomedTurnedClipRenders" classname="app.frame.studio.export.CanvasFillDeviceTest" time="8.471" />
+  <testcase name="fillModesPlaceTheClipAsDescribed" classname="app.frame.studio.export.CanvasFillDeviceTest" time="14.079" />
+  <testcase name="exportsFullFeaturedProject" classname="app.frame.studio.export.ExportPipelineTest" time="30.166" />
+  <testcase name="previewPlaysCompositionWithoutErrors" classname="app.frame.studio.export.ExportPipelineTest" time="3.127" />
+  <testcase name="everySceneEffectRenders" classname="app.frame.studio.export.ExportPipelineTest" time="13.16" />
+  <testcase name="overlayExportsFinishThreeTimesInARow" classname="app.frame.studio.export.ExportRetryDeviceTest" time="22.043" />
+  <testcase name="overlaySoundIsMixedAtItsTime" classname="app.frame.studio.export.OverlayDeviceTest" time="7.153">
+    <failure>java.lang.AssertionError: overlay sound missing (rms 0.0)
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.assertTrue(Assert.java:42)
+at app.frame.studio.export.OverlayDeviceTest.overlaySoundIsMixedAtItsTime(OverlayDeviceTest.kt:209)
+</failure>
+  </testcase>
+  <testcase name="exportsKeyframedOverlays" classname="app.frame.studio.export.OverlayDeviceTest" time="7.815" />
+  <testcase name="layeredPreviewPlays" classname="app.frame.studio.export.OverlayDeviceTest" time="3.762" />
+  <testcase name="overlayProjectPreparesAtTheEnd" classname="app.frame.studio.export.PreviewAtEndDeviceTest" time="6.073" />
+  <testcase name="textProjectPreparesAtTheEnd" classname="app.frame.studio.export.PreviewAtEndDeviceTest" time="6.153" />
+  <testcase name="safeResumePositionStaysAwayFromTheEnd" classname="app.frame.studio.export.PreviewAtEndDeviceTest" time="0.002" />
+  <testcase name="videoOverlayProjectPreparesAtTheEnd" classname="app.frame.studio.export.PreviewAtEndDeviceTest" time="6.106" />
+  <testcase name="fourKSixtyBecomesInstagramReady" classname="app.frame.studio.export.ShareOptimizerDeviceTest" time="0.004">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.export.ShareOptimizerDeviceTest$fourKSixtyBecomesInstagramReady$1.invokeSuspend(ShareOptimizerDeviceTest.kt:22)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.export.ShareOptimizerDeviceTest.fourKSixtyBecomesInstagramReady(ShareOptimizerDeviceTest.kt:20)
+</failure>
+  </testcase>
+  <testcase name="cleanedAndDuckedExportKeepsItsLength" classname="app.frame.studio.export.SoundCleanupDeviceTest" time="5.03" />
+  <testcase name="everyTextAnimationExports" classname="app.frame.studio.export.TextAnimationDeviceTest" time="21.626" />
+  <testcase name="everyShaderTransitionExports" classname="app.frame.studio.export.TransitionDeviceTest" time="42.738" />
+  <testcase name="makesBeatSyncedMovieAndExportsIt" classname="app.frame.studio.magic.MagicMovieDeviceTest" time="25.691" />
+  <testcase name="duplicatesOnlyLeaveOne" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="0.054" />
+  <testcase name="singlePhoto" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="28.894" />
+  <testcase name="skipsBrokenFilesAndKeepsTheGoodOnes" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="5.034" />
+  <testcase name="veryShortAndVeryLongVideos" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="0.002">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/short.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.magic.MagicMovieRobustnessTest.sample(MagicMovieRobustnessTest.kt:57)
+at app.frame.studio.magic.MagicMovieRobustnessTest.sample$default(MagicMovieRobustnessTest.kt:55)
+at app.frame.studio.magic.MagicMovieRobustnessTest$veryShortAndVeryLongVideos$1.invokeSuspend(MagicMovieRobustnessTest.kt:169)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.magic.MagicMovieRobustnessTest.veryShortAndVeryLongVideos(MagicMovieRobustnessTest.kt:168)
+</failure>
+  </testcase>
+  <testcase name="allBrokenGivesAClearError" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="0.026" />
+  <testcase name="silentMusicHasNoBeatsButStillWorks" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="0.078">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/short.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.magic.MagicMovieRobustnessTest.sample(MagicMovieRobustnessTest.kt:57)
+at app.frame.studio.magic.MagicMovieRobustnessTest.sample$default(MagicMovieRobustnessTest.kt:55)
+at app.frame.studio.magic.MagicMovieRobustnessTest$silentMusicHasNoBeatsButStillWorks$1.invokeSuspend(MagicMovieRobustnessTest.kt:153)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.magic.MagicMovieRobustnessTest.silentMusicHasNoBeatsButStillWorks(MagicMovieRobustnessTest.kt:152)
+</failure>
+  </testcase>
+  <testcase name="manyPhotosStayWithinLimitsAndTime" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="4.013" />
+  <testcase name="unreadableMusicStillMakesTheMovie" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="7.279" />
+  <testcase name="cancellingStopsWithoutSavingAProject" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="1.507" />
+  <testcase name="verdictsMatchThePhonesDecoders" classname="app.frame.studio.media.HeavyMediaDeviceTest" time="0.025">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v8k.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.media.HeavyMediaDeviceTest.sample(HeavyMediaDeviceTest.kt:48)
+at app.frame.studio.media.HeavyMediaDeviceTest.access$sample(HeavyMediaDeviceTest.kt:38)
+at app.frame.studio.media.HeavyMediaDeviceTest$verdictsMatchThePhonesDecoders$1.invokeSuspend(HeavyMediaDeviceTest.kt:53)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.media.HeavyMediaDeviceTest.verdictsMatchThePhonesDecoders(HeavyMediaDeviceTest.kt:51)
+</failure>
+  </testcase>
+  <testcase name="heavyClipStillExportsAtFullResolution" classname="app.frame.studio.media.HeavyMediaDeviceTest" time="0.004">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.media.HeavyMediaDeviceTest.sample(HeavyMediaDeviceTest.kt:48)
+at app.frame.studio.media.HeavyMediaDeviceTest.heavyClipStillExportsAtFullResolution(HeavyMediaDeviceTest.kt:114)
+</failure>
+  </testcase>
+  <testcase name="proxyIsMadeAtShortSide540" classname="app.frame.studio.media.HeavyMediaDeviceTest" time="0.026">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.media.HeavyMediaDeviceTest.sample(HeavyMediaDeviceTest.kt:48)
+at app.frame.studio.media.HeavyMediaDeviceTest.proxyIsMadeAtShortSide540(HeavyMediaDeviceTest.kt:88)
+</failure>
+  </testcase>
+  <testcase name="eightKIsRefusedWithAClearReasonWhenNoDecoderFits" classname="app.frame.studio.media.HeavyMediaDeviceTest" time="0.001">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v8k.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.media.HeavyMediaDeviceTest.sample(HeavyMediaDeviceTest.kt:48)
+at app.frame.studio.media.HeavyMediaDeviceTest.access$sample(HeavyMediaDeviceTest.kt:38)
+at app.frame.studio.media.HeavyMediaDeviceTest$eightKIsRefusedWithAClearReasonWhenNoDecoderFits$1.invokeSuspend(HeavyMediaDeviceTest.kt:74)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.media.HeavyMediaDeviceTest.eightKIsRefusedWithAClearReasonWhenNoDecoderFits(HeavyMediaDeviceTest.kt:73)
+</failure>
+  </testcase>
+  <testcase name="lowEndStress" classname="app.frame.studio.perf.PerfStressTest" time="149.262" />
+  <testcase name="everyCollageTemplateBuilds" classname="app.frame.studio.templates.CollageTemplateTest" time="0.653">
+    <failure>java.lang.IllegalArgumentException: Cannot coerce value to an empty range: maximum 0.49999994 is less than minimum 0.50000006.
+at kotlin.ranges.RangesKt___RangesKt.coerceIn(_Ranges.kt:1476)
+at app.frame.studio.templates.PhotoFraming.clamp(PhotoFit.kt:41)
+at app.frame.studio.templates.PhotoFraming.source(PhotoFit.kt:25)
+at app.frame.studio.templates.CollageRenderer.drawCropped$app_debug(CollageRenderer.kt:240)
+at app.frame.studio.templates.FrameRenderer$Ctx.photoOrPlaceholder(FrameRenderer.kt:126)
+at app.frame.studio.templates.FrameRenderer$Ctx.print(FrameRenderer.kt:144)
+at app.frame.studio.templates.FrameRenderer.draw(FrameRenderer.kt:72)
+at app.frame.studio.templates.CollageRenderer.draw(CollageRenderer.kt:79)
+at app.frame.studio.templates.CollageRenderer.render(CollageRenderer.kt:49)
+at app.frame.studio.templates.TemplateBuilder$renderCollagePages$2.invokeSuspend$lambda$10$lambda$8$lambda$7(TemplateBuilder.kt:125)
+at app.frame.studio.templates.TemplateBuilder$renderCollagePages$2.$r8$lambda$MXYpRS0ys--vNchTTfZPSMPsjT4(Unknown Source:0)
+at app.frame.studio.templates.TemplateBuilder$renderCollagePages$2$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+at app.frame.studio.templates.CollageRenderer.withFits(CollageRenderer.kt:228)
+at app.frame.studio.templates.TemplateBuilder$renderCollagePages$2.invokeSuspend(TemplateBuilder.kt:124)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+</failure>
+  </testcase>
+  <testcase name="framingChangesPreviewAndVideo" classname="app.frame.studio.templates.PhotoAdjustDeviceTest" time="0.302" />
+  <testcase name="everyBundledFontLoads" classname="app.frame.studio.text.TextFontsDeviceTest" time="0.028" />
+  <testcase name="fontSpanChangesRenderedPixels" classname="app.frame.studio.text.TextFontsDeviceTest" time="0.001" />
+  <testcase name="tour" classname="app.frame.studio.ui.ScreenshotTour" time="275.178" />
+</testsuite>/data/local/tmp/shots/./: 14 files pulled, 0 skipped. 56.7 MB/s (1252482 bytes in 0.021s)
+SMOKE: EXPORT FAILED
