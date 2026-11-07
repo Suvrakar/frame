@@ -1,0 +1,436 @@
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CollageRenderer.kt:14: Warning: Avoid using android.media.ExifInterface; use androidx.exifinterface.media.ExifInterface instead [ExifInterface]
+import android.media.ExifInterface
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CollageRenderer.kt:280: Warning: Avoid using android.media.ExifInterface; use androidx.exifinterface.media.ExifInterface instead [ExifInterface]
+                when (ExifInterface(s).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/ImageNormalizer.kt:7: Warning: Avoid using android.media.ExifInterface; use androidx.exifinterface.media.ExifInterface instead [ExifInterface]
+import android.media.ExifInterface
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/ImageNormalizer.kt:74: Warning: Avoid using android.media.ExifInterface; use androidx.exifinterface.media.ExifInterface instead [ExifInterface]
+            when (ExifInterface(stream).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/magic/MagicMovieBuilder.kt:8: Warning: Avoid using android.media.ExifInterface; use androidx.exifinterface.media.ExifInterface instead [ExifInterface]
+import android.media.ExifInterface
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/magic/MagicMovieBuilder.kt:189: Warning: Avoid using android.media.ExifInterface; use androidx.exifinterface.media.ExifInterface instead [ExifInterface]
+            val exif = ExifInterface(stream)
+                       ~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/MediaProbe.kt:9: Warning: Avoid using android.media.ExifInterface; use androidx.exifinterface.media.ExifInterface instead [ExifInterface]
+import android.media.ExifInterface
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/MediaProbe.kt:70: Warning: Avoid using android.media.ExifInterface; use androidx.exifinterface.media.ExifInterface instead [ExifInterface]
+            when (ExifInterface(stream).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ExifInterface":
+   The android.media.ExifInterface implementation has some known security bugs
+   in older versions of Android. There is a new implementation available of
+   this library in the support library, which is preferable.
+
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/media/MediaInspector.kt:75: Warning: Field requires API level 29 (current min is 26): android.media.MediaCodecInfo.CodecProfileLevel#HEVCProfileMain10HDR10Plus [InlinedApi]
+                p == CodecProfileLevel.HEVCProfileMain10HDR10Plus
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/media/MediaInspector.kt:78: Warning: Field requires API level 29 (current min is 26): android.media.MediaCodecInfo.CodecProfileLevel#VP9Profile2HDR10Plus [InlinedApi]
+                p == CodecProfileLevel.VP9Profile2HDR10Plus
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/media/MediaInspector.kt:79: Warning: Field requires API level 29 (current min is 26): android.media.MediaCodecInfo.CodecProfileLevel#AV1ProfileMain10 [InlinedApi]
+            "video/av01" -> p == CodecProfileLevel.AV1ProfileMain10 ||
+                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/media/MediaInspector.kt:80: Warning: Field requires API level 29 (current min is 26): android.media.MediaCodecInfo.CodecProfileLevel#AV1ProfileMain10HDR10 [InlinedApi]
+                p == CodecProfileLevel.AV1ProfileMain10HDR10 ||
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/media/MediaInspector.kt:81: Warning: Field requires API level 29 (current min is 26): android.media.MediaCodecInfo.CodecProfileLevel#AV1ProfileMain10HDR10Plus [InlinedApi]
+                p == CodecProfileLevel.AV1ProfileMain10HDR10Plus
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "InlinedApi":
+   This check scans through all the Android API field references in the
+   application and flags certain constants, such as static final integers and
+   Strings, which were introduced in later versions. These will actually be
+   copied into the class files rather than being referenced, which means that
+   the value is available even when running on older devices. In some cases
+   that's fine, and in other cases it can result in a runtime crash or
+   incorrect behavior. It depends on the context, so consider the code
+   carefully and decide whether it's safe and can be suppressed or whether the
+   code needs to be guarded.
+
+   If you really want to use this API and don't need to support older devices
+   just set the minSdkVersion in your build.gradle or AndroidManifest.xml
+   files.
+
+   If your code is deliberately accessing newer APIs, and you have ensured
+   (e.g. with conditional execution) that this code will only ever be called
+   on a supported platform, then you can annotate your class or method with
+   the @TargetApi annotation specifying the local minimum SDK to apply, such
+   as @TargetApi(11), such that this check considers 11 rather than your
+   manifest file's minimum SDK as the required API level.
+
+/home/runner/work/frame/frame/app/build.gradle.kts:55: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk = 36
+        ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application or sdk runs on a version of Android that is more
+   recent than your targetSdkVersion specifies that it has been tested with,
+   various compatibility modes kick in. This ensures that your application
+   continues to work, but it may look out of place. For example, if the
+   targetSdkVersion is less than 14, your app may get an option button in the
+   UI.
+
+   To fix this issue, set the targetSdkVersion to the highest available value.
+   Then test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+/home/runner/work/frame/frame/gradle/wrapper/gradle-wrapper.properties:3: Warning: A newer version of Gradle than 8.14.3 is available: 8.14.6 [AndroidGradlePluginVersion]
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "AndroidGradlePluginVersion":
+   This detector looks for usage of the Android Gradle Plugin where the
+   version you are using is not the current stable release. Using older
+   versions is fine, and there are cases where you deliberately want to stick
+   with an older version. However, you may simply not be aware that a more
+   recent version is available, and that is what this lint check helps find.
+
+/home/runner/work/frame/frame/app/build.gradle.kts:179: Warning: A newer version of androidx.compose:compose-bom than 2025.08.00 is available: 2026.09.00 [GradleDependency]
+    implementation(platform("androidx.compose:compose-bom:2025.08.00"))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:186: Warning: A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.19.1 [GradleDependency]
+    implementation("androidx.core:core-ktx:1.17.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:192: Warning: A newer version of androidx.activity:activity-compose than 1.10.1 is available: 1.13.0 [GradleDependency]
+    implementation("androidx.activity:activity-compose:1.10.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:193: Warning: A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.9.2 is available: 2.11.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.2")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:194: Warning: A newer version of androidx.lifecycle:lifecycle-viewmodel-compose than 2.9.2 is available: 2.11.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:195: Warning: A newer version of androidx.lifecycle:lifecycle-runtime-compose than 2.9.2 is available: 2.11.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.2")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:196: Warning: A newer version of androidx.navigation:navigation-compose than 2.9.3 is available: 2.10.2 [GradleDependency]
+    implementation("androidx.navigation:navigation-compose:2.9.3")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:198: Warning: A newer version of androidx.media3:media3-exoplayer than 1.8.0 is available: 1.11.1 [GradleDependency]
+    implementation("androidx.media3:media3-exoplayer:$media3")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:199: Warning: A newer version of androidx.media3:media3-ui than 1.8.0 is available: 1.11.1 [GradleDependency]
+    implementation("androidx.media3:media3-ui:$media3")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:200: Warning: A newer version of androidx.media3:media3-transformer than 1.8.0 is available: 1.11.1 [GradleDependency]
+    implementation("androidx.media3:media3-transformer:$media3")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:201: Warning: A newer version of androidx.media3:media3-effect than 1.8.0 is available: 1.11.1 [GradleDependency]
+    implementation("androidx.media3:media3-effect:$media3")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:202: Warning: A newer version of androidx.media3:media3-common than 1.8.0 is available: 1.11.1 [GradleDependency]
+    implementation("androidx.media3:media3-common:$media3")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:203: Warning: A newer version of androidx.media3:media3-muxer than 1.8.0 is available: 1.11.1 [GradleDependency]
+    implementation("androidx.media3:media3-muxer:$media3")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:208: Warning: A newer version of com.google.android.gms:play-services-ads than 24.5.0 is available: 25.5.0 [GradleDependency]
+    implementation("com.google.android.gms:play-services-ads:24.5.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:209: Warning: A newer version of com.google.android.ump:user-messaging-platform than 3.2.0 is available: 4.0.0 [GradleDependency]
+    implementation("com.google.android.ump:user-messaging-platform:3.2.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:211: Warning: A newer version of com.android.billingclient:billing-ktx than 7.1.1 is available: 9.1.0 [GradleDependency]
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:215: Warning: A newer version of com.google.firebase:firebase-bom than 34.19.0 is available: 35.1.0 [GradleDependency]
+    implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:225: Warning: A newer version of androidx.test.uiautomator:uiautomator than 2.3.0 is available: 2.4.1 [GradleDependency]
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+/home/runner/work/frame/frame/app/build.gradle.kts:205: Warning: A newer version of org.jetbrains.kotlinx:kotlinx-serialization-json than 1.8.1 is available: 1.12.0 [NewerVersionAvailable]
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:206: Warning: A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-android than 1.10.2 is available: 1.11.0 [NewerVersionAvailable]
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/build.gradle.kts:220: Warning: A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-test than 1.10.2 is available: 1.11.0 [NewerVersionAvailable]
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NewerVersionAvailable":
+   This detector checks with a central repository to see if there are newer
+   versions available for the dependencies used by this project. This is
+   similar to the GradleDependency check, which checks for newer versions
+   available in the Android SDK tools and libraries, but this works with any
+   MavenCentral dependency, and connects to the library every time, which
+   makes it more flexible but also much slower.
+
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/audio/AudioPcmReader.kt:85: Warning: Unnecessary; SDK_INT is always >= 26 [ObsoleteSdkInt]
+                        floatPcm = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/media/MediaInspector.kt:66: Warning: Unnecessary; SDK_INT is always >= 26 [ObsoleteSdkInt]
+        if (Build.VERSION.SDK_INT >= 24 && f.containsKey(MediaFormat.KEY_COLOR_TRANSFER)) {
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/res/mipmap-anydpi-v26: Warning: This folder configuration (v26) is unnecessary; minSdkVersion is 26. Merge all the resources in this folder into mipmap-anydpi. [ObsoleteSdkInt]
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/ui/templates/AdjustPhotos.kt:81: Hint: Prefer mutableIntStateOf instead of mutableStateOf [AutoboxingStateCreation from androidx.compose.runtime]
+    var page by remember(session) { mutableStateOf(0) }
+                                    ~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/ui/editor/Panels.kt:438: Hint: Prefer mutableIntStateOf instead of mutableStateOf [AutoboxingStateCreation from androidx.compose.runtime]
+    var every by remember { mutableStateOf(2) }
+                            ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "AutoboxingStateCreation":
+   Calling mutableStateOf<T>() when T is either backed by a primitive type on
+   the JVM or is a value class results in a state implementation that requires
+   all state values to be boxed. This usually causes an additional allocation
+   for each state write, and adds some additional work to auto-unbox values
+   when reading the value of the state. Instead, prefer to use a specialized
+   primitive state implementation for Int, Long, Float, and Double when the
+   state does not need to track null values and does not override the default
+   SnapshotMutationPolicy. See mutableIntStateOf(), mutableLongStateOf(),
+   mutableFloatStateOf(), and mutableDoubleStateOf() for more information.
+
+   Vendor: Jetpack Compose
+   Identifier: androidx.compose.runtime
+   Feedback: https://issuetracker.google.com/issues/new?component=612128
+
+/home/runner/work/frame/frame/app/src/main/res/values/colors.xml:3: Warning: The resource R.color.ic_launcher_background appears to be unused [UnusedResources]
+    <color name="ic_launcher_background">#1B1B1F</color>
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/res/values/colors.xml:4: Warning: The resource R.color.seed appears to be unused [UnusedResources]
+    <color name="seed">#1A73E8</color>
+           ~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+   Available options:
+
+   **skip-libraries** (default is true):
+   Whether the unused resource check should skip reporting unused resources in libraries.
+
+   Many libraries will declare resources that are part of the library surface; other modules depending on the library will also reference the resources. To avoid reporting all these resources as unused (in the context of a library), the unused resource check normally skips reporting unused resources in libraries. Instead, run the unused resource check on the consuming app module (along with `checkDependencies=true`).
+
+   However, there are cases where you want to check that all the resources declared in a library are used; in that case, you can disable the skip option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UnusedResources">
+           <option name="skip-libraries" value="true" />
+       </issue>
+   </lint>
+   ```
+
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/captions/AutoCaptioner.kt:51: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                AudioPcmReader.readMono(context, Uri.parse(src.uri), src.mediaStartMs, src.mediaEndMs, SPEECH_RATE)
+                                                 ~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CardRenderer.kt:31: Warning: Use the KTX function createBitmap instead? [UseKtx]
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CardRenderer.kt:70: Warning: Use the KTX extension function Canvas.withRotation instead? [UseKtx]
+                canvas.save()
+                ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CardRenderer.kt:114: Warning: Use the KTX extension function Canvas.withTranslation instead? [UseKtx]
+        canvas.save()
+        ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CollageRenderer.kt:47: Warning: Use the KTX function createBitmap instead? [UseKtx]
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CollageRenderer.kt:101: Warning: Use the KTX extension function Canvas.withRotation instead? [UseKtx]
+            canvas.save()
+            ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CollageRenderer.kt:163: Warning: Use the KTX extension function Canvas.withTranslation instead? [UseKtx]
+        canvas.save()
+        ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CollageRenderer.kt:252: Warning: Use the KTX extension function Canvas.withSave instead? [UseKtx]
+        canvas.save()
+        ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/CollageRenderer.kt:305: Warning: Use the KTX extension function Bitmap.scale instead? [UseKtx]
+                    if (scale >= 1f) full else Bitmap.createScaledBitmap(
+                                               ^
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/ui/common/Common.kt:105: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                                                 ~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/export/CompositionFactory.kt:159: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+            val item = MediaItem.Builder().setUri(Uri.parse(blank)).setImageDurationMs(ms).build()
+                                                  ~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/export/CompositionFactory.kt:204: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+            val item = MediaItem.Builder().setUri(Uri.parse(o.sourceUri)).setImageDurationMs(o.durationMs()).build()
+                                                  ~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/export/CompositionFactory.kt:240: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+            .setUri(Uri.parse(uri))
+                    ~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/export/CompositionFactory.kt:256: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                .setUri(Uri.parse(clip.sourceUri))
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/ui/editor/EditorViewModel.kt:409: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                uris.filterNot { probe.isReadable(Uri.parse(it)) }.toSet()
+                                                  ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/ui/editor/EditorViewModel.kt:996: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                AudioPcmReader.readMono(app, Uri.parse(clip.sourceUri), clip.trimStartMs, end)?.let { pcm ->
+                                             ~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/FrameApp.kt:87: Warning: Use the KTX function createBitmap instead? [UseKtx]
+            val bmp = android.graphics.Bitmap.createBitmap(16, 16, android.graphics.Bitmap.Config.ARGB_8888)
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/FrameRenderer.kt:98: Warning: Use the KTX extension function Canvas.withSave instead? [UseKtx]
+                canvas.save()
+                ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/FrameRenderer.kt:153: Warning: Use the KTX extension function Canvas.withRotation instead? [UseKtx]
+                    canvas.save()
+                    ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/FrameRenderer.kt:188: Warning: Use the KTX extension function Canvas.withClip instead? [UseKtx]
+            canvas.save()
+            ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/FrameRenderer.kt:233: Warning: Use the KTX extension function Canvas.withRotation instead? [UseKtx]
+                canvas.save()
+                ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/FrameRenderer.kt:293: Warning: Use the KTX extension function Canvas.withRotation instead? [UseKtx]
+            canvas.save()
+            ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/FrameRenderer.kt:346: Warning: Use the KTX extension function Canvas.withSave instead? [UseKtx]
+                        canvas.save()
+                        ~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/magic/MagicMovieBuilder.kt:168: Warning: Use the KTX extension function Bitmap.scale instead? [UseKtx]
+            Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale).toInt().coerceAtLeast(3), (bitmap.height * scale).toInt().coerceAtLeast(3), true)
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/MediaProbe.kt:85: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                val parsed = Uri.parse(uri)
+                             ~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/MediaProbe.kt:190: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                    r.setDataSource(context, Uri.parse(uri))
+                                             ~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/MediaProbe.kt:244: Warning: Use the KTX extension function Bitmap.scale instead? [UseKtx]
+                            Bitmap.createScaledBitmap(
+                            ^
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/PhotoAdjustSession.kt:41: Warning: Use the KTX function createBitmap instead? [UseKtx]
+        if (closed) return Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888) to emptyMap()
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/PhotoAdjustSession.kt:47: Warning: Use the KTX function createBitmap instead? [UseKtx]
+        val out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/PhotoAdjustSession.kt:82: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+            val photos = media.map { CollageRenderer.loadPhoto(context, Uri.parse(it.uri), it.isImage, maxSide) }
+                                                                        ~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/pro/ProStore.kt:164: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        prefs.edit().putBoolean(KEY_DEBUG, on).apply()
+        ~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/pro/ProStore.kt:170: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        prefs.edit().putBoolean(KEY_PRO, on).apply()
+        ~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/media/ProxyStore.kt:137: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+            val edited = EditedMediaItem.Builder(MediaItem.fromUri(Uri.parse(uri)))
+                                                                   ~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/SettingsStore.kt:23: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        prefs.edit().putString(KEY_THEME, mode.name).apply()
+        ~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/SettingsStore.kt:33: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        set(value) = prefs.edit().putString(KEY_LAST_CANVAS, value).apply()
+                     ~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/data/SettingsStore.kt:38: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        prefs.edit().putStringSet(KEY_FAV_FILTERS, next).apply()
+        ~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/TemplateBuilder.kt:118: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+            val photos = slice.map { CollageRenderer.loadPhoto(context, Uri.parse(it.uri), it.isImage, maxSide) }
+                                                                        ~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/TemplatePreviews.kt:66: Warning: Use the KTX function createBitmap instead? [UseKtx]
+        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/runner/work/frame/frame/app/src/main/java/app/frame/studio/templates/TemplatePreviews.kt:149: Warning: Use the KTX function createBitmap instead? [UseKtx]
+            val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseKtx":
+   The Android KTX libraries decorates the Android platform SDK as well as
+   various libraries with more convenient extension functions available from
+   Kotlin, allowing you to use default parameters, named parameters, and
+   more.
+
+   Available options:
+
+   **remove-defaults** (default is true):
+   Whether to skip arguments that match the defaults provided by the extension.
+
+   Extensions often provide default values for some of the parameters. For example:
+   ```kotlin
+   fun Path.readLines(charset: Charset = Charsets.UTF_8): List<String> { return Files.readAllLines(this, charset) }
+   ```
+   This lint check will by default automatically omit parameters that match the default, so if your code was calling
+
+   ```kotlin
+   Files.readAllLines(file, Charset.UTF_8)
+   ```
+   lint would replace this with
+   ```kotlin
+   file.readLines()
+   ```
+   rather than
+
+   ```kotlin
+   file.readLines(Charset.UTF_8
+   ```
+   You can turn this behavior off using this option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="remove-defaults" value="true" />
+       </issue>
+   </lint>
+   ```
+
+   **require-present** (default is true):
+   Whether to only offer extensions already available.
+
+   This option lets you only have lint suggest extension replacements if those extensions are already available on the class path (in other words, you're already depending on the library containing the extension method.)
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="require-present" value="true" />
+       </issue>
+   </lint>
+   ```
+
+0 errors, 80 warnings, 2 hints

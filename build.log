@@ -1,0 +1,181 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig
+> Task :app:checkDebugAarMetadata
+> Task :app:processDebugNavigationResources
+> Task :app:compileDebugNavigationResources
+> Task :app:generateDebugResValues
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileDebug
+> Task :app:processDebugManifestForPackage
+> Task :app:javaPreCompileDebugUnitTest
+> Task :app:processDebugResources
+> Task :app:compileDebugKotlin
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:81:17 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.VideoCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:82:21 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.VideoCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:92:24 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.AudioCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:111:17 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.VideoCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:111:62 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.VideoCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/text/TextFonts.kt:12:56 This annotation is currently applied to the value parameter only, but in the future it will also be applied to field.
+- To opt in to applying to both value parameter and field, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/ui/common/AppIcons.kt:99:44 'val Icons.Filled.RotateRight: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.RotateRight.
+
+> Task :app:compileDebugJavaWithJavac
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:processDebugJavaRes
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:compileDebugUnitTestKotlin
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes
+> Task :app:testDebugUnitTest
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1794034397342.json
+
+BUILD SUCCESSFUL in 1m 45s
+26 actionable tasks: 26 executed
+WARNING: Release build is using Google's TEST AdMob IDs. Set admobAppId/admobBannerId before publishing.
+WARNING: app/google-services.json is missing; this release has no Analytics or Crashlytics.
+WARNING: No release keystore configured; release outputs will be unsigned.
+> Task :app:buildKotlinToolingMetadata
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:generateReleaseBuildConfig
+> Task :app:checkReleaseAarMetadata
+> Task :app:processReleaseNavigationResources
+> Task :app:compileReleaseNavigationResources FROM-CACHE
+> Task :app:generateReleaseResValues
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources FROM-CACHE
+> Task :app:packageReleaseResources
+> Task :app:parseReleaseLocalResources FROM-CACHE
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease
+> Task :app:processReleaseMainManifest
+> Task :app:processReleaseManifest
+> Task :app:javaPreCompileRelease FROM-CACHE
+> Task :app:extractProguardFiles
+> Task :app:processReleaseManifestForPackage
+> Task :app:preReleaseUnitTestBuild UP-TO-DATE
+> Task :app:mergeReleaseResources
+> Task :app:processReleaseResources
+
+> Task :app:compileReleaseKotlin
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:81:17 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.VideoCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:82:21 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.VideoCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:92:24 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.AudioCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:111:17 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.VideoCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/device/DeviceProfile.kt:111:62 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type 'MediaCodecInfo.VideoCapabilities?'.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/text/TextFonts.kt:12:56 This annotation is currently applied to the value parameter only, but in the future it will also be applied to field.
+- To opt in to applying to both value parameter and field, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
+
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///home/runner/work/frame/frame/app/src/main/java/app/frame/studio/ui/common/AppIcons.kt:99:44 'val Icons.Filled.RotateRight: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.RotateRight.
+
+> Task :app:compileReleaseJavaWithJavac
+> Task :app:generateReleaseLintReportModel
+> Task :app:bundleReleaseClassesToCompileJar
+> Task :app:generateReleaseUnitTestLintModel
+> Task :app:lintAnalyzeRelease
+> Task :app:lintAnalyzeReleaseUnitTest
+
+> Task :app:lintReportRelease
+Wrote HTML report to file:///home/runner/work/frame/frame/app/build/reports/lint-results-release.html
+
+> Task :app:lintRelease
+
+> Task :app:copyReleaseLintReports
+Copying lint text report to /home/runner/work/frame/frame/app/stdout
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_2-1794034496923.json
+
+BUILD SUCCESSFUL in 2m 3s
+29 actionable tasks: 25 executed, 4 from cache
+WARNING: Release build is using Google's TEST AdMob IDs. Set admobAppId/admobBannerId before publishing.
+WARNING: app/google-services.json is missing; this release has no Analytics or Crashlytics.
+WARNING: No release keystore configured; release outputs will be unsigned.
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:mergeReleaseJniLibFolders
+> Task :app:buildKotlinToolingMetadata UP-TO-DATE
+> Task :app:mergeReleaseNativeLibs
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateReleaseBuildConfig UP-TO-DATE
+> Task :app:checkReleaseAarMetadata UP-TO-DATE
+> Task :app:processReleaseNavigationResources UP-TO-DATE
+> Task :app:compileReleaseNavigationResources UP-TO-DATE
+> Task :app:generateReleaseResValues UP-TO-DATE
+> Task :app:checkReleaseDuplicateClasses
+> Task :app:mapReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateReleaseResources UP-TO-DATE
+
+> Task :app:stripReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libdatastore_shared_counter.so. Run with --info option to learn more.
+
+> Task :app:mergeReleaseResources UP-TO-DATE
+> Task :app:packageReleaseResources UP-TO-DATE
+> Task :app:parseReleaseLocalResources UP-TO-DATE
+> Task :app:createReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:extractDeepLinksRelease UP-TO-DATE
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:processReleaseMainManifest UP-TO-DATE
+> Task :app:processReleaseManifest UP-TO-DATE
+> Task :app:processReleaseManifestForPackage UP-TO-DATE
+> Task :app:processReleaseResources UP-TO-DATE
+> Task :app:compileReleaseKotlin UP-TO-DATE
+> Task :app:javaPreCompileRelease UP-TO-DATE
+> Task :app:compileReleaseJavaWithJavac UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:mergeReleaseArtProfile
+> Task :app:mergeReleaseGeneratedProguardFiles
+> Task :app:processReleaseJavaRes
+> Task :app:mergeReleaseStartupProfile
+> Task :app:mergeReleaseShaders
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:generateReleaseAssets UP-TO-DATE
+> Task :app:mergeReleaseAssets
+> Task :app:compressReleaseAssets
+> Task :app:extractReleaseVersionControlInfo
+> Task :app:generateReleaseLintVitalReportModel
+> Task :app:collectReleaseDependencies
+> Task :app:sdkReleaseDependencyData
+> Task :app:writeReleaseAppMetadata
+> Task :app:writeReleaseSigningConfigVersions
+> Task :app:configureReleaseDependencies
+> Task :app:parseReleaseIntegrityConfig
+> Task :app:expandReleaseArtProfileWildcards
+> Task :app:mergeReleaseJavaResource
+> Task :app:lintVitalAnalyzeRelease
+> Task :app:lintVitalReportRelease
+> Task :app:lintVitalRelease
+> Task :app:minifyReleaseWithR8
+> Task :app:buildReleasePreBundle
+> Task :app:convertShrunkResourcesToBinaryRelease
+> Task :app:compileReleaseArtProfile
+> Task :app:optimizeReleaseResources
+> Task :app:packageRelease
+> Task :app:createReleaseApkListingFileRedirect
+> Task :app:assembleRelease
+> Task :app:packageReleaseBundle
+> Task :app:signReleaseBundle
+> Task :app:produceReleaseBundleIdeListingFile
+> Task :app:createReleaseBundleListingFileRedirect
+> Task :app:bundleRelease
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_4-1794034620181.json
+
+BUILD SUCCESSFUL in 3m 43s
+57 actionable tasks: 36 executed, 21 up-to-date
