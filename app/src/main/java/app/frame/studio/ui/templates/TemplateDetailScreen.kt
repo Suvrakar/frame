@@ -83,15 +83,16 @@ fun TemplateDetailScreen(
     val scope = rememberCoroutineScope()
 
     val gate = rememberProGate(app.pro)
-    val pick = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickMultipleVisualMedia(maxItems = template.slots.coerceAtLeast(2)),
-    ) { uris ->
-        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+    // Frame / collage templates: photos are framed on a live preview before the video is made.
+    var adjust by remember { mutableStateOf<Pair<List<android.net.Uri>, app.frame.studio.templates.PhotoAdjustSession>?>(null) }
+    androidx.compose.runtime.DisposableEffect(Unit) { onDispose { adjust?.second?.close() } }
+
+    fun make(uris: List<android.net.Uri>, fits: Map<String, app.frame.studio.templates.PhotoFit>) {
         creating = true
         scope.launch {
             try {
                 val skipped = mutableListOf<String>()
-                val project = app.templateBuilder.create(template, values.toMap(), uris, skipped)
+                val project = app.templateBuilder.create(template, values.toMap(), uris, skipped, fits)
                 if (template.pro) app.pro.consumePass(ProFeature.PREMIUM_TEMPLATES)
                 AppEvents.projectCreated("template")
                 AppEvents.templateUsed(template.id, skipped.size)
@@ -100,6 +101,8 @@ fun TemplateDetailScreen(
                     scope.launch { snackbar.showSnackbar(msg) }
                     kotlinx.coroutines.delay(2200)
                 }
+                adjust?.second?.close()
+                adjust = null
                 onCreated(project.id)
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
@@ -110,6 +113,45 @@ fun TemplateDetailScreen(
                 creating = false
             }
         }
+    }
+
+    val pick = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(maxItems = template.slots.coerceAtLeast(2)),
+    ) { uris ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        if (template.collage == null) {
+            make(uris, emptyMap())
+            return@rememberLauncherForActivityResult
+        }
+        creating = true
+        scope.launch {
+            try {
+                val skipped = mutableListOf<String>()
+                val session = app.templateBuilder.openAdjust(template, values.toMap(), uris, skipped)
+                if (session == null) make(uris, emptyMap()) else adjust = uris to session
+                ImportMessages.summary(skipped)?.let { snackbar.showSnackbar(it) }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Telemetry.nonFatal("template_adjust", e)
+                snackbar.showSnackbar(e.message ?: "Couldn't open those photos")
+            } finally {
+                creating = false
+            }
+        }
+    }
+
+    adjust?.let { (uris, session) ->
+        AdjustPhotosScreen(
+            session = session,
+            creating = creating,
+            onCancel = {
+                session.close()
+                adjust = null
+            },
+            onCreate = { fits -> make(uris, fits) },
+        )
+        return
     }
 
     GlassBackground {

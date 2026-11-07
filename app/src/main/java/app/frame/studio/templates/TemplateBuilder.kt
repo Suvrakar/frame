@@ -24,7 +24,26 @@ class TemplateBuilder(
     private val device: DeviceProfile,
 ) {
 
-    suspend fun create(template: VideoTemplate, values: Map<TemplateField, String>, uris: List<Uri>, skipped: MutableList<String> = mutableListOf()): Project {
+    /**
+     * Frame / collage templates: a live preview where the user moves and zooms each photo in its
+     * frame before [create]. Null for templates whose photos become ordinary clips.
+     */
+    suspend fun openAdjust(template: VideoTemplate, values: Map<TemplateField, String>, uris: List<Uri>, skipped: MutableList<String>): PhotoAdjustSession? {
+        if (template.collage == null) return null
+        val media = uris.mapNotNull { uri -> probeSlot(uri, skipped) }
+        require(media.isNotEmpty()) { "Those files couldn't be opened" }
+        val size = ExportPlan.outputSize(emptyList(), if (device.isLowEnd) ExportHeight.HD_720 else ExportHeight.HD_1080, template.aspect)
+        return withContext(Dispatchers.IO) { PhotoAdjustSession.open(context, template, values, media, size.width, size.height) }
+    }
+
+    suspend fun create(
+        template: VideoTemplate,
+        values: Map<TemplateField, String>,
+        uris: List<Uri>,
+        skipped: MutableList<String> = mutableListOf(),
+        /** How the user framed each photo (by uri); missing = centred. */
+        fits: Map<String, PhotoFit> = emptyMap(),
+    ): Project {
         val media = uris.mapNotNull { uri -> probeSlot(uri, skipped) }
         require(media.isNotEmpty()) { "Those files couldn't be opened" }
 
@@ -48,7 +67,7 @@ class TemplateBuilder(
 
         val style = template.collage
         val project = if (style != null) {
-            val pages = renderCollagePages(template, style, values, media, size, projectId, cards)
+            val pages = renderCollagePages(template, style, values, media, size, projectId, cards, fits)
             TemplatePlan.buildCollage(
                 template = template,
                 values = values,
@@ -86,6 +105,7 @@ class TemplateBuilder(
         size: ExportPlan.Size,
         projectId: String,
         dir: File,
+        fits: Map<String, PhotoFit>,
     ): List<Pair<CollagePage, String>> = withContext(Dispatchers.IO) {
         val header = template.header?.let { Templates.fillCard(it, values) } ?: ("" to "")
         val labels = template.photoLabels.map { Templates.fillCaption(it, values).orEmpty() }
@@ -96,13 +116,17 @@ class TemplateBuilder(
         pages.groupBy { it.group }.forEach { (group, groupPages) ->
             val slice = media.drop(group * style.cells).take(style.cells)
             val photos = slice.map { CollageRenderer.loadPhoto(context, Uri.parse(it.uri), it.isImage, maxSide) }
+            val byBitmap = java.util.IdentityHashMap<android.graphics.Bitmap, PhotoFit>()
+            slice.forEachIndexed { i, m -> photos[i]?.let { b -> fits[m.uri]?.let { byBitmap[b] = it } } }
             try {
                 groupPages.forEach { page ->
                     val file = File(dir, "${projectId}_collage_${group}_${page.visible}.jpg")
-                    CollageRenderer.render(
-                        template, style, photos, page.visible, header.first, header.second,
-                        labels, size.width, size.height, file,
-                    )
+                    CollageRenderer.withFits(byBitmap) {
+                        CollageRenderer.render(
+                            template, style, photos, page.visible, header.first, header.second,
+                            labels, size.width, size.height, file,
+                        )
+                    }
                     result += page to Uri.fromFile(file).toString()
                 }
             } finally {

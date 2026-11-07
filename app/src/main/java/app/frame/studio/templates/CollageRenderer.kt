@@ -211,15 +211,43 @@ object CollageRenderer {
         }
     }
 
-    /** Center-crops [bitmap] into [dst] with rounded corners. */
+    /**
+     * Per-photo framing for the current render (identity-keyed by bitmap), and where each photo
+     * was drawn (canvas coordinates) for the adjust screen's hit-testing. Rendering is single-threaded
+     * per call, and both are set and cleared around each render.
+     */
+    private val fits = ThreadLocal<Map<Bitmap, PhotoFit>?>()
+    private val slots = ThreadLocal<MutableMap<Bitmap, RectF>?>()
+
+    /** Runs [block] with [photoFits] applied; returns where each photo landed. */
+    fun <T> withFits(photoFits: Map<Bitmap, PhotoFit>, block: () -> T): Pair<T, Map<Bitmap, RectF>> {
+        val landed = java.util.IdentityHashMap<Bitmap, RectF>()
+        fits.set(photoFits)
+        slots.set(landed)
+        try {
+            return block() to landed
+        } finally {
+            fits.set(null)
+            slots.set(null)
+        }
+    }
+
+    /** Crops [bitmap] into [dst] (centred, or as the user framed it) with rounded corners. */
     internal fun drawCropped(canvas: Canvas, bitmap: Bitmap, dst: RectF, radius: Float, paint: Paint) {
-        val scale = maxOf(dst.width() / bitmap.width, dst.height() / bitmap.height)
+        val fit = fits.get()?.get(bitmap) ?: PhotoFit.CENTER
+        val bw = bitmap.width.toFloat()
+        val bh = bitmap.height.toFloat()
+        val src = PhotoFraming.source(bw, bh, dst.width(), dst.height(), fit)
+        val scale = dst.width() / src.width
         val matrix = Matrix().apply {
+            postTranslate(-src.left, -src.top)
             postScale(scale, scale)
-            postTranslate(
-                dst.left + (dst.width() - bitmap.width * scale) / 2,
-                dst.top + (dst.height() - bitmap.height * scale) / 2,
-            )
+            postTranslate(dst.left, dst.top)
+        }
+        slots.get()?.let { sink ->
+            @Suppress("DEPRECATION")
+            val onCanvas = RectF(dst).also { canvas.matrix.mapRect(it) }
+            sink[bitmap] = onCanvas
         }
         canvas.save()
         if (radius > 0f) canvas.clipPath(Path().apply { addRoundRect(dst, radius, radius, Path.Direction.CW) })
