@@ -1,0 +1,54 @@
+--------- beginning of system
+--------- beginning of main
+11-07 06:59:43.232  6816  6838 I FramePerf: beats.ms=752 bpm=119.76989 count=23
+11-07 06:59:43.232  6816  6838 I FramePerf: beats.signed=[-36, -25, -14, -27, -16, -28, -18, -30, -19, -31, -21, -33, -22, -35, -24, -36, -25, -14, -27, -16, -28, -17, -30] encoderDelay=1024
+11-07 06:59:43.281  6816  6838 I FramePerf: captions.supported=false result=Unavailable Unavailable(message=Auto captions need Android 13 or newer. You can still type captions and Frame will animate them.)
+11-07 07:04:17.831  6816  6838 I FramePerf: magic.create ms=890
+11-07 07:04:46.337  6816  6838 I FramePerf: magic.robust items=4 ms=38
+11-07 07:04:46.373  6816  6838 I FramePerf: magic.robust items=1 ms=17
+11-07 07:05:19.182  6816  6838 I FramePerf: magic.robust items=6 ms=34
+11-07 07:05:29.546  6816  6838 I FramePerf: magic.robust items=45 ms=2800
+11-07 07:05:29.612  6816  6838 I FramePerf: magic.robust items=3 ms=29
+11-07 07:05:39.996  6816  6838 I FramePerf: device.lowEnd=true
+11-07 07:05:39.996  6816  6838 I FramePerf: device.cores=2
+11-07 07:05:39.996  6816  6838 I FramePerf: device.memoryClassMb=512
+11-07 07:05:39.996  6816  6838 I FramePerf: device.previewHeight=SD_480
+11-07 07:05:39.996  6816  6838 I FramePerf: device.supportedExport=480p, 720p, 1080p
+11-07 07:05:40.093  6816  6838 I FramePerf: import.bigPhotoMs=94
+11-07 07:05:40.093  6816  6838 I FramePerf: import.bigPhotoSize=1920x1440
+11-07 07:05:41.716  6816  6838 I FramePerf: preview.readyMs=1619
+11-07 07:05:46.750  6816  6816 I FramePerf: preview.releaseMs=33
+11-07 07:05:46.750  6816  6838 I FramePerf: preview.advancedMsIn5s=4458
+11-07 07:05:56.751  6816  6816 I FramePerf: export.progressAt10s=2:21
+11-07 07:06:06.753  6816  6816 I FramePerf: export.progressAt20s=2:43
+11-07 07:06:16.755  6816  6816 I FramePerf: export.progressAt30s=2:56
+11-07 07:06:26.756  6816  6816 I FramePerf: export.progressAt40s=2:67
+11-07 07:06:36.757  6816  6816 I FramePerf: export.progressAt50s=2:72
+11-07 07:06:46.758  6816  6816 I FramePerf: export.progressAt60s=2:75
+11-07 07:06:56.759  6816  6816 I FramePerf: export.progressAt70s=2:80
+11-07 07:07:06.760  6816  6816 I FramePerf: export.progressAt80s=2:85
+11-07 07:07:16.760  6816  6816 I FramePerf: export.progressAt90s=2:88
+11-07 07:07:26.761  6816  6816 I FramePerf: export.progressAt100s=2:92
+11-07 07:07:36.762  6816  6816 I FramePerf: export.progressAt110s=2:97
+11-07 07:07:45.223  6816  6838 I FramePerf: export.ms=118473
+11-07 07:07:45.223  6816  6838 I FramePerf: export.timelineMs=31665
+11-07 07:07:45.223  6816  6838 I FramePerf: export.bytes=16274929
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.Total frames rendered=123
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.Janky frames=109 (88.62%)
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.50th percentile=20ms
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.90th percentile=61ms
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.95th percentile=129ms
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.99th percentile=200ms
+11-07 07:08:00.277  6816  6838 I FramePerf: ui.templates.Total frames rendered=113
+11-07 07:08:00.277  6816  6838 I FramePerf: ui.templates.Janky frames=108 (95.58%)
+11-07 07:08:00.278  6816  6838 I FramePerf: ui.templates.50th percentile=23ms
+11-07 07:08:00.278  6816  6838 I FramePerf: ui.templates.90th percentile=38ms
+11-07 07:08:00.278  6816  6838 I FramePerf: ui.templates.95th percentile=53ms
+11-07 07:08:00.278  6816  6838 I FramePerf: ui.templates.99th percentile=97ms
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.Total frames rendered=467
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.Janky frames=391 (83.73%)
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.50th percentile=20ms
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.90th percentile=36ms
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.95th percentile=44ms
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.99th percentile=85ms
+11-07 07:08:24.017  6816  6838 I FramePerf: ui.totalPssMb=350

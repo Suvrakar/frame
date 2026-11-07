@@ -1,0 +1,572 @@
+Performing Streamed Install
+Success
+Starting: Intent { cmp=app.frame.studio.debug/app.frame.studio.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: app.frame.studio.debug/app.frame.studio.MainActivity
+TotalTime: 6000
+WaitTime: 6008
+Complete
+Starting: Intent { cmp=app.frame.studio.debug/app.frame.studio.MainActivity }
+11-07 06:57:59.907  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:00.545  2392  2392 I TelecomFramework: PstnPhoneCapabilitiesNotifier: handleVideoCapabilitesChanged. Video capability - false
+11-07 06:58:00.545  2392  2392 I TelecomFramework: PstnPhoneCapabilitiesNotifier: handleVideoCapabilitesChanged. Video capability - false
+11-07 06:58:00.977  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:00.977  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:00.977  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:00.977  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id -1
+11-07 06:58:00.977  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: adding default
+11-07 06:58:01.093  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:01.093  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:01.864  2392  2392 I TelecomFramework: PstnPhoneCapabilitiesNotifier: handleVideoCapabilitesChanged. Video capability - false
+11-07 06:58:02.397  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:02.397  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:02.397  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:02.397  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id -1
+11-07 06:58:02.397  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: adding default
+11-07 06:58:02.404  1914  1952 V BackupManagerService: restoreAtInstall pkg=app.frame.studio.debug token=1 restoreSet=0
+11-07 06:58:02.439  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:02.439  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:02.486  2392  2392 I TelecomFramework: PstnPhoneCapabilitiesNotifier: handleVideoCapabilitesChanged. Video capability - false
+11-07 06:58:03.020  2313  2645 I ModuleSetMgr: Computing pending module set with APKs: [[AdsFdrDynamite.integ:21460000000], [Cronetdynamite:202414040800], [Dynamiteloader:202414040800], [Dynamitemodulesa:202414040000], [Dynamitemodulesc:202414040000], [Googlecertificates:202414040000], [Mapsdynamite:202414040000], [Measurementdynamite:202414040000]]
+11-07 06:58:03.691  1914  3311 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=app.frame.studio.debug/app.frame.studio.MainActivity} from uid 2000
+11-07 06:58:03.825  1914  1941 I ActivityManager: Start proc 3484:app.frame.studio.debug/u0a146 for activity {app.frame.studio.debug/app.frame.studio.MainActivity}
+11-07 06:58:03.977  2825  3187 I OpenGLRenderer: Davey! duration=709ms; Flags=0, IntendedVsync=23642226346, Vsync=23775559674, OldestInputEvent=9223372036854775807, NewestInputEvent=0, HandleInputStart=23777385570, AnimationStart=23777420800, PerformTraversalsStart=23777564590, DrawStart=24340418190, SyncQueued=24348827850, SyncStart=24348934920, IssueDrawCommandsStart=24349771990, SwapBuffers=24350361450, FrameCompleted=24351770330, DequeueBufferDuration=162000, QueueBufferDuration=373000, 
+11-07 06:58:06.087  2073  2311 I OpenGLRenderer: Davey! duration=2802ms; Flags=0, IntendedVsync=23658893789, Vsync=25942227031, OldestInputEvent=9223372036854775807, NewestInputEvent=0, HandleInputStart=25948555060, AnimationStart=25948588720, PerformTraversalsStart=25948716840, DrawStart=25953543870, SyncQueued=25953729780, SyncStart=25953830840, IssueDrawCommandsStart=25954418410, SwapBuffers=26458397960, FrameCompleted=26461566220, DequeueBufferDuration=1583000, QueueBufferDuration=1037000, 
+11-07 06:58:06.109  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:06.109  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:06.109  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:06.214  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:06.214  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:06.226  2392  2392 I TelecomFramework: TelecomAccountRegistry: Unregistering phone account ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}.
+11-07 06:58:06.480  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:67)
+11-07 06:58:06.481  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:67)
+11-07 06:58:06.481  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:67)
+11-07 06:58:06.482  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:67)
+11-07 06:58:06.482  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:67)
+11-07 06:58:06.483  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:68)
+11-07 06:58:06.483  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:68)
+11-07 06:58:06.484  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:68)
+11-07 06:58:06.484  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:68)
+11-07 06:58:06.484  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.onCreate(FrameApp.kt:68)
+11-07 06:58:06.982  3484  3484 D StrictMode: 	at app.frame.studio.ads.AdsService.gatherConsent(AdsService.kt:40)
+11-07 06:58:06.983  3484  3484 D StrictMode: 	at app.frame.studio.ads.AdsService.gatherConsent(AdsService.kt:40)
+11-07 06:58:07.294  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:07.294  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:07.295  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:07.295  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:07.349  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:07.349  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.003  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:08.003  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.003  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:08.003  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:08.019  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:08.019  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.047  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:08.047  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.047  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:08.047  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:08.163  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:08.163  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.214  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:08.214  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.214  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:08.214  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:08.238  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:08.238  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.273  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:08.273  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.273  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:08.273  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:08.277  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:08.277  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.338  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:08.338  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.338  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:08.338  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:08.342  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:08.342  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.448  2392  2392 I TelecomFramework: PstnPhoneCapabilitiesNotifier: handleVideoCapabilitesChanged. Video capability - false
+11-07 06:58:08.709  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:08.709  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.709  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:08.709  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:08.782  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:08.782  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.822  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:08.822  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.822  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:08.822  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:08.826  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:08.826  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:08.954  2392  2392 I TelecomFramework: PstnPhoneCapabilitiesNotifier: handleVideoCapabilitesChanged. Video capability - false
+11-07 06:58:09.067  2392  2392 I TelecomFramework: PstnPhoneCapabilitiesNotifier: handleVideoCapabilitesChanged. Video capability - false
+11-07 06:58:06.670  3484  3484 W RenderThread: type=1400 audit(0.0:22): avc: denied { write } for name="property_service" dev="tmpfs" ino=7274 scontext=u:r:untrusted_app:s0:c146,c256,c512,c768 tcontext=u:object_r:property_socket:s0 tclass=sock_file permissive=0 app=app.frame.studio.debug
+11-07 06:58:09.689  3484  3650 I OpenGLRenderer: Davey! duration=2453ms; Flags=1, IntendedVsync=27608854522, Vsync=28775521142, OldestInputEvent=9223372036854775807, NewestInputEvent=0, HandleInputStart=28776466380, AnimationStart=28776528880, PerformTraversalsStart=29399074190, DrawStart=29812448740, SyncQueued=29857910660, SyncStart=29858530370, IssueDrawCommandsStart=29858896040, SwapBuffers=29978222810, FrameCompleted=30063268090, DequeueBufferDuration=48000, QueueBufferDuration=736000, 
+11-07 06:58:09.693  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.templatePreviews_delegate$lambda$0(FrameApp.kt:44)
+11-07 06:58:09.693  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.$r8$lambda$eQyH8DB7RUr1L6_cq5Bte6B_A9w(Unknown Source:0)
+11-07 06:58:09.693  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+11-07 06:58:09.693  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.getTemplatePreviews(FrameApp.kt:44)
+11-07 06:58:09.694  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.templatePreviews_delegate$lambda$0(FrameApp.kt:44)
+11-07 06:58:09.694  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.$r8$lambda$eQyH8DB7RUr1L6_cq5Bte6B_A9w(Unknown Source:0)
+11-07 06:58:09.694  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+11-07 06:58:09.694  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.getTemplatePreviews(FrameApp.kt:44)
+11-07 06:58:09.696  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.templatePreviews_delegate$lambda$0(FrameApp.kt:44)
+11-07 06:58:09.696  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.$r8$lambda$eQyH8DB7RUr1L6_cq5Bte6B_A9w(Unknown Source:0)
+11-07 06:58:09.696  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+11-07 06:58:09.696  3484  3484 D StrictMode: 	at app.frame.studio.FrameApp.getTemplatePreviews(FrameApp.kt:44)
+11-07 06:58:09.747  2392  2392 I TelecomFramework: : Carrier-config changed, checking for phone account updates.
+11-07 06:58:09.820  2392  2392 I TelecomFramework: AccountEntry: reRegisterPstnPhoneAccount: subId: 1 - no change
+11-07 06:58:10.211  2392  2392 I TelecomFramework: : onSubscriptionsChanged - update accounts
+11-07 06:58:10.211  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Unregistering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:10.211  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Found 1 phones.  Attempting to register.
+11-07 06:58:10.211  2392  2392 I TelecomFramework: TelecomAccountRegistry: setupAccounts: Phone with subscription id 1
+11-07 06:58:10.237  2392  2392 I TelecomFramework: AccountEntry: Registered phoneAccount: [[ ] PhoneAccount: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0} Capabilities: CallProvider MultiUser PlaceEmerg SimSub  Audio Routes: BESW Schemes: tel voicemail  Extras: Bundle[{android.telecom.extra.SUPPORTS_VIDEO_CALLING_FALLBACK=true}] GroupId: ***] with handle: ComponentInfo{com.android.phone/com.android.services.telephony.TelephonyConnectionService}, ***, UserHandle{0}
+11-07 06:58:10.237  2392  2392 I TelecomFramework: PstnIncomingCallNotifier: Registering: Handler (com.android.internal.telephony.GsmCdmaPhone) {55dbfb7}
+11-07 06:58:10.293  2392  2392 I TelecomFramework: PstnPhoneCapabilitiesNotifier: handleVideoCapabilitesChanged. Video capability - false
+11-07 06:58:10.424  1914  1941 I ActivityManager: Start proc 3987:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0/u0ai9000 for  {app.frame.studio.debug/org.chromium.content.app.SandboxedProcessService0}
+11-07 06:58:10.683  3484  3484 E chromium: [ERROR:filesystem_posix.cc(89)] stat /data/user/0/app.frame.studio.debug/cache/WebView/Crashpad: No such file or directory (2)
+11-07 06:58:10.684  3484  3484 E chromium: [ERROR:filesystem_posix.cc(62)] mkdir /data/user/0/app.frame.studio.debug/cache/WebView/Crashpad: No such file or directory (2)
+11-07 06:58:11.544  3484  3650 I OpenGLRenderer: Davey! duration=3126ms; Flags=0, IntendedVsync=28792240352, Vsync=31892240228, OldestInputEvent=9223372036854775807, NewestInputEvent=0, HandleInputStart=31905792210, AnimationStart=31905849090, PerformTraversalsStart=31914536420, DrawStart=31914913320, SyncQueued=31915054080, SyncStart=31915463030, IssueDrawCommandsStart=31915515300, SwapBuffers=31916470340, FrameCompleted=31918729340, DequeueBufferDuration=43000, QueueBufferDuration=349000, 
+11-07 06:58:13.063  3484  3650 I OpenGLRenderer: Davey! duration=1528ms; Flags=0, IntendedVsync=31908868828, Vsync=31975535492, OldestInputEvent=9223372036854775807, NewestInputEvent=0, HandleInputStart=31982251330, AnimationStart=31982294590, PerformTraversalsStart=31982655130, DrawStart=31982991540, SyncQueued=31983089050, SyncStart=31983557130, IssueDrawCommandsStart=31983664900, SwapBuffers=33369699810, FrameCompleted=33437383410, DequeueBufferDuration=63000, QueueBufferDuration=480000, 
+11-07 06:58:13.150  3484  4122 D ProfileInstaller: Installing profile for app.frame.studio.debug
+11-07 06:58:13.240  3484  3649 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.photoOrPlaceholder(FrameRenderer.kt:126)
+11-07 06:58:13.240  3484  3649 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.invite(FrameRenderer.kt:279)
+11-07 06:58:13.240  3484  3649 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer.draw(FrameRenderer.kt:77)
+11-07 06:58:14.744  3484  4227 W GooglePlayServicesUtil: Google Play services out of date for app.frame.studio.debug.  Requires 212800000 but found 202414023
+11-07 06:58:15.638  3484  4228 W GooglePlayServicesUtil: Google Play services out of date for app.frame.studio.debug.  Requires 212800000 but found 202414023
+11-07 06:58:15.792  2313  2642 I CheckinCompat: Disabling old GoogleServicesFramework version [CONTEXT service_id=130 ]
+11-07 06:58:16.727  3484  3484 I Ads     : JS: The jsLoaded GMSG has been sent (https://googleads.g.doubleclick.net/mads/static/sdk/native/sdk-core-v40.html:1108)
+11-07 06:58:17.007  2313  2643 I ChromeSync: [Sync,SyncIntentOperation] Handling the intent: Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 cmp=com.google.android.gms/.chimera.GmsIntentOperationService (has extras) }.
+11-07 06:58:17.540  2313  2643 I ChromeSync: [Persistence,AffiliationManager] One of affiliation or grouping data for android://mfl2LqXGQ697otrtqD23U0fLW6F_Pbgl6DAMMliaFXUHYVHhwK7QibLewybXOK2idnvbrn__F6dvZRnmradyow==@app.frame.studio.debug/ was not found. Marking affiliation data as stale...
+11-07 06:58:17.612  2053  3822 W GCM     : Unexpected forwarded intent: Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 cmp=com.google.android.gms/.chimera.PersistentIntentOperationService (has extras) }
+11-07 06:58:17.627  2053  3474 W GCM     : Unexpected forwarded intent: Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 cmp=com.google.android.gms/.chimera.PersistentIntentOperationService (has extras) }
+11-07 06:58:17.742  3484  4350 I Ads     : This request is sent from a test device.
+11-07 06:58:17.913  3484  4327 D zzawx   : File /data/user/0/app.frame.studio.debug/cache/1743000482668.dex not found. No need for deletion
+11-07 06:58:18.170  1914  1939 I ActivityTaskManager: Displayed app.frame.studio.debug/app.frame.studio.MainActivity: +6s0ms
+11-07 06:58:18.852  4262  4301 I DynamiteLoaderV2: [71] AdsFdrDynamite.integ
+11-07 06:58:19.016  3484  4350 I Ads     : This request is sent from a test device.
+11-07 06:58:19.151  3484  3649 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.photoOrPlaceholder(FrameRenderer.kt:126)
+11-07 06:58:19.151  3484  3649 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.invite(FrameRenderer.kt:279)
+11-07 06:58:19.151  3484  3649 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer.draw(FrameRenderer.kt:77)
+11-07 06:58:19.348  1914  2884 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 (has extras) } to com.google.android.packageinstaller/com.android.packageinstaller.PackageInstalledReceiver
+11-07 06:58:19.371  3484  4329 W Ads     : Not retrying to fetch app settings
+11-07 06:58:19.381  1914  1940 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 (has extras) } to com.android.musicfx/.Compatibility$Receiver
+11-07 06:58:19.386  1914  1940 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 (has extras) } to com.google.android.apps.enterprise.dmagent/.AppUpdateReceiver
+11-07 06:58:19.386  3484  4224 W Ads     : Not retrying to fetch app settings
+11-07 06:58:19.388  1914  1940 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 (has extras) } to com.google.android.gms/.games.chimera.GamesSystemBroadcastReceiverProxy
+11-07 06:58:19.388  1914  1940 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 (has extras) } to com.google.android.gms/.gass.chimera.PackageChangeBroadcastReceiver
+11-07 06:58:19.389  1914  1940 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 (has extras) } to com.google.android.gms/.chimera.GmsIntentOperationService$PersistentTrustedReceiver
+11-07 06:58:19.389  1914  1940 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 (has extras) } to com.google.android.googlequicksearchbox/com.google.android.apps.gsa.googlequicksearchbox.GelStubAppWatcher
+11-07 06:58:19.389  1914  1940 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.PACKAGE_ADDED dat=package:app.frame.studio.debug flg=0x4000010 (has extras) } to com.google.android.ims/.receivers.RcsAutoStartReceiver
+11-07 06:58:19.430  3484  4539 W GooglePlayServicesUtil: Google Play services out of date for app.frame.studio.debug.  Requires 243734000 but found 202414023
+11-07 06:58:19.520  3484  4540 W GooglePlayServicesUtil: Google Play services out of date for app.frame.studio.debug.  Requires 243734000 but found 202414023
+11-07 06:58:20.734  3484  3484 I Ads     : JS: The jsLoaded GMSG has been sent (https://googleads.g.doubleclick.net/mads/static/mad/sdk/native/production/sdk-core-v40-impl.js?n=true&lv=sdk_20190107_RC02:1101)
+11-07 06:58:21.240  3484  4315 I Ads     : SDK version: afma-sdk-a-v252530000.252530000.0
+11-07 06:58:21.240  3484  4315 I Ads     : HTTP timeout: 60000 milliseconds.
+11-07 06:58:21.315  3484  3484 I Ads     : Received log message: <Google:HTML> You are currently using version 252530000.252530000.0 of the SDK, which is out of date. Please consider updating your SDK to the most recent SDK version to get the latest features and bug fixes. The latest SDK can be installed from https://goo.gle/android-install-instructions. More information about the SDK deprecation schedule is available at https://developers.google.com/admob/android/deprecation.
+11-07 06:58:21.360  3484  4204 I Ads     : SDK version: afma-sdk-a-v252530000.252530000.0
+11-07 06:58:21.360  3484  4204 I Ads     : HTTP timeout: 60000 milliseconds.
+11-07 06:58:22.751  2053  3183 I Fitness : OnPackageChangedOperation got intent: Intent { act=android.intent.action.PACKAGE_CHANGED dat=package:app.frame.studio.debug flg=0x45000010 cmp=com.google.android.gms/.chimera.PersistentIntentOperationService (has extras) } [CONTEXT service_id=17 ]
+11-07 06:58:23.160  3484  4667 I Phlogger: Unable to retrieve flag snapshot for com.google.android.gms.measurement#app.frame.studio.debug, using defaults.
+11-07 06:58:23.225  3484  4534 I FA      :   adb shell setprop debug.firebase.analytics.app app.frame.studio.debug
+11-07 06:58:24.095  3484  4240 I chatty  : uid=10146(app.frame.studio.debug) Chrome_InProcGp identical 2 lines
+11-07 06:58:27.691  3484  4240 I chatty  : uid=10146(app.frame.studio.debug) Chrome_InProcGp identical 2 lines
+11-07 06:58:27.794  2392  2392 I TelecomFramework: : Carrier-config changed, checking for phone account updates.
+11-07 06:58:27.821  2392  2392 I TelecomFramework: AccountEntry: reRegisterPstnPhoneAccount: subId: 1 - no change
+11-07 06:58:28.767  3484  3650 I OpenGLRenderer: Davey! duration=931ms; Flags=0, IntendedVsync=48208934081, Vsync=48208934081, OldestInputEvent=9223372036854775807, NewestInputEvent=0, HandleInputStart=48209294100, AnimationStart=48209318520, PerformTraversalsStart=48211257090, DrawStart=48211370930, SyncQueued=48212229570, SyncStart=48213217130, IssueDrawCommandsStart=48213277040, SwapBuffers=49138335200, FrameCompleted=49141711530, DequeueBufferDuration=204000, QueueBufferDuration=2507000, 
+11-07 06:58:28.778  3484  3484 I Ads     : JS: The jsLoaded GMSG has been sent (https://googleads.g.doubleclick.net/mads/static/sdk/native/sdk-core-v40.html:1108)
+11-07 06:58:29.513  3484  3484 E Ads     : JS: Refused to get unsafe header "X-Afma-Gcache-IsGcacheHit" (https://www.gstatic.com/mysidia/1cec40efff96c3a49249fe7c8358c810.js?tag=addon/rewarded_video:479)
+11-07 06:58:29.553  2053  3345 I aopq    : Scheduling Phenotype for a PhenotypeSyncImmediately(6, com.google.android.gms.measurement#app.frame.studio.debug) one off with window [1, 2] in seconds [CONTEXT service_id=51 ]
+11-07 06:58:29.555  3484  3484 E Ads     : JS: Refused to get unsafe header "X-Afma-Gcache-IsGcacheHit" (https://www.gstatic.com/mysidia/1cec40efff96c3a49249fe7c8358c810.js?tag=addon/rewarded_video:479)
+11-07 06:58:29.730  1702  4018 D AudioFlinger: Client defaulted notificationFrames to 1058 for frameCount 2116
+11-07 06:58:31.355  4931  4931 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-07 06:58:31.374  4931  4931 I AndroidRuntime: Using default boot image
+11-07 06:58:31.374  4931  4931 I AndroidRuntime: Leaving lock profiling enabled
+11-07 06:58:32.122  4931  4931 D AndroidRuntime: Calling main entry com.android.commands.input.Input
+11-07 06:58:32.157  4931  4931 D AndroidRuntime: Shutting down VM
+11-07 06:58:32.180  4931  5028 I AndroidRuntime: NOTE: attach of thread 'Binder:4931_2' failed
+11-07 06:58:32.785  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:32.801  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:32.818  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:32.835  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:32.868  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:32.902  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:33.002  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:33.018  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:33.035  1707  1707 E Layer   : [Surface(name=AppWindowToken{1ccc18 token=Token{48633fb ActivityRecord{184918a u0 app.frame.studio.debug/app.frame.studio.MainActivity t6}}})/@0xd000b5b - animation-leash#0] No local sync point found
+11-07 06:58:34.265  1914  3325 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=app.frame.studio.debug/app.frame.studio.MainActivity} from uid 2000
+11-07 06:58:34.628  3484  4350 I Ads     : This request is sent from a test device.
+11-07 06:58:34.871  3484  3641 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.photoOrPlaceholder(FrameRenderer.kt:126)
+11-07 06:58:34.871  3484  3641 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer$Ctx.invite(FrameRenderer.kt:279)
+11-07 06:58:34.871  3484  3641 W TemplatePreviews: 	at app.frame.studio.templates.FrameRenderer.draw(FrameRenderer.kt:77)
+11-07 06:58:34.979  3484  5111 W GooglePlayServicesUtil: Google Play services out of date for app.frame.studio.debug.  Requires 243734000 but found 202414023
+11-07 06:58:35.135  3484  3484 I Ads     : Received log message: <Google:HTML> You are currently using version 252530000.252530000.0 of the SDK, which is out of date. Please consider updating your SDK to the most recent SDK version to get the latest features and bug fixes. The latest SDK can be installed from https://goo.gle/android-install-instructions. More information about the SDK deprecation schedule is available at https://developers.google.com/admob/android/deprecation.
+11-07 06:58:35.176  3484  4324 I Ads     : SDK version: afma-sdk-a-v252530000.252530000.0
+11-07 06:58:35.176  3484  4324 I Ads     : HTTP timeout: 60000 milliseconds.
+11-07 06:58:35.922  2313  2642 I CheckinCompat: Done disabling old GoogleServicesFramework version [CONTEXT service_id=130 ]
+11-07 06:58:36.390  1914  1939 I ActivityTaskManager: Displayed app.frame.studio.debug/app.frame.studio.MainActivity: +377ms
+11-07 06:58:38.874  2313  2645 I ModuleSetMgr: Computing pending module set with APKs: [[AdsFdrDynamite.integ:21460000000], [Cronetdynamite:202414040800], [Dynamiteloader:202414040800], [Dynamitemodulesa:202414040000], [Dynamitemodulesc:202414040000], [Googlecertificates:202414040000], [Mapsdynamite:202414040000], [Measurementdynamite:202414040000]]
+SMOKE: LAUNCH OK
+/tmp/sample.mp4: 1 file pushed, 0 skipped. 433.1 MB/s (100233 bytes in 0.000s)
+/tmp/sample.m4a: 1 file pushed, 0 skipped. 66.2 MB/s (36473 bytes in 0.001s)
+/tmp/sample.png: 1 file pushed, 0 skipped. 222.6 MB/s (33510 bytes in 0.000s)
+/tmp/big.jpg: 1 file pushed, 0 skipped. 3245.1 MB/s (1765678 bytes in 0.001s)
+/tmp/beats.m4a: 1 file pushed, 0 skipped. 260.4 MB/s (47922 bytes in 0.000s)
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:processDebugAndroidTestManifest
+> Task :app:generateDebugAndroidTestBuildConfig
+> Task :app:checkDebugAndroidTestAarMetadata
+> Task :app:processDebugAndroidTestNavigationResources
+> Task :app:compileDebugAndroidTestNavigationResources FROM-CACHE
+> Task :app:generateDebugAndroidTestResValues FROM-CACHE
+> Task :app:mapDebugAndroidTestSourceSetPaths
+> Task :app:generateDebugAndroidTestResources
+> Task :app:javaPreCompileDebugAndroidTest FROM-CACHE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAndroidTestResources
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:packageDebug UP-TO-DATE
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:processDebugAndroidTestResources
+> Task :app:mergeDebugAndroidTestShaders
+> Task :app:compileDebugAndroidTestShaders NO-SOURCE
+> Task :app:generateDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergeDebugAndroidTestAssets
+> Task :app:compressDebugAndroidTestAssets
+> Task :app:desugarDebugAndroidTestFileDependencies FROM-CACHE
+> Task :app:checkDebugAndroidTestDuplicateClasses
+> Task :app:mergeDebugAndroidTestJniLibFolders
+> Task :app:mergeLibDexDebugAndroidTest FROM-CACHE
+> Task :app:mergeDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebugAndroidTest
+> Task :app:writeDebugAndroidTestSigningConfigVersions
+> Task :app:mergeExtDexDebugAndroidTest
+
+> Task :app:compileDebugAndroidTestKotlin
+w: file:///home/runner/work/frame/frame/app/src/androidTest/java/app/frame/studio/media/HeavyMediaDeviceTest.kt:81:54 Check for instance is always 'true'.
+
+> Task :app:compileDebugAndroidTestJavaWithJavac
+> Task :app:dexBuilderDebugAndroidTest
+> Task :app:mergeDebugAndroidTestGlobalSynthetics FROM-CACHE
+> Task :app:processDebugAndroidTestJavaRes
+> Task :app:mergeProjectDexDebugAndroidTest
+> Task :app:mergeDebugAndroidTestJavaResource
+> Task :app:packageDebugAndroidTest
+> Task :app:createDebugAndroidTestApkListingFileRedirect
+[EmulatorConsole]: Failed to start Emulator console for 5554
+> Task :app:connectedDebugAndroidTest
+Starting 40 tests on emulator-5554 - 10
+
+emulator-5554 - 10 Tests 2/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 10 Tests 3/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 10 Tests 4/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 10 Tests 5/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 10 Tests 6/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 10 Tests 7/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 10 Tests 8/40 completed. (0 skipped) (0 failed)
+emulator-5554 - 10 Tests 9/40 completed. (0 skipped) (0 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.export.OverlayDeviceTest > overlaySoundIsMixedAtItsTime[emulator-5554 - 10] [31mFAILED [0m
+	java.lang.AssertionError: overlay sound missing (rms 0.0)
+	at org.junit.Assert.fail(Assert.java:89)
+
+emulator-5554 - 10 Tests 10/40 completed. (0 skipped) (1 failed)
+emulator-5554 - 10 Tests 12/40 completed. (0 skipped) (1 failed)
+emulator-5554 - 10 Tests 15/40 completed. (0 skipped) (1 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.export.ShareOptimizerDeviceTest > fourKSixtyBecomesInstagramReady[emulator-5554 - 10] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+emulator-5554 - 10 Tests 18/40 completed. (0 skipped) (2 failed)
+emulator-5554 - 10 Tests 19/40 completed. (0 skipped) (2 failed)
+emulator-5554 - 10 Tests 20/40 completed. (0 skipped) (2 failed)
+emulator-5554 - 10 Tests 22/40 completed. (0 skipped) (2 failed)
+emulator-5554 - 10 Tests 23/40 completed. (0 skipped) (2 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.magic.MagicMovieRobustnessTest > veryShortAndVeryLongVideos[emulator-5554 - 10] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/short.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+app.frame.studio.magic.MagicMovieRobustnessTest > silentMusicHasNoBeatsButStillWorks[emulator-5554 - 10] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/short.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+emulator-5554 - 10 Tests 28/40 completed. (0 skipped) (4 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.media.HeavyMediaDeviceTest > verdictsMatchThePhonesDecoders[emulator-5554 - 10] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v8k.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+app.frame.studio.media.HeavyMediaDeviceTest > heavyClipStillExportsAtFullResolution[emulator-5554 - 10] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+app.frame.studio.media.HeavyMediaDeviceTest > proxyIsMadeAtShortSide540[emulator-5554 - 10] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+app.frame.studio.media.HeavyMediaDeviceTest > eightKIsRefusedWithAClearReasonWhenNoDecoderFits[emulator-5554 - 10] [31mFAILED [0m
+	kotlin.io.NoSuchFileException: /data/local/tmp/v8k.mp4: The source file doesn't exist.
+	at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+
+emulator-5554 - 10 Tests 34/40 completed. (0 skipped) (8 failed)
+
+> Task :app:connectedDebugAndroidTest
+
+app.frame.studio.templates.CollageTemplateTest > everyCollageTemplateBuilds[emulator-5554 - 10] [31mFAILED [0m
+	java.lang.IllegalArgumentException: Cannot coerce value to an empty range: maximum 0.49999994 is less than minimum 0.50000006.
+	at kotlin.ranges.RangesKt___RangesKt.coerceIn(_Ranges.kt:1476)
+
+emulator-5554 - 10 Tests 39/40 completed. (0 skipped) (9 failed)
+Finished 40 tests on emulator-5554 - 10
+
+> Task :app:connectedDebugAndroidTest
+Tests on emulator-5554 - 10 failed: There was 9 failure(s).
+
+> Task :app:connectedDebugAndroidTest FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__reactivecircus_android-emulator-runner-1794034723993.json
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:connectedDebugAndroidTest'.
+> There were failing tests. See the report at: file:///home/runner/work/frame/frame/app/build/reports/androidTests/connected/debug/index.html
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 14m 10s
+71 actionable tasks: 26 executed, 6 from cache, 39 up-to-date
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="app.frame.studio.audio.BeatDetectionDeviceTest" tests="40" failures="9" errors="0" skipped="0" time="789.003" timestamp="2026-11-07T07:12:52" hostname="localhost">
+  <properties>
+    <property name="device" value="emulator-5554 - 10" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="findsTheBeatOfARealAacFile" classname="app.frame.studio.audio.BeatDetectionDeviceTest" time="0.723" />
+  <testcase name="autoCaptionsFinishCleanly" classname="app.frame.studio.captions.CaptionsDeviceTest" time="0.013" />
+  <testcase name="exportsEveryCaptionStyle" classname="app.frame.studio.captions.CaptionsDeviceTest" time="14.714" />
+  <testcase name="movedZoomedTurnedClipRenders" classname="app.frame.studio.export.CanvasFillDeviceTest" time="8.705" />
+  <testcase name="fillModesPlaceTheClipAsDescribed" classname="app.frame.studio.export.CanvasFillDeviceTest" time="15.083" />
+  <testcase name="exportsFullFeaturedProject" classname="app.frame.studio.export.ExportPipelineTest" time="30.096" />
+  <testcase name="previewPlaysCompositionWithoutErrors" classname="app.frame.studio.export.ExportPipelineTest" time="2.851" />
+  <testcase name="everySceneEffectRenders" classname="app.frame.studio.export.ExportPipelineTest" time="34.229" />
+  <testcase name="overlayExportsFinishThreeTimesInARow" classname="app.frame.studio.export.ExportRetryDeviceTest" time="26.527" />
+  <testcase name="overlaySoundIsMixedAtItsTime" classname="app.frame.studio.export.OverlayDeviceTest" time="8.883">
+    <failure>java.lang.AssertionError: overlay sound missing (rms 0.0)
+at org.junit.Assert.fail(Assert.java:89)
+at org.junit.Assert.assertTrue(Assert.java:42)
+at app.frame.studio.export.OverlayDeviceTest.overlaySoundIsMixedAtItsTime(OverlayDeviceTest.kt:209)
+</failure>
+  </testcase>
+  <testcase name="exportsKeyframedOverlays" classname="app.frame.studio.export.OverlayDeviceTest" time="9.683" />
+  <testcase name="layeredPreviewPlays" classname="app.frame.studio.export.OverlayDeviceTest" time="3.668" />
+  <testcase name="overlayProjectPreparesAtTheEnd" classname="app.frame.studio.export.PreviewAtEndDeviceTest" time="6.044" />
+  <testcase name="textProjectPreparesAtTheEnd" classname="app.frame.studio.export.PreviewAtEndDeviceTest" time="6.046" />
+  <testcase name="safeResumePositionStaysAwayFromTheEnd" classname="app.frame.studio.export.PreviewAtEndDeviceTest" time="0.001" />
+  <testcase name="videoOverlayProjectPreparesAtTheEnd" classname="app.frame.studio.export.PreviewAtEndDeviceTest" time="6.037" />
+  <testcase name="fourKSixtyBecomesInstagramReady" classname="app.frame.studio.export.ShareOptimizerDeviceTest" time="0.002">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.export.ShareOptimizerDeviceTest$fourKSixtyBecomesInstagramReady$1.invokeSuspend(ShareOptimizerDeviceTest.kt:22)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.export.ShareOptimizerDeviceTest.fourKSixtyBecomesInstagramReady(ShareOptimizerDeviceTest.kt:20)
+</failure>
+  </testcase>
+  <testcase name="cleanedAndDuckedExportKeepsItsLength" classname="app.frame.studio.export.SoundCleanupDeviceTest" time="6.449" />
+  <testcase name="everyTextAnimationExports" classname="app.frame.studio.export.TextAnimationDeviceTest" time="36.118" />
+  <testcase name="everyShaderTransitionExports" classname="app.frame.studio.export.TransitionDeviceTest" time="58.381" />
+  <testcase name="makesBeatSyncedMovieAndExportsIt" classname="app.frame.studio.magic.MagicMovieDeviceTest" time="29.427" />
+  <testcase name="duplicatesOnlyLeaveOne" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="0.079" />
+  <testcase name="singlePhoto" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="32.787" />
+  <testcase name="skipsBrokenFilesAndKeepsTheGoodOnes" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="6.605" />
+  <testcase name="veryShortAndVeryLongVideos" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="0.005">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/short.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.magic.MagicMovieRobustnessTest.sample(MagicMovieRobustnessTest.kt:57)
+at app.frame.studio.magic.MagicMovieRobustnessTest.sample$default(MagicMovieRobustnessTest.kt:55)
+at app.frame.studio.magic.MagicMovieRobustnessTest$veryShortAndVeryLongVideos$1.invokeSuspend(MagicMovieRobustnessTest.kt:169)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.magic.MagicMovieRobustnessTest.veryShortAndVeryLongVideos(MagicMovieRobustnessTest.kt:168)
+</failure>
+  </testcase>
+  <testcase name="allBrokenGivesAClearError" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="0.002" />
+  <testcase name="silentMusicHasNoBeatsButStillWorks" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="0.05">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/short.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.magic.MagicMovieRobustnessTest.sample(MagicMovieRobustnessTest.kt:57)
+at app.frame.studio.magic.MagicMovieRobustnessTest.sample$default(MagicMovieRobustnessTest.kt:55)
+at app.frame.studio.magic.MagicMovieRobustnessTest$silentMusicHasNoBeatsButStillWorks$1.invokeSuspend(MagicMovieRobustnessTest.kt:153)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.magic.MagicMovieRobustnessTest.silentMusicHasNoBeatsButStillWorks(MagicMovieRobustnessTest.kt:152)
+</failure>
+  </testcase>
+  <testcase name="manyPhotosStayWithinLimitsAndTime" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="3.735" />
+  <testcase name="unreadableMusicStillMakesTheMovie" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="9.019" />
+  <testcase name="cancellingStopsWithoutSavingAProject" classname="app.frame.studio.magic.MagicMovieRobustnessTest" time="1.33" />
+  <testcase name="verdictsMatchThePhonesDecoders" classname="app.frame.studio.media.HeavyMediaDeviceTest" time="0.004">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v8k.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.media.HeavyMediaDeviceTest.sample(HeavyMediaDeviceTest.kt:48)
+at app.frame.studio.media.HeavyMediaDeviceTest.access$sample(HeavyMediaDeviceTest.kt:38)
+at app.frame.studio.media.HeavyMediaDeviceTest$verdictsMatchThePhonesDecoders$1.invokeSuspend(HeavyMediaDeviceTest.kt:53)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.media.HeavyMediaDeviceTest.verdictsMatchThePhonesDecoders(HeavyMediaDeviceTest.kt:51)
+</failure>
+  </testcase>
+  <testcase name="heavyClipStillExportsAtFullResolution" classname="app.frame.studio.media.HeavyMediaDeviceTest" time="0.0">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.media.HeavyMediaDeviceTest.sample(HeavyMediaDeviceTest.kt:48)
+at app.frame.studio.media.HeavyMediaDeviceTest.heavyClipStillExportsAtFullResolution(HeavyMediaDeviceTest.kt:114)
+</failure>
+  </testcase>
+  <testcase name="proxyIsMadeAtShortSide540" classname="app.frame.studio.media.HeavyMediaDeviceTest" time="0.001">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v4k60.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.media.HeavyMediaDeviceTest.sample(HeavyMediaDeviceTest.kt:48)
+at app.frame.studio.media.HeavyMediaDeviceTest.proxyIsMadeAtShortSide540(HeavyMediaDeviceTest.kt:88)
+</failure>
+  </testcase>
+  <testcase name="eightKIsRefusedWithAClearReasonWhenNoDecoderFits" classname="app.frame.studio.media.HeavyMediaDeviceTest" time="0.001">
+    <failure>kotlin.io.NoSuchFileException: /data/local/tmp/v8k.mp4: The source file doesn't exist.
+at kotlin.io.FilesKt__UtilsKt.copyTo(Utils.kt:219)
+at kotlin.io.FilesKt__UtilsKt.copyTo$default(Utils.kt:217)
+at app.frame.studio.media.HeavyMediaDeviceTest.sample(HeavyMediaDeviceTest.kt:48)
+at app.frame.studio.media.HeavyMediaDeviceTest.access$sample(HeavyMediaDeviceTest.kt:38)
+at app.frame.studio.media.HeavyMediaDeviceTest$eightKIsRefusedWithAClearReasonWhenNoDecoderFits$1.invokeSuspend(HeavyMediaDeviceTest.kt:74)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+at app.frame.studio.media.HeavyMediaDeviceTest.eightKIsRefusedWithAClearReasonWhenNoDecoderFits(HeavyMediaDeviceTest.kt:73)
+</failure>
+  </testcase>
+  <testcase name="lowEndStress" classname="app.frame.studio.perf.PerfStressTest" time="164.086" />
+  <testcase name="everyCollageTemplateBuilds" classname="app.frame.studio.templates.CollageTemplateTest" time="0.838">
+    <failure>java.lang.IllegalArgumentException: Cannot coerce value to an empty range: maximum 0.49999994 is less than minimum 0.50000006.
+at kotlin.ranges.RangesKt___RangesKt.coerceIn(_Ranges.kt:1476)
+at app.frame.studio.templates.PhotoFraming.clamp(PhotoFit.kt:41)
+at app.frame.studio.templates.PhotoFraming.source(PhotoFit.kt:25)
+at app.frame.studio.templates.CollageRenderer.drawCropped$app_debug(CollageRenderer.kt:240)
+at app.frame.studio.templates.FrameRenderer$Ctx.photoOrPlaceholder(FrameRenderer.kt:126)
+at app.frame.studio.templates.FrameRenderer$Ctx.print(FrameRenderer.kt:144)
+at app.frame.studio.templates.FrameRenderer.draw(FrameRenderer.kt:72)
+at app.frame.studio.templates.CollageRenderer.draw(CollageRenderer.kt:79)
+at app.frame.studio.templates.CollageRenderer.render(CollageRenderer.kt:49)
+at app.frame.studio.templates.TemplateBuilder$renderCollagePages$2.invokeSuspend$lambda$10$lambda$8$lambda$7(TemplateBuilder.kt:125)
+at app.frame.studio.templates.TemplateBuilder$renderCollagePages$2.$r8$lambda$MXYpRS0ys--vNchTTfZPSMPsjT4(Unknown Source:0)
+at app.frame.studio.templates.TemplateBuilder$renderCollagePages$2$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+at app.frame.studio.templates.CollageRenderer.withFits(CollageRenderer.kt:228)
+at app.frame.studio.templates.TemplateBuilder$renderCollagePages$2.invokeSuspend(TemplateBuilder.kt:124)
+at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+</failure>
+  </testcase>
+  <testcase name="framingChangesPreviewAndVideo" classname="app.frame.studio.templates.PhotoAdjustDeviceTest" time="0.227" />
+  <testcase name="everyBundledFontLoads" classname="app.frame.studio.text.TextFontsDeviceTest" time="0.024" />
+  <testcase name="fontSpanChangesRenderedPixels" classname="app.frame.studio.text.TextFontsDeviceTest" time="0.003" />
+  <testcase name="tour" classname="app.frame.studio.ui.ScreenshotTour" time="262.906" />
+</testsuite>/data/local/tmp/shots/./: 16 files pulled, 0 skipped. 44.7 MB/s (1203309 bytes in 0.026s)
+SMOKE: EXPORT FAILED

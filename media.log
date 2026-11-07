@@ -1,0 +1,441 @@
+11-07 06:59:35.770  3987  3987 I AndroidRuntime: VM exiting with result code 0, cleanup skipped.
+11-07 06:59:38.435  6799  6799 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+11-07 06:59:38.443  6799  6799 I AndroidRuntime: Using default boot image
+11-07 06:59:38.443  6799  6799 I AndroidRuntime: Leaving lock profiling enabled
+11-07 06:59:38.719  6799  6799 D AndroidRuntime: Calling main entry com.android.commands.am.Am
+11-07 06:59:43.232  6816  6838 I FramePerf: beats.ms=752 bpm=119.76989 count=23
+11-07 06:59:43.232  6816  6838 I FramePerf: beats.signed=[-36, -25, -14, -27, -16, -28, -18, -30, -19, -31, -21, -33, -22, -35, -24, -36, -25, -14, -27, -16, -28, -17, -30] encoderDelay=1024
+11-07 06:59:43.281  6816  6838 I FramePerf: captions.supported=false result=Unavailable Unavailable(message=Auto captions need Android 13 or newer. You can still type captions and Frame will animate them.)
+11-07 06:59:43.492  6816  6816 I TransformerInternal: Init 5281cf5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 06:59:43.575  6816  6816 I ExoPlayerImpl: Init 5652a8a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 06:59:44.055  6816  6861 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979585
+11-07 06:59:44.241  6816  6861 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 06:59:46.308  6816  6853 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 06:59:57.950  6816  6853 I TransformerInternal: Release 5281cf5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 06:59:57.969  6816  6853 I ExoPlayerImpl: Release 5652a8a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 06:59:58.004  6816  6816 I TransformerInternal: Init 50f22bc [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 06:59:58.011  6816  6816 I ExoPlayerImpl: Init d6f4245 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 06:59:58.061  6816  7186 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979586
+11-07 06:59:58.134  6816  7186 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 06:59:59.250  6816  7179 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:00:06.483  6816  7179 I TransformerInternal: Release 50f22bc [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:06.495  6816  7179 I ExoPlayerImpl: Release d6f4245 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:06.706  6816  6816 I TransformerInternal: Init 9cf4725 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:06.708  6816  6816 I ExoPlayerImpl: Init 8cc0fa [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:06.808  6816  7473 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979587
+11-07 07:00:06.891  6816  7473 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:00:08.167  6816  7466 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:00:10.385  6816  7466 I TransformerInternal: Release 9cf4725 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:10.395  6816  7466 I ExoPlayerImpl: Release 8cc0fa [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:10.588  6816  6816 I TransformerInternal: Init 8e24368 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:10.589  6816  6816 I ExoPlayerImpl: Init 3509381 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:10.648  6816  7657 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979588
+11-07 07:00:10.757  6816  7657 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:00:12.074  6816  7650 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:00:17.972  6816  7650 I TransformerInternal: Release 8e24368 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:17.982  6816  7650 I ExoPlayerImpl: Release 3509381 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:18.130  6816  6816 I TransformerInternal: Init 779e661 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:18.131  6816  6816 I ExoPlayerImpl: Init 31ed586 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:18.189  6816  7840 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979589
+11-07 07:00:18.250  6816  7840 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:00:19.371  6816  7833 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:00:21.598  6816  7833 I TransformerInternal: Release 779e661 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:21.610  6816  7833 I ExoPlayerImpl: Release 31ed586 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:21.825  6816  6816 I TransformerInternal: Init 976646c [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:21.827  6816  6816 I ExoPlayerImpl: Init 189da35 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:21.828  6816  6816 I ExoPlayerImpl: Init 22c3eca [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:21.908  6816  8027 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979590
+11-07 07:00:21.936  6816  8015 I ExoPlayerImpl: Init de8efa3 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:22.047  6816  8027 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:00:23.808  6816  8015 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:00:32.802  6816  8015 I ExoPlayerImpl: Release 189da35 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:32.823  6816  8015 I ExoPlayerImpl: Init e0c0a3d [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:32.897  6816  8205 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979591
+11-07 07:00:33.037  6816  8205 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:00:42.337  6816  8015 I ExoPlayerImpl: Release e0c0a3d [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:51.842  6816  8015 I TransformerInternal: Release 976646c [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:51.864  6816  8015 I ExoPlayerImpl: Release 22c3eca [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:51.873  6816  8015 I ExoPlayerImpl: Release de8efa3 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:51.950  6816  6816 I ExoPlayerImpl: Init 84b33a7 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:51.988  6816  6816 I ExoPlayerImpl: Init 9ed6343 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:52.058  6816  8403 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979592
+11-07 07:00:54.582  6816  6816 I ExoPlayerImpl: Release 84b33a7 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:54.624  6816  8403 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979593
+11-07 07:00:54.640  6816  6816 I ExoPlayerImpl: Release 9ed6343 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:00:54.753  6816  6816 I TransformerInternal: Init 79255d6 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:54.755  6816  6816 I ExoPlayerImpl: Init 8f9f057 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:00:54.782  6816  8419 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979594
+11-07 07:00:57.116  6816  8415 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:01:28.932  6816  8415 I TransformerInternal: Release 79255d6 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:01:28.948  6816  8415 I ExoPlayerImpl: Release 8f9f057 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:01:28.991  6816  6816 I TransformerInternal: Init 7920041 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:01:29.299  6816  8535 I ExoPlayerImpl: Init d369d88 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:01:29.364  6816  8549 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979595
+11-07 07:01:29.420  6816  8549 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:01:30.537  6816  8535 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:01:37.585  6816  8535 I TransformerInternal: Release 7920041 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:01:37.599  6816  8535 I ExoPlayerImpl: Release d369d88 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.lambda$onExportCompletedWithSuccess$1$androidx-media3-transformer-Transformer(Transformer.java:1721)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer$$ExternalSyntheticLambda2.invoke(D8$$SyntheticClass:0)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.onExportCompletedWithSuccess(Transformer.java:1722)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.access$3300(Transformer.java:92)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer$ComponentListener.onCompleted(Transformer.java:1786)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.transformer.TransformerInternal.lambda$endInternal$1$androidx-media3-transformer-TransformerInternal(TransformerInternal.java:513)
+11-07 07:01:37.636  6816  6816 D StrictMode: 	at androidx.media3.transformer.TransformerInternal$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)
+11-07 07:01:38.000  6816  6816 I TransformerInternal: Init b502da9 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:01:38.345  6816  8740 I ExoPlayerImpl: Init f5ea390 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:01:38.399  6816  8754 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979596
+11-07 07:01:38.450  6816  8754 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:01:39.713  6816  8740 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:01:46.718  6816  8740 I TransformerInternal: Release b502da9 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:01:46.737  6816  8740 I ExoPlayerImpl: Release f5ea390 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.lambda$onExportCompletedWithSuccess$1$androidx-media3-transformer-Transformer(Transformer.java:1721)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer$$ExternalSyntheticLambda2.invoke(D8$$SyntheticClass:0)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.onExportCompletedWithSuccess(Transformer.java:1722)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.access$3300(Transformer.java:92)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer$ComponentListener.onCompleted(Transformer.java:1786)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.transformer.TransformerInternal.lambda$endInternal$1$androidx-media3-transformer-TransformerInternal(TransformerInternal.java:513)
+11-07 07:01:46.753  6816  6816 D StrictMode: 	at androidx.media3.transformer.TransformerInternal$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)
+11-07 07:01:47.002  6816  6816 I TransformerInternal: Init 525b211 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:01:47.296  6816  8950 I ExoPlayerImpl: Init 63e7c98 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:01:47.359  6816  8964 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979597
+11-07 07:01:47.423  6816  8964 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:01:48.441  6816  8950 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:01:55.415  6816  8950 I TransformerInternal: Release 525b211 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:01:55.433  6816  8950 I ExoPlayerImpl: Release 63e7c98 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.lambda$onExportCompletedWithSuccess$1$androidx-media3-transformer-Transformer(Transformer.java:1721)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer$$ExternalSyntheticLambda2.invoke(D8$$SyntheticClass:0)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.onExportCompletedWithSuccess(Transformer.java:1722)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer.access$3300(Transformer.java:92)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.transformer.Transformer$ComponentListener.onCompleted(Transformer.java:1786)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.transformer.TransformerInternal.lambda$endInternal$1$androidx-media3-transformer-TransformerInternal(TransformerInternal.java:513)
+11-07 07:01:55.454  6816  6816 D StrictMode: 	at androidx.media3.transformer.TransformerInternal$$ExternalSyntheticLambda3.run(D8$$SyntheticClass:0)
+11-07 07:01:55.515  6816  6816 I TransformerInternal: Init 816abe [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:01:55.516  6816  6816 I ExoPlayerImpl: Init 294871f [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:01:55.570  6816  9167 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979598
+11-07 07:01:55.669  6816  9167 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:01:57.500  6816  9157 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:02:03.910  6816  9157 I TransformerInternal: Release 816abe [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:03.930  6816  9157 I ExoPlayerImpl: Release 294871f [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:04.390  6816  6816 I TransformerInternal: Init 1379700 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:04.394  6816  6816 I ExoPlayerImpl: Init ead7b39 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:04.699  6816  9439 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979599
+11-07 07:02:04.762  6816  9439 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:02:06.365  6816  9426 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:02:13.649  6816  9426 I TransformerInternal: Release 1379700 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:13.665  6816  9426 I ExoPlayerImpl: Release ead7b39 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:14.080  6816  6816 I ExoPlayerImpl: Init d74bbb5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:14.084  6816  6816 I ExoPlayerImpl: Init bc6cad8 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:14.145  6816  9845 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979600
+11-07 07:02:17.667  6816  6816 I ExoPlayerImpl: Release d74bbb5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:17.669  6816  6816 I ExoPlayerImpl: Release bc6cad8 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:17.695  6816  9845 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979601
+11-07 07:02:17.779  6816  6816 I ExoPlayerImpl: Init a9a146a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:17.782  6816  6816 I ExoPlayerImpl: Init 4b46ed1 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:23.778  6816  6816 I ExoPlayerImpl: Release a9a146a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:23.780  6816  6816 I ExoPlayerImpl: Release 4b46ed1 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:23.817  6816  6816 I ExoPlayerImpl: Init 7669eb8 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:29.815  6816  6816 I ExoPlayerImpl: Release 7669eb8 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:29.866  6816  6816 I ExoPlayerImpl: Init 94645d7 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:29.868  6816  6816 I ExoPlayerImpl: Init 7c011ad [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:29.929  6816  9879 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979602
+11-07 07:02:35.864  6816  6816 I ExoPlayerImpl: Release 94645d7 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:35.866  6816  6816 I ExoPlayerImpl: Release 7c011ad [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:35.873  6816  9879 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979603
+11-07 07:02:35.914  6816  6816 I TransformerInternal: Init e6582ab [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:35.918  6816  6816 I ExoPlayerImpl: Init a4aed08 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:35.921  6816  6816 I ExoPlayerImpl: Init 24f8ca1 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:35.995  6816  9902 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979604
+11-07 07:02:36.018  6816  9889 I ExoPlayerImpl: Init de18f68 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:36.086  6816  9902 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:02:37.208  6816  9889 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:02:42.300  6816  9889 I TransformerInternal: Release e6582ab [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:42.315  6816  9889 I ExoPlayerImpl: Release a4aed08 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:42.329  6816  9889 I ExoPlayerImpl: Release 24f8ca1 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:42.333  6816  9889 I ExoPlayerImpl: Release de18f68 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:42.361  6816  6816 I TransformerInternal: Init 456d7f3 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:42.367  6816  6816 I ExoPlayerImpl: Init 7b82cb0 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:42.424  6816 10173 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979605
+11-07 07:02:42.567  6816 10173 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:02:44.519  6816 10166 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:02:51.540  6816 10166 I ExoPlayerImpl: Release 7b82cb0 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:02:51.566  6816 10166 I ExoPlayerImpl: Init 476ae0d [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:02:51.628  6816 10504 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979606
+11-07 07:02:51.718  6816 10504 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:00.487  6816 10166 I ExoPlayerImpl: Release 476ae0d [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:00.510  6816 10166 I ExoPlayerImpl: Init dceaaca [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:00.579  6816 10759 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979607
+11-07 07:03:00.727  6816 10759 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:09.535  6816 10166 I TransformerInternal: Release 456d7f3 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:09.554  6816 10166 I ExoPlayerImpl: Release dceaaca [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:18.471  6816  6816 I TransformerInternal: Init 47adb01 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:18.474  6816  6816 I ExoPlayerImpl: Init acfbda6 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:18.517  6816 14871 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979608
+11-07 07:03:18.592  6816 14871 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:20.459  6816 14864 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:03:21.735  6816 14864 I ExoPlayerImpl: Release acfbda6 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:21.762  6816 14864 I ExoPlayerImpl: Init 421113a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:21.793  6816 14941 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979609
+11-07 07:03:21.917  6816 14941 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:25.982  6816 14864 I ExoPlayerImpl: Release 421113a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:25.998  6816 14864 I ExoPlayerImpl: Init eb77f42 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:26.129  6816 15011 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979610
+11-07 07:03:26.216  6816 15011 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:29.474  6816 14864 I ExoPlayerImpl: Release eb77f42 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:29.491  6816 14864 I ExoPlayerImpl: Init 58509b5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:29.579  6816 15076 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979611
+11-07 07:03:29.733  6816 15076 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:33.331  6816 14864 I ExoPlayerImpl: Release 58509b5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:33.366  6816 14864 I ExoPlayerImpl: Init fe054b4 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:33.422  6816 15143 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979612
+11-07 07:03:33.529  6816 15143 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:37.142  6816 14864 I ExoPlayerImpl: Release fe054b4 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:37.171  6816 14864 I ExoPlayerImpl: Init eceed6f [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:37.279  6816 15210 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979613
+11-07 07:03:37.413  6816 15210 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:41.196  6816 14864 I ExoPlayerImpl: Release eceed6f [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:41.230  6816 14864 I ExoPlayerImpl: Init 21381d6 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:41.273  6816 15278 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979614
+11-07 07:03:41.396  6816 15278 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:45.430  6816 14864 I ExoPlayerImpl: Release 21381d6 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:45.457  6816 14864 I ExoPlayerImpl: Init 5211399 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:45.518  6816 15346 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979615
+11-07 07:03:45.669  6816 15346 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:49.460  6816 14864 I ExoPlayerImpl: Release 5211399 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:49.493  6816 14864 I ExoPlayerImpl: Init 821b728 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:49.574  6816 15412 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979616
+11-07 07:03:49.700  6816 15412 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:53.672  6816 14864 I ExoPlayerImpl: Release 821b728 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:53.711  6816 14864 I ExoPlayerImpl: Init 2aa0eb3 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:53.791  6816 15483 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979617
+11-07 07:03:53.881  6816 15483 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:03:57.138  6816 14864 I ExoPlayerImpl: Release 2aa0eb3 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:03:57.154  6816 14864 I ExoPlayerImpl: Init 603712a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:03:57.207  6816 15550 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979618
+11-07 07:03:57.302  6816 15550 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:04:00.359  6816 14864 I ExoPlayerImpl: Release 603712a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:04:00.377  6816 14864 I ExoPlayerImpl: Init 93a6d3d [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:04:00.438  6816 15617 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979619
+11-07 07:04:00.584  6816 15617 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:04:03.653  6816 14864 I ExoPlayerImpl: Release 93a6d3d [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:04:03.676  6816 14864 I ExoPlayerImpl: Init fe2185c [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:04:03.834  6816 15684 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979620
+11-07 07:04:03.935  6816 15684 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:04:07.045  6816 14864 I ExoPlayerImpl: Release fe2185c [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:04:07.085  6816 14864 I ExoPlayerImpl: Init 17a59b7 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:04:07.151  6816 15750 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979621
+11-07 07:04:07.281  6816 15750 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:04:10.697  6816 14864 I TransformerInternal: Release 47adb01 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:04:10.712  6816 14864 I ExoPlayerImpl: Release 17a59b7 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:04:17.831  6816  6838 I FramePerf: magic.create ms=890
+11-07 07:04:17.833  6816  6816 I TransformerInternal: Init 13412b0 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:04:17.837  6816  6816 I ExoPlayerImpl: Init 4fdc529 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:04:19.362  6816 18541 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:04:24.334  6816 18541 I ExoPlayerImpl: Init c84cd58 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:04:24.398  6816 18596 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979622
+11-07 07:04:24.456  6816 18596 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:04:46.206  6816 18541 I TransformerInternal: Release 13412b0 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:04:46.224  6816 18541 I ExoPlayerImpl: Release c84cd58 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:04:46.241  6816 18541 I ExoPlayerImpl: Release 4fdc529 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:04:46.337  6816  6838 I FramePerf: magic.robust items=4 ms=38
+11-07 07:04:46.373  6816  6838 I FramePerf: magic.robust items=1 ms=17
+11-07 07:04:46.378  6816  6816 I TransformerInternal: Init bb53f51 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:04:47.630  6816 18762 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:05:19.099  6816 18762 I TransformerInternal: Release bb53f51 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:19.182  6816  6838 I FramePerf: magic.robust items=6 ms=34
+11-07 07:05:19.184  6816  6816 I TransformerInternal: Init 96a19aa [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:05:20.379  6816 19226 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:05:25.699  6816 19226 I TransformerInternal: Release 96a19aa [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:29.546  6816  6838 I FramePerf: magic.robust items=45 ms=2800
+11-07 07:05:29.612  6816  6838 I FramePerf: magic.robust items=3 ms=29
+11-07 07:05:29.614  6816  6816 I TransformerInternal: Init f2694c5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:05:30.820  6816 19344 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:05:38.552  6816 19344 I TransformerInternal: Release f2694c5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:39.996  6816  6838 I FramePerf: device.lowEnd=true
+11-07 07:05:39.996  6816  6838 I FramePerf: device.cores=2
+11-07 07:05:39.996  6816  6838 I FramePerf: device.memoryClassMb=512
+11-07 07:05:39.996  6816  6838 I FramePerf: device.previewHeight=SD_480
+11-07 07:05:39.996  6816  6838 I FramePerf: device.supportedExport=480p, 720p, 1080p
+11-07 07:05:40.093  6816  6838 I FramePerf: import.bigPhotoMs=94
+11-07 07:05:40.093  6816  6838 I FramePerf: import.bigPhotoSize=1920x1440
+11-07 07:05:40.102  6816  6816 I ExoPlayerImpl: Init c67ccb5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:05:40.109  6816  6816 I ExoPlayerImpl: Init 1deebb [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:05:40.151  6816 19453 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979623
+11-07 07:05:41.716  6816  6838 I FramePerf: preview.readyMs=1619
+11-07 07:05:43.308  6816 19483 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979624
+11-07 07:05:44.013  6816 19453 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979625
+11-07 07:05:46.717  6816  6816 I ExoPlayerImpl: Release c67ccb5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:46.723  6816 19483 I MediaCodec: [OMX.android.goldfish.h264.decoder] connecting to the same surface. Nothing to do.
+11-07 07:05:46.733  6816  6816 I ExoPlayerImpl: Release 1deebb [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:46.750  6816  6816 I FramePerf: preview.releaseMs=33
+11-07 07:05:46.750  6816  6838 I FramePerf: preview.advancedMsIn5s=4458
+11-07 07:05:46.757  6816  6816 I TransformerInternal: Init 580dd75 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:05:46.758  6816  6816 I ExoPlayerImpl: Init 8d6210a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:05:46.766  6816  6816 I ExoPlayerImpl: Init 8f94d7b [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:05:46.835  6816 19504 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979626
+11-07 07:05:46.918  6816 19504 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:05:48.888  6816 19492 W MuxerWrapper: Applying workarounds for edit list: shifting only the first video timestamp to zero.
+11-07 07:05:53.339  6816 19492 I ExoPlayerImpl: Release 8d6210a [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:53.962  6816 19492 I ExoPlayerImpl: Init 4f66d3b [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:05:54.022  6816 19637 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979627
+11-07 07:05:54.125  6816 19637 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:05:56.751  6816  6816 I FramePerf: export.progressAt10s=2:21
+11-07 07:05:57.742  6816 19492 I ExoPlayerImpl: Release 8f94d7b [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:05:57.759  6816 19492 I ExoPlayerImpl: Init 92da7a5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:06:05.638  6816 19492 I ExoPlayerImpl: Release 4f66d3b [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:06:06.304  6816 19492 I ExoPlayerImpl: Init bcc487e [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:06:06.358  6816 19826 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979628
+11-07 07:06:06.421  6816 19826 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:06:06.753  6816  6816 I FramePerf: export.progressAt20s=2:43
+11-07 07:06:16.755  6816  6816 I FramePerf: export.progressAt30s=2:56
+11-07 07:06:17.252  6816 19492 I ExoPlayerImpl: Release bcc487e [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:06:17.853  6816 19492 I ExoPlayerImpl: Init 9377a8e [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:06:17.906  6816 19993 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979629
+11-07 07:06:17.969  6816 19993 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:06:26.756  6816  6816 I FramePerf: export.progressAt40s=2:67
+11-07 07:06:29.425  6816 19492 I ExoPlayerImpl: Release 9377a8e [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:06:30.118  6816 19492 I ExoPlayerImpl: Init 59f989e [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:06:30.177  6816 20179 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979630
+11-07 07:06:30.235  6816 20179 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:06:36.757  6816  6816 I FramePerf: export.progressAt50s=2:72
+11-07 07:06:41.171  6816 19492 I ExoPlayerImpl: Release 59f989e [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:06:41.773  6816 19492 I ExoPlayerImpl: Init 3a3784f [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:06:41.821  6816 20345 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979631
+11-07 07:06:41.924  6816 20345 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:06:46.758  6816  6816 I FramePerf: export.progressAt60s=2:75
+11-07 07:06:53.045  6816 19492 I ExoPlayerImpl: Release 3a3784f [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:06:53.740  6816 19492 I ExoPlayerImpl: Init a011d1f [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:06:53.818  6816 20529 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979632
+11-07 07:06:53.890  6816 20529 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:06:56.759  6816  6816 I FramePerf: export.progressAt70s=2:80
+11-07 07:07:04.342  6816 19492 I ExoPlayerImpl: Release a011d1f [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:07:04.959  6816 19492 I ExoPlayerImpl: Init ec63def [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:07:05.010  6816 20689 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979633
+11-07 07:07:05.065  6816 20689 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:07:06.760  6816  6816 I FramePerf: export.progressAt80s=2:85
+11-07 07:07:16.227  6816 19492 I ExoPlayerImpl: Release ec63def [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:07:16.760  6816  6816 I FramePerf: export.progressAt90s=2:88
+11-07 07:07:16.908  6816 19492 I ExoPlayerImpl: Init 5d548de [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:07:16.959  6816 20873 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979634
+11-07 07:07:17.027  6816 20873 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:07:26.761  6816  6816 I FramePerf: export.progressAt100s=2:92
+11-07 07:07:27.619  6816 19492 I ExoPlayerImpl: Release 5d548de [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:07:28.192  6816 19492 I ExoPlayerImpl: Init 64502ee [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:07:28.242  6816 21033 I MediaCodec: [OMX.google.h264.decoder] setting surface generation to 6979635
+11-07 07:07:28.296  6816 21033 D MediaCodec: [OMX.google.h264.decoder] setting dataspace on output surface to #104
+11-07 07:07:36.762  6816  6816 I FramePerf: export.progressAt110s=2:97
+11-07 07:07:39.800  6816 19492 I ExoPlayerImpl: Release 64502ee [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:07:45.197  6816 19492 I TransformerInternal: Release 580dd75 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:07:45.212  6816 19492 I ExoPlayerImpl: Release 92da7a5 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:07:45.223  6816  6838 I FramePerf: export.ms=118473
+11-07 07:07:45.223  6816  6838 I FramePerf: export.timelineMs=31665
+11-07 07:07:45.223  6816  6838 I FramePerf: export.bytes=16274929
+11-07 07:07:48.599  6816 21341 W cr_MediaCodecUtil: HW encoder for video/avc is not available on this device.
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.Total frames rendered=123
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.Janky frames=109 (88.62%)
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.50th percentile=20ms
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.90th percentile=61ms
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.95th percentile=129ms
+11-07 07:07:53.385  6816  6838 I FramePerf: ui.home.99th percentile=200ms
+11-07 07:07:54.790  6816 21465 I cr_MediaCodecBridge: create MediaCodec video decoder, mime video/x-vnd.on2.vp9
+11-07 07:07:54.826  6816 21467 I MediaCodec: MediaCodec will operate in async mode
+11-07 07:07:54.828  6816 21467 I MediaCodec: [OMX.android.goldfish.vp9.decoder] setting surface generation to 6979636
+11-07 07:07:56.231  6816 21465 W cr_MediaCodecBridge: Releasing: OMX.android.goldfish.vp9.decoder
+11-07 07:07:56.238  6816 21465 W cr_MediaCodecBridge: Codec released
+11-07 07:08:00.277  6816  6838 I FramePerf: ui.templates.Total frames rendered=113
+11-07 07:08:00.277  6816  6838 I FramePerf: ui.templates.Janky frames=108 (95.58%)
+11-07 07:08:00.278  6816  6838 I FramePerf: ui.templates.50th percentile=23ms
+11-07 07:08:00.278  6816  6838 I FramePerf: ui.templates.90th percentile=38ms
+11-07 07:08:00.278  6816  6838 I FramePerf: ui.templates.95th percentile=53ms
+11-07 07:08:00.278  6816  6838 I FramePerf: ui.templates.99th percentile=97ms
+11-07 07:08:10.547  6816 21496 I ExoPlayerImpl: Init 8d6bbc1 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:08:10.555  6816 21496 I ExoPlayerImpl: Init 2f621f9 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:08:10.851  6816 21518 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979637
+11-07 07:08:17.412  6816 21562 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979638
+11-07 07:08:18.306  6816 21518 I MediaCodec: [OMX.android.goldfish.h264.decoder] setting surface generation to 6979639
+11-07 07:08:20.037  6816 21562 I MediaCodec: [OMX.android.goldfish.h264.decoder] connecting to the same surface. Nothing to do.
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.Total frames rendered=467
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.Janky frames=391 (83.73%)
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.50th percentile=20ms
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.90th percentile=36ms
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.95th percentile=44ms
+11-07 07:08:23.932  6816  6838 I FramePerf: ui.editor.99th percentile=85ms
+11-07 07:08:24.017  6816  6838 I FramePerf: ui.totalPssMb=350
+11-07 07:08:24.174  6816 21496 I ExoPlayerImpl: Release 8d6bbc1 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1048)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:263)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1044)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:626)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2608)
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-07 07:08:24.678  6816 21496 E CompositionPlayer-0:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:   androidx.media3.common.PlaybackException: error from player 0
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.maybeUpdatePlaybackError(CompositionPlayer.java:1088)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.access$1800(CompositionPlayer.java:106)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer$PlayerListener.onPlayerError(CompositionPlayer.java:1271)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:263)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1044)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:626)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2608)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1048)
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-07 07:08:24.680  6816 21496 E CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:08:24.680  6816 21496 I ExoPlayerImpl: Release 2f621f9 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1048)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:263)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1044)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:626)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2608)
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-07 07:08:25.181  6816 21496 E CompositionPlayer-1:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:   androidx.media3.exoplayer.ExoPlaybackException: Unexpected runtime error
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1048)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl$$ExternalSyntheticLambda10.invoke(D8$$SyntheticClass:0)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet$ListenerHolder.invoke(ListenerSet.java:342)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet.lambda$queueEvent$0(ListenerSet.java:226)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet$$ExternalSyntheticLambda1.run(D8$$SyntheticClass:0)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet.flushEvents(ListenerSet.java:248)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.common.util.ListenerSet.sendEvent(ListenerSet.java:263)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.release(ExoPlayerImpl.java:1044)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.transformer.CompositionPlayer.handleRelease(CompositionPlayer.java:626)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.common.SimpleBasePlayer.release(SimpleBasePlayer.java:2608)
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:   Caused by: androidx.media3.exoplayer.ExoTimeoutException: Player release timed out.
+11-07 07:08:25.182  6816 21496 W CompositionPlayer:       at androidx.media3.exoplayer.ExoPlayerImpl.lambda$release$6(ExoPlayerImpl.java:1047)
+11-07 07:10:29.841  6816 21810 I ExoPlayerImpl: Init dd65723 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:10:44.774  6816 21810 I ExoPlayerImpl: Release dd65723 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:10:54.041  6816 21886 I ExoPlayerImpl: Init 4e0b5a3 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:11:02.984  6816 21886 I ExoPlayerImpl: Release 4e0b5a3 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:11:02.993  6816 21886 I ExoPlayerImpl: Init a5def85 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29]
+11-07 07:11:06.713  6816 21886 I ExoPlayerImpl: Release a5def85 [AndroidXMedia3/1.8.0] [generic_x86_64, Android SDK built for x86_64, Google, 29] [media3.common, media3.transformer, media3.exoplayer, media3.decoder, media3.datasource, media3.extractor, media3.effect]
+11-07 07:12:49.465  6799  6799 D AndroidRuntime: Shutting down VM
