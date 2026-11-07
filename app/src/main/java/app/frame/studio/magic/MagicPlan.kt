@@ -274,6 +274,8 @@ object MagicPlan {
             textOverlays = overlays,
             effects = effects,
             aspect = aspect,
+            // Phones mix portrait and landscape shots: no black bars in a Magic Movie.
+            canvasFill = app.frame.studio.domain.CanvasFill.BLUR,
         )
     }
 

@@ -1,5 +1,8 @@
 package app.frame.studio.ui.projects
 
+import app.frame.studio.export.SocialPresets
+import app.frame.studio.domain.CanvasFill
+import app.frame.studio.telemetry.Telemetry
 import app.frame.studio.telemetry.AppEvents
 import app.frame.studio.ui.common.bounceClick
 import androidx.compose.foundation.background
@@ -95,11 +98,26 @@ fun ProjectsScreen(
     var renameTarget by remember { mutableStateOf<Project?>(null) }
     var deleteTarget by remember { mutableStateOf<Project?>(null) }
 
+    var choosingCanvas by remember { mutableStateOf(false) }
     fun newProject() {
-        scope.launch {
-            val project = app.repository.create("Project ${projects.size + 1}")
-            AppEvents.projectCreated("blank")
-            onNewProject(project.id)
+        choosingCanvas = true
+    }
+    if (choosingCanvas) {
+        NewProjectSheet(
+            lastChoiceKey = app.settings.lastCanvas,
+            onDismiss = { choosingCanvas = false },
+        ) { choice ->
+            choosingCanvas = false
+            app.settings.lastCanvas = choice.key
+            scope.launch {
+                val blank = app.repository.create("Project ${projects.size + 1}")
+                val shaped = (choice.preset?.let { SocialPresets.apply(blank, it, app.device::clampExportHeight) } ?: blank)
+                    .copy(canvasFill = CanvasFill.BLUR)
+                app.repository.save(shaped)
+                AppEvents.projectCreated("blank")
+                Telemetry.event("canvas_chosen", "canvas" to choice.key)
+                onNewProject(shaped.id)
+            }
         }
     }
 

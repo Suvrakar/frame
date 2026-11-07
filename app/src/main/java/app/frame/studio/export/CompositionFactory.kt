@@ -1,5 +1,6 @@
 package app.frame.studio.export
 
+import app.frame.studio.domain.CanvasFill
 import app.frame.studio.audio.Ducking
 import app.frame.studio.domain.AudioKind
 import app.frame.studio.domain.TextAnimation
@@ -88,7 +89,7 @@ object CompositionFactory {
         require(project.videoClips.isNotEmpty()) { "Add at least one clip" }
         val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect)
 
-        val videoSequence = EditedMediaItemSequence.Builder(project.videoClips.let { clips -> val starts = TimelineMath.videoStarts(clips); clips.mapIndexed { i, c -> videoItem(c, size, forExport, starts[i]) } })
+        val videoSequence = EditedMediaItemSequence.Builder(project.videoClips.let { clips -> val starts = TimelineMath.videoStarts(clips); clips.mapIndexed { i, c -> videoItem(c, size, forExport, starts[i], project.canvasFill) } })
             // Clips without an audio track (and photos) still contribute silence so the mix stays in sync.
             .experimentalSetForceAudioTrack(true)
             .build()
@@ -244,7 +245,7 @@ object CompositionFactory {
             )
             .build()
 
-    private fun videoItem(clip: VideoClip, size: ExportPlan.Size, forExport: Boolean, timelineStartMs: Long): EditedMediaItem {
+    private fun videoItem(clip: VideoClip, size: ExportPlan.Size, forExport: Boolean, timelineStartMs: Long, fill: CanvasFill): EditedMediaItem {
         val audio = mutableListOf<AudioProcessor>()
         val video = mutableListOf<Effect>()
 
@@ -300,8 +301,12 @@ object CompositionFactory {
             val matrix = color.toGl()
             video += RgbMatrix { _, _ -> matrix }
         }
-        // Every clip is fitted into the same canvas so mixed shapes export cleanly.
-        video += Presentation.createForWidthAndHeight(size.width, size.height, Presentation.LAYOUT_SCALE_TO_FIT)
+        // Every clip is placed on the same canvas so mixed shapes export cleanly.
+        video += when (fill) {
+            CanvasFill.BLUR -> app.frame.studio.effects.BlurFillEffect(size.width, size.height)
+            CanvasFill.FILL -> Presentation.createForWidthAndHeight(size.width, size.height, Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP)
+            CanvasFill.FIT -> Presentation.createForWidthAndHeight(size.width, size.height, Presentation.LAYOUT_SCALE_TO_FIT)
+        }
         // Vignette and grain work on the fitted frame so they follow the canvas shape.
         val grade = Filters.gradeFor(clip.filterId, clip.filterIntensity, clip.adjust)
         if (!grade.isNone) video += GradeEffect(grade)

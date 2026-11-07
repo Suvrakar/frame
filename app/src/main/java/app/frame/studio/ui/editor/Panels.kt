@@ -2,6 +2,10 @@
 
 package app.frame.studio.ui.editor
 
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material.icons.filled.BlurOn
+import androidx.compose.material.icons.filled.Crop
+import androidx.compose.material.icons.filled.FitScreen
 import app.frame.studio.domain.TextAnimation
 import app.frame.studio.text.TextMotion
 import app.frame.studio.export.TransitionPlan
@@ -562,6 +566,7 @@ fun CanvasPanel(
     project: app.frame.studio.domain.Project,
     onAspect: (CanvasAspect) -> Unit,
     onPreset: (SocialPreset) -> Unit,
+    onFill: (app.frame.studio.domain.CanvasFill) -> Unit = {},
 ) {
     val aspect = project.aspect
     Column {
@@ -579,6 +584,43 @@ fun CanvasPanel(
                 CanvasAspect.R1_1, CanvasAspect.R4_5 -> "Instagram feed"
                 CanvasAspect.ORIGINAL -> "Follows your first clip"
                 else -> "Clips are fitted inside the frame"
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        Text(
+            "Clips of another shape",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
+        )
+        androidx.compose.material3.SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+            val fills = app.frame.studio.domain.CanvasFill.entries
+            fills.forEachIndexed { i, f ->
+                SegmentedButton(
+                    selected = project.canvasFill == f,
+                    onClick = { onFill(f) },
+                    shape = androidx.compose.material3.SegmentedButtonDefaults.itemShape(i, fills.size),
+                    icon = {
+                        Icon(
+                            when (f) {
+                                app.frame.studio.domain.CanvasFill.BLUR -> Icons.Filled.BlurOn
+                                app.frame.studio.domain.CanvasFill.FILL -> Icons.Filled.Crop
+                                app.frame.studio.domain.CanvasFill.FIT -> Icons.Filled.FitScreen
+                            },
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    },
+                ) { Text(f.label) }
+            }
+        }
+        Text(
+            when (project.canvasFill) {
+                app.frame.studio.domain.CanvasFill.BLUR -> "Whole clip on a soft blurred background — no black bars."
+                app.frame.studio.domain.CanvasFill.FILL -> "Clip fills the frame; the edges are trimmed."
+                app.frame.studio.domain.CanvasFill.FIT -> "Whole clip with black bars."
             },
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

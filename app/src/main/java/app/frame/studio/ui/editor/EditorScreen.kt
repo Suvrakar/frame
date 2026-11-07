@@ -1061,7 +1061,7 @@ private fun ActivePanel(
                     },
                 )
             }
-            Tool.CANVAS -> CanvasPanel(project, vm::setAspect, vm::applySocialPreset)
+            Tool.CANVAS -> CanvasPanel(project, vm::setAspect, vm::applySocialPreset, vm::setCanvasFill)
             Tool.AUDIO -> AddAudioPanel(
                 onMusic = { onPickAudio(AudioKind.MUSIC) },
                 onSound = { onPickAudio(AudioKind.SOUND) },

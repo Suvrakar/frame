@@ -27,6 +27,11 @@ class SettingsStore(context: Context) {
     /** Filter ids the user starred in the filter browser. */
     val favoriteFilters: StateFlow<Set<String>> = _favoriteFilters.asStateFlow()
 
+    /** The canvas picked for the last new video ("original" or a preset id). */
+    var lastCanvas: String?
+        get() = prefs.getString(KEY_LAST_CANVAS, null)
+        set(value) = prefs.edit().putString(KEY_LAST_CANVAS, value).apply()
+
     fun toggleFavoriteFilter(id: String) {
         val next = _favoriteFilters.value.let { if (id in it) it - id else it + id }
         _favoriteFilters.value = next
@@ -35,6 +40,7 @@ class SettingsStore(context: Context) {
 
     companion object {
         private const val KEY_THEME = "theme_mode"
+        private const val KEY_LAST_CANVAS = "last_canvas"
         private const val KEY_FAV_FILTERS = "favorite_filters"
     }
 }

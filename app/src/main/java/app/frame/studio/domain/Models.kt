@@ -355,7 +355,20 @@ data class Project(
     val overlays: List<OverlayClip> = emptyList(),
     /** Music dips automatically while a voiceover plays. */
     val duckMusic: Boolean = false,
+    /** How clips of a different shape sit in the canvas. Old projects keep black bars. */
+    val canvasFill: CanvasFill = CanvasFill.FIT,
 )
+
+/** How a clip whose shape differs from the canvas is placed in it. */
+@Serializable
+enum class CanvasFill(val label: String) {
+    /** Whole clip over a blurred, enlarged copy of itself (no bars, nothing cut). */
+    BLUR("Blur"),
+    /** Clip fills the canvas; edges are cropped. */
+    FILL("Fill"),
+    /** Whole clip with black bars. */
+    FIT("Fit"),
+}
 
 @Serializable
 data class ExportRecord(
