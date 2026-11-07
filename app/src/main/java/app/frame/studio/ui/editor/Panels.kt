@@ -2,6 +2,7 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.export.TransitionPlan
 import app.frame.studio.ui.common.icon
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -683,49 +684,74 @@ private fun ShapeCard(label: String, ratio: Float, selected: Boolean, dashed: Bo
     }
 }
 
+/** Transition at the cut after [clip]: scrolling tiles (Pro ones badged), duration, apply to all. */
 @Composable
-fun TransitionPanel(clip: VideoClip, onChange: (TransitionType, Long) -> Unit, onApplyAll: () -> Unit) {
+fun TransitionPanel(
+    clip: VideoClip,
+    isPro: Boolean,
+    onChange: (TransitionType, Long) -> Unit,
+    onApplyAll: () -> Unit,
+) {
     Column {
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            TransitionType.entries.forEach { type ->
-                val selected = clip.transition == type
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .width(72.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surfaceContainerHigh)
-                        .clickable { onChange(type, clip.transitionMs) }
-                        .padding(10.dp),
-                ) {
-                    Box(
-                        Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(
-                                when (type) {
-                                    TransitionType.NONE -> MaterialTheme.colorScheme.surfaceVariant
-                                    TransitionType.FADE_BLACK -> Color.Black
-                                    TransitionType.FADE_WHITE -> Color.White
-                                },
-                            )
-                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(8.dp)),
-                    )
-                    Text(
-                        type.label,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(top = 6.dp),
-                    )
-                }
+        androidx.compose.foundation.lazy.LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(TransitionType.entries.size) { i ->
+                val type = TransitionType.entries[i]
+                TransitionTile(
+                    type = type,
+                    selected = clip.transition == type,
+                    locked = !isPro && TransitionPlan.isPro(type),
+                ) { onChange(type, clip.transitionMs) }
             }
         }
         if (clip.transition != TransitionType.NONE) {
-            ValueSlider("Duration", formatDuration(clip.transitionMs), clip.transitionMs / 1000f, 0.1f..2f, {
+            ValueSlider("Duration", formatDuration(clip.transitionMs), clip.transitionMs / 1000f, 0.2f..1.5f, {
                 onChange(clip.transition, (it * 10).roundToInt() * 100L)
             })
         }
         TextButton(onClick = onApplyAll) { Text("Apply to all cuts") }
+    }
+}
+
+@Composable
+private fun TransitionTile(type: TransitionType, selected: Boolean, locked: Boolean, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(16.dp)
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(68.dp).bounceClick(onClick = onClick)) {
+        Box(
+            Modifier
+                .size(60.dp)
+                .clip(shape)
+                .background(
+                    if (type == TransitionType.NONE) {
+                        androidx.compose.ui.graphics.Brush.linearGradient(listOf(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.colorScheme.surfaceContainerHigh))
+                    } else {
+                        androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFF3B3FB8), Color(0xFF8E4FD6)))
+                    },
+                )
+                .then(if (selected) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, shape) else Modifier),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                type.icon,
+                contentDescription = null,
+                tint = if (type == TransitionType.NONE) MaterialTheme.colorScheme.onSurfaceVariant else Color.White,
+                modifier = Modifier.size(26.dp),
+            )
+            if (locked) {
+                Icon(
+                    Icons.Filled.WorkspacePremium,
+                    contentDescription = "Pro",
+                    tint = Color(0xFFFFC94D),
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp).size(14.dp),
+                )
+            }
+        }
+        Text(
+            type.label,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            modifier = Modifier.padding(top = 4.dp),
+        )
     }
 }
 

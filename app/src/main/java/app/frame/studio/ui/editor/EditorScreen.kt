@@ -2,6 +2,7 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.export.TransitionPlan
 import app.frame.studio.ui.common.bounceClick
 import androidx.compose.material3.FilterChip
 import androidx.compose.material.icons.filled.LayersClear
@@ -1023,7 +1024,25 @@ private fun ActivePanel(
             Tool.ADJUST -> clip?.let { c -> AdjustPanel(c.adjust) { vm.setAdjust(c.id, it) } }
             Tool.CROP -> clip?.let { c -> CropPanel(c) { vm.setCrop(c.id, it) } }
             Tool.TRANSITION -> clip?.let { c ->
-                TransitionPanel(c, { type, ms -> vm.setTransition(c.id, type, ms) }, { vm.applyTransitionToAll(c.id) })
+                val isPro by app.pro.isPro.collectAsStateWithLifecycle()
+                TransitionPanel(
+                    clip = c,
+                    isPro = isPro,
+                    onChange = { type, ms ->
+                        if (TransitionPlan.isPro(type)) {
+                            proGate.require(ProFeature.PREMIUM_TRANSITIONS) { vm.setTransition(c.id, type, ms) }
+                        } else {
+                            vm.setTransition(c.id, type, ms)
+                        }
+                    },
+                    onApplyAll = {
+                        if (TransitionPlan.isPro(c.transition)) {
+                            proGate.require(ProFeature.PREMIUM_TRANSITIONS) { vm.applyTransitionToAll(c.id) }
+                        } else {
+                            vm.applyTransitionToAll(c.id)
+                        }
+                    },
+                )
             }
             Tool.CANVAS -> CanvasPanel(project, vm::setAspect, vm::applySocialPreset)
             Tool.AUDIO -> AddAudioPanel(

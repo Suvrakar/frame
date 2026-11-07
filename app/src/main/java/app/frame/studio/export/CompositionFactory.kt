@@ -122,6 +122,9 @@ object CompositionFactory {
         if (windows.any { it.fadeInMs > 0 || it.fadeOutMs > 0 }) {
             compositionVideoEffects += fadeEffect(windows)
         }
+        // Zoom, whip, spin… transitions move the picture (and picture-in-picture), not the text.
+        val transitions = TransitionPlan.windows(project.videoClips)
+        if (transitions.isNotEmpty()) compositionVideoEffects += app.frame.studio.effects.TransitionShaderEffect(transitions)
         // Scene effects (rain, snow, confetti…) sit above the picture but below text and stickers.
         SceneEffects.clamp(project.effects, totalMs).forEach { compositionVideoEffects += SceneShaderEffect(it) }
         val overlays = project.textOverlays

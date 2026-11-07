@@ -38,6 +38,20 @@ enum class TransitionType(val label: String) {
     NONE("None"),
     FADE_BLACK("Fade"),
     FADE_WHITE("Flash"),
+    // Shader transitions (see export/TransitionPlan.kt): split across the cut, no overlap.
+    ZOOM_IN("Zoom in"),
+    ZOOM_OUT("Zoom out"),
+    WHIP_LEFT("Whip left"),
+    WHIP_RIGHT("Whip right"),
+    WHIP_UP("Whip up"),
+    WHIP_DOWN("Whip down"),
+    SPIN("Spin"),
+    BLUR("Blur"),
+    GLITCH("Glitch"),
+    PIXELATE("Pixelate"),
+    IRIS("Iris"),
+    SHAKE("Shake"),
+    BURN("Film burn"),
 }
 
 @Serializable

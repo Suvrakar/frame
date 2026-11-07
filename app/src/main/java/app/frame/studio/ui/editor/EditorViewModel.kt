@@ -471,7 +471,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     }
 
     fun setTransition(id: String, type: TransitionType, ms: Long) = editVideo(id, "transition") {
-        it.copy(transition = type, transitionMs = ms.coerceIn(100, 2_000))
+        it.copy(transition = type, transitionMs = ms.coerceIn(200, 2_000))
     }
 
     fun applyTransitionToAll(id: String) = edit { p ->

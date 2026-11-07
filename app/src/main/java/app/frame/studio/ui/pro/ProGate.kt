@@ -1,5 +1,6 @@
 package app.frame.studio.ui.pro
 
+import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -191,6 +192,7 @@ private fun iconFor(feature: ProFeature): ImageVector = when (feature) {
     ProFeature.HIGH_RES_EXPORT -> Icons.Outlined.HighQuality
     ProFeature.PREMIUM_TEMPLATES -> Icons.Outlined.Dashboard
     ProFeature.PREMIUM_FILTERS -> Icons.Outlined.FilterVintage
+    ProFeature.PREMIUM_TRANSITIONS -> Icons.Outlined.SwapHoriz
 }
 
 @Composable

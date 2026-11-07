@@ -1,5 +1,19 @@
 package app.frame.studio.ui.common
 
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Gradient
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material.icons.filled.ZoomOut
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowLeft
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
+import androidx.compose.material.icons.filled.Cyclone
+import androidx.compose.material.icons.filled.BrokenImage
+import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -19,6 +33,7 @@ import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.ui.graphics.vector.ImageVector
 import app.frame.studio.domain.SceneEffectType
+import app.frame.studio.domain.TransitionType
 import app.frame.studio.magic.MagicVibe
 
 /**
@@ -39,6 +54,26 @@ val SceneEffectType.icon: ImageVector
         SceneEffectType.GLITCH -> Icons.Filled.LiveTv
         SceneEffectType.SHAKE -> Icons.Filled.Vibration
         SceneEffectType.PULSE -> Icons.Filled.MonitorHeart
+    }
+
+val TransitionType.icon: ImageVector
+    get() = when (this) {
+        TransitionType.NONE -> Icons.Filled.Block
+        TransitionType.FADE_BLACK -> Icons.Filled.Gradient
+        TransitionType.FADE_WHITE -> Icons.Filled.FlashOn
+        TransitionType.ZOOM_IN -> Icons.Filled.ZoomIn
+        TransitionType.ZOOM_OUT -> Icons.Filled.ZoomOut
+        TransitionType.WHIP_LEFT -> Icons.Filled.KeyboardDoubleArrowLeft
+        TransitionType.WHIP_RIGHT -> Icons.Filled.KeyboardDoubleArrowRight
+        TransitionType.WHIP_UP -> Icons.Filled.KeyboardDoubleArrowUp
+        TransitionType.WHIP_DOWN -> Icons.Filled.KeyboardDoubleArrowDown
+        TransitionType.SPIN -> Icons.Filled.Cyclone
+        TransitionType.BLUR -> Icons.Filled.BlurOn
+        TransitionType.GLITCH -> Icons.Filled.BrokenImage
+        TransitionType.PIXELATE -> Icons.Filled.GridOn
+        TransitionType.IRIS -> Icons.Filled.Camera
+        TransitionType.SHAKE -> Icons.Filled.Vibration
+        TransitionType.BURN -> Icons.Filled.LocalFireDepartment
     }
 
 val MagicVibe.icon: ImageVector

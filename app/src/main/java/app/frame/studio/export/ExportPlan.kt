@@ -90,6 +90,8 @@ object ExportPlan {
                 TransitionType.NONE -> legacyTransitionMs.coerceAtLeast(0) / 2 to false
                 TransitionType.FADE_BLACK -> clip.transitionMs.coerceAtLeast(0) / 2 to false
                 TransitionType.FADE_WHITE -> clip.transitionMs.coerceAtLeast(0) / 2 to true
+                // Rendered by TransitionShaderEffect instead of a colour dip.
+                else -> 0L to false
             }
         }
         return clips.mapIndexed { i, clip ->

@@ -27,6 +27,7 @@ enum class ProFeature(val title: String, val pitch: String) {
     HIGH_RES_EXPORT("4K & 60 fps", "Export in the highest quality your phone supports."),
     PREMIUM_TEMPLATES("Premium templates", "Every frame, invitation and collage design."),
     PREMIUM_FILTERS("Premium filters", "The full filter library, including film and cinematic looks."),
+    PREMIUM_TRANSITIONS("Premium transitions", "Zoom, spin, glitch, iris, film burn and more between your clips."),
 }
 
 /**
