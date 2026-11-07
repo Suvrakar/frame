@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash entrance (Android 12+), 800 ms total, within the platform's 1000 ms guideline:
+  the monogram settles in (0-600 ms), the viewfinder corners draw on (150-650 ms) and the AI
+  sparkle twists in last (450-800 ms). The final frame equals splash_icon.xml exactly, so the
+  hand-off to the static logo (and to the exit animation) is seamless. The system skips the
+  animation when the user has turned animations off.
+-->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/splash_icon">
+
+        <target android:name="monogram">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="600">
+                    <propertyValuesHolder android:propertyName="scaleX" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0.56" />
+                        <keyframe android:fraction="0" android:value="0.56" />
+                        <keyframe android:fraction="1" android:value="0.78" android:interpolator="@android:interpolator/overshoot" />
+                    </propertyValuesHolder>
+                    <propertyValuesHolder android:propertyName="scaleY" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0.56" />
+                        <keyframe android:fraction="0" android:value="0.56" />
+                        <keyframe android:fraction="1" android:value="0.78" android:interpolator="@android:interpolator/overshoot" />
+                    </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <target android:name="f_main">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="300">
+                    <propertyValuesHolder android:propertyName="fillAlpha" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0" />
+                        <keyframe android:fraction="0" android:value="0" />
+                        <keyframe android:fraction="1" android:value="1" android:interpolator="@android:interpolator/fast_out_slow_in" />
+                    </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <target android:name="f_bar">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="360">
+                    <propertyValuesHolder android:propertyName="fillAlpha" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0" />
+                        <keyframe android:fraction="0.1667" android:value="0" />
+                        <keyframe android:fraction="1" android:value="1" android:interpolator="@android:interpolator/fast_out_slow_in" />
+                    </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <target android:name="r">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="420">
+                    <propertyValuesHolder android:propertyName="fillAlpha" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0" />
+                        <keyframe android:fraction="0.2857" android:value="0" />
+                        <keyframe android:fraction="1" android:value="1" android:interpolator="@android:interpolator/fast_out_slow_in" />
+                    </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <target android:name="corners">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="650">
+                    <propertyValuesHolder android:propertyName="trimPathEnd" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0" />
+                        <keyframe android:fraction="0.2308" android:value="0" />
+                        <keyframe android:fraction="1" android:value="1" android:interpolator="@android:interpolator/fast_out_slow_in" />
+                    </propertyValuesHolder>
+                    <propertyValuesHolder android:propertyName="strokeAlpha" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0" />
+                        <keyframe android:fraction="0.2308" android:value="0" />
+                        <keyframe android:fraction="0.6923" android:value="1" android:interpolator="@android:interpolator/linear" />
+                        <keyframe android:fraction="1" android:value="1" />
+                    </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <target android:name="sparkle">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="800">
+                    <propertyValuesHolder android:propertyName="scaleX" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0" />
+                        <keyframe android:fraction="0.5625" android:value="0" />
+                        <keyframe android:fraction="1" android:value="1" android:interpolator="@android:interpolator/overshoot" />
+                    </propertyValuesHolder>
+                    <propertyValuesHolder android:propertyName="scaleY" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="0" />
+                        <keyframe android:fraction="0.5625" android:value="0" />
+                        <keyframe android:fraction="1" android:value="1" android:interpolator="@android:interpolator/overshoot" />
+                    </propertyValuesHolder>
+                    <propertyValuesHolder android:propertyName="rotation" android:valueType="floatType">
+                        <keyframe android:fraction="0" android:value="-90" />
+                        <keyframe android:fraction="0.5625" android:value="-90" />
+                        <keyframe android:fraction="1" android:value="0" android:interpolator="@android:interpolator/fast_out_slow_in" />
+                    </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+</animated-vector>

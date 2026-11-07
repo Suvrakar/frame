@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash logo: the launcher icon ("Fr" monogram on the brand gradient) as a rounded square, the
+  same 22% corner rounding as the app's cards. Android 12+ masks splash icons to a circle of 2/3
+  the icon size (radius 36 here), so the tile is sized to sit wholly inside it: its corners reach
+  35.6 from the centre. Groups/paths are named for splash_icon_animated.xml (Android 12+).
+  Keep in sync with ic_launcher_background.xml and ic_launcher_foreground.xml.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Brand tile: deep indigo to violet with a soft top-left highlight. -->
+    <path android:pathData="M38,25H70A13,13 0,0 1,83,38V70A13,13 0,0 1,70,83H38A13,13 0,0 1,25,70V38A13,13 0,0 1,38,25Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="25"
+                android:startY="25"
+                android:endX="83"
+                android:endY="83">
+                <item android:offset="0" android:color="#FF17153F" />
+                <item android:offset="0.55" android:color="#FF4A4FE0" />
+                <item android:offset="1" android:color="#FF9D4EDD" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M38,25H70A13,13 0,0 1,83,38V70A13,13 0,0 1,70,83H38A13,13 0,0 1,25,70V38A13,13 0,0 1,38,25Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="36"
+                android:centerY="30"
+                android:gradientRadius="44">
+                <item android:offset="0" android:color="#2EFFFFFF" />
+                <item android:offset="1" android:color="#00FFFFFF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Glass edge, as on the app's cards. -->
+    <path
+        android:pathData="M38,25H70A13,13 0,0 1,83,38V70A13,13 0,0 1,70,83H38A13,13 0,0 1,25,70V38A13,13 0,0 1,38,25Z"
+        android:strokeWidth="0.6"
+        android:strokeColor="#24FFFFFF" />
+    <!-- The launcher artwork (designed for an 18..90 tile) scaled onto this 25..83 tile. -->
+    <group
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.8056"
+        android:scaleY="0.8056">
+    <!-- Viewfinder corners. -->
+    <path
+        android:name="corners"
+        android:pathData="M32,40V32H40M32,68V76H40M68,76H76V68"
+        android:strokeWidth="2.4"
+        android:strokeColor="#B3FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <!-- AI sparkle. -->
+    <group
+        android:name="sparkle"
+        android:pivotX="73"
+        android:pivotY="35">
+        <path android:pathData="M73,29.5Q74,34 78.5,35Q74,36 73,40.5Q72,36 67.5,35Q72,34 73,29.5Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="67.5"
+                    android:startY="29.5"
+                    android:endX="78.5"
+                    android:endY="40.5">
+                    <item android:offset="0" android:color="#FFFFF1C4" />
+                    <item android:offset="1" android:color="#FFFFB938" />
+                </gradient>
+            </aapt:attr>
+        </path>
+    </group>
+    <!-- The "Fr" monogram, scaled about the centre. -->
+    <group
+        android:name="monogram"
+        android:pivotX="54"
+        android:pivotY="54"
+        android:scaleX="0.78"
+        android:scaleY="0.78">
+        <path
+            android:name="f_main"
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M35,34H73V41.5H42.5V74H35Z" />
+        <path
+            android:name="f_bar"
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M42.5,50H55V57H42.5Z" />
+        <path
+            android:name="r"
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M58.5,74V58A10,10 0,0 1,68.5 48H73V55.5H68.5A2.5,2.5 0,0 0,66 58V74Z" />
+    </group>
+    </group>
+</vector>

@@ -184,6 +184,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation("androidx.core:core-ktx:1.17.0")
+    // Branded launch screen on every Android version (system splash on 12+, same look below).
+    implementation("androidx.core:core-splashscreen:1.2.0")
     // Installs the baseline profiles shipped by Compose/Media3 so hot paths are precompiled
     // (smoother first launch and scrolling, most noticeable on low-end phones).
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")

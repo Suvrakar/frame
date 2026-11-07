@@ -73,11 +73,12 @@ object Routes {
 }
 
 @Composable
-fun FrameNavHost(app: FrameApp) {
+fun FrameNavHost(app: FrameApp, onReady: () -> Unit = {}) {
     var ready by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         app.repository.load()
         ready = true
+        onReady() // lets the launch screen go
     }
     if (!ready) {
         LoadingScreen()
