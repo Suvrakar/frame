@@ -2,6 +2,10 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.timeline.TimelineMath
+import app.frame.studio.timeline.CanvasPlacement
+import androidx.compose.material.icons.filled.RestartAlt
+import app.frame.studio.domain.VideoClip
 import app.frame.studio.export.TransitionPlan
 import app.frame.studio.ui.common.bounceClick
 import androidx.compose.material3.FilterChip
@@ -720,9 +724,36 @@ private fun PreviewArea(
                         onCommit = onTransform,
                         onTap = controller::togglePlay,
                         frameVersion = controller.frameVersion,
-                        ghost = overlayGhost(project, selection, playhead),
+                        ghost = overlayGhost(project, selection, playhead) ?: clipGhost(project, selection, playhead),
+                        snap = if (selection is Selection.Video) CanvasPlacement::snap else null,
                     )
                 }
+            }
+            // A moved / resized main clip can be put back with one tap.
+            val placed = videoAtPlayhead(project, selection, playhead)?.takeIf { !CanvasPlacement.isDefault(it) }
+            if (placed != null) {
+                androidx.compose.material3.AssistChip(
+                    onClick = { onTransform(Transform(0.5f, 0.5f, 1f, 0f, 1f)) },
+                    label = { Text("Reset") },
+                    leadingIcon = { Icon(Icons.Filled.RestartAlt, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                        containerColor = Color.Black.copy(alpha = 0.55f), labelColor = Color.White, leadingIconContentColor = Color.White,
+                    ),
+                    modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
+                )
+            }
+            if (selection is Selection.Video && transform != null && box != null && placed == null) {
+                Text(
+                    "Drag, pinch or twist to fit",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.Black.copy(alpha = 0.55f))
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                )
             }
         }
     }
@@ -752,8 +783,18 @@ private fun overlayGhost(project: Project, selection: Selection, playheadMs: Lon
     }
 }
 
+/** The selected main clip, if the playhead is inside it (its frame is what the preview shows). */
+private fun videoAtPlayhead(project: Project, selection: Selection, playheadMs: Long): VideoClip? {
+    val s = selection as? Selection.Video ?: return null
+    val starts = TimelineMath.videoStarts(project.videoClips)
+    val i = project.videoClips.indexOfFirst { it.id == s.id }.takeIf { it >= 0 } ?: return null
+    val clip = project.videoClips[i]
+    return clip.takeIf { playheadMs >= starts[i] && playheadMs < starts[i] + it.outputDurationMs() }
+}
+
 /** The selected object's placement at [playheadMs], or null when it isn't on screen then. */
 private fun transformOf(project: Project, selection: Selection, playheadMs: Long): Transform? = when (selection) {
+    is Selection.Video -> videoAtPlayhead(project, selection, playheadMs)?.let(CanvasPlacement::transform)
     is Selection.Overlay -> project.overlays.firstOrNull { it.id == selection.id }
         ?.takeIf { playheadMs >= it.startMs && playheadMs < it.endMs() }
         ?.let { o -> Keyframes.at(Keyframes.base(o), o.keyframes, playheadMs - o.startMs) }
@@ -765,6 +806,9 @@ private fun transformOf(project: Project, selection: Selection, playheadMs: Long
 
 /** The object's size at scale 1, in 0..1 frame units. */
 private fun boxOf(project: Project, selection: Selection, canvasW: Int, canvasH: Int): Pair<Float, Float>? = when (selection) {
+    is Selection.Video -> project.videoClips.firstOrNull { it.id == selection.id }?.let { c ->
+        CanvasPlacement.baseBox(c, canvasW, canvasH, project.canvasFill)
+    }
     is Selection.Overlay -> project.overlays.firstOrNull { it.id == selection.id }?.let { o ->
         OverlayGeometry.boxFraction(o.width, o.height, canvasW, canvasH, 1f)
     }
@@ -783,6 +827,27 @@ private fun boxOf(project: Project, selection: Selection, canvasW: Int, canvasH:
         (w / canvasW) to (h / canvasH)
     }
     else -> null
+}
+
+/** The selected main clip drawn by Compose while it is dragged (follows the finger instantly). */
+@Composable
+private fun clipGhost(project: Project, selection: Selection, playheadMs: Long): (@Composable () -> Unit)? {
+    val clip = videoAtPlayhead(project, selection, playheadMs) ?: return null
+    val app = LocalContext.current.applicationContext as app.frame.studio.FrameApp
+    val start = TimelineMath.videoStarts(project.videoClips)[project.videoClips.indexOf(clip)]
+    val atMs = (clip.trimStartMs + ((playheadMs - start) * clip.speed).toLong()) / 250 * 250
+    return {
+        VideoThumbnail(
+            probe = app.mediaProbe,
+            uri = clip.sourceUri,
+            atMs = atMs,
+            isImage = clip.isImage,
+            maxSize = 640,
+            showPlaceholderIcon = false,
+            animate = false,
+            modifier = Modifier.fillMaxSize(),
+        )
+    }
 }
 
 private fun keyedAt(project: Project, selection: Selection, playheadMs: Long): Boolean = when (selection) {

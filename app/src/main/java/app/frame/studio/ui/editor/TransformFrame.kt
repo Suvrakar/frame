@@ -59,8 +59,12 @@ fun TransformFrame(
     onTap: () -> Unit,
     frameVersion: Int = 0,
     ghost: (@Composable () -> Unit)? = null,
+    /** Optional magnet (e.g. canvas centre lines); applied live, with guides and a haptic tick. */
+    snap: ((Transform) -> Transform)? = null,
 ) {
     var live by remember { mutableStateOf<Transform?>(null) }
+    val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val latestSnap = rememberUpdatedState(snap)
     // Committed placement, the frame version and the base transform at commit (ghost overlays only).
     var pending by remember { mutableStateOf<Held?>(null) }
     val latestBase = rememberUpdatedState(transform)
@@ -95,6 +99,8 @@ fun TransformFrame(
                 awaitEachGesture {
                     awaitFirstDown(requireUnconsumed = false)
                     var current = latestBase.value
+                    var raw = current
+                    var wasSnapped = false
                     var moved = false
                     var travel = 0f
                     do {
@@ -105,12 +111,17 @@ fun TransformFrame(
                         travel += abs(pan.x) + abs(pan.y)
                         if (travel > viewConfiguration.touchSlop || zoom != 1f || rotation != 0f) {
                             if (pan != Offset.Zero || zoom != 1f || rotation != 0f) {
-                                current = current.copy(
-                                    x = current.x + pan.x / frameW,
-                                    y = current.y + pan.y / frameH,
-                                    scale = (current.scale * zoom).coerceIn(0.05f, 6f),
-                                    rotation = current.rotation + rotation,
+                                // Track the finger unsnapped so leaving a magnet feels natural.
+                                raw = raw.copy(
+                                    x = raw.x + pan.x / frameW,
+                                    y = raw.y + pan.y / frameH,
+                                    scale = (raw.scale * zoom).coerceIn(0.05f, 6f),
+                                    rotation = raw.rotation + rotation,
                                 )
+                                current = latestSnap.value?.invoke(raw) ?: raw
+                                val snapped = current != raw
+                                if (snapped && !wasSnapped) haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                wasSnapped = snapped
                                 live = current
                                 moved = true
                             }
@@ -128,6 +139,13 @@ fun TransformFrame(
                 }
             },
     ) {
+        val guide = Color(0xFFFF4FD8)
+        if (snap != null && live != null) {
+            androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+                if (shown.x == 0.5f) drawLine(guide, Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), strokeWidth = 1.dp.toPx())
+                if (shown.y == 0.5f) drawLine(guide, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), strokeWidth = 1.dp.toPx())
+            }
+        }
         val w = (boxFraction.first * shown.scale * frameW).coerceAtLeast(24f)
         val h = (boxFraction.second * shown.scale * frameH).coerceAtLeast(24f)
         val cx = shown.x * frameW

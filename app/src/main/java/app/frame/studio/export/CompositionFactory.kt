@@ -1,5 +1,6 @@
 package app.frame.studio.export
 
+import app.frame.studio.timeline.CanvasPlacement
 import app.frame.studio.domain.CanvasFill
 import app.frame.studio.audio.Ducking
 import app.frame.studio.domain.AudioKind
@@ -302,10 +303,17 @@ object CompositionFactory {
             video += RgbMatrix { _, _ -> matrix }
         }
         // Every clip is placed on the same canvas so mixed shapes export cleanly.
-        video += when (fill) {
-            CanvasFill.BLUR -> app.frame.studio.effects.BlurFillEffect(size.width, size.height)
-            CanvasFill.FILL -> Presentation.createForWidthAndHeight(size.width, size.height, Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP)
-            CanvasFill.FIT -> Presentation.createForWidthAndHeight(size.width, size.height, Presentation.LAYOUT_SCALE_TO_FIT)
+        // Untouched Fit / Fill clips keep Media3's own (cheapest) path; anything the user moved,
+        // zoomed or turned, and the blurred background, go through one placement pass.
+        video += when {
+            fill == CanvasFill.FIT && CanvasPlacement.isDefault(clip) ->
+                Presentation.createForWidthAndHeight(size.width, size.height, Presentation.LAYOUT_SCALE_TO_FIT)
+            fill == CanvasFill.FILL && CanvasPlacement.isDefault(clip) ->
+                Presentation.createForWidthAndHeight(size.width, size.height, Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP)
+            else -> app.frame.studio.effects.CanvasPlaceEffect(
+                size.width, size.height, fill,
+                clip.placeX, clip.placeY, clip.placeScale.coerceIn(CanvasPlacement.MIN_SCALE, CanvasPlacement.MAX_SCALE), clip.placeRotation,
+            )
         }
         // Vignette and grain work on the fitted frame so they follow the canvas shape.
         val grade = Filters.gradeFor(clip.filterId, clip.filterIntensity, clip.adjust)

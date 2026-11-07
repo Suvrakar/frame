@@ -1,5 +1,6 @@
 package app.frame.studio.ui.editor
 
+import app.frame.studio.timeline.CanvasPlacement
 import app.frame.studio.telemetry.AppEvents
 import app.frame.studio.export.CompositionFactory
 import app.frame.studio.media.ImportMessages
@@ -778,6 +779,10 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
                 val at = (playhead - o.startMs).coerceIn(0, o.durationMs())
                 val (base, keys) = Keyframes.edit(Keyframes.base(o), o.keyframes, at, clamped)
                 o.copy(x = base.x, y = base.y, scale = base.scale, rotation = base.rotation, opacity = base.opacity, keyframes = keys)
+            }
+            is Selection.Video -> editVideo(sel.id, "place") { c ->
+                val p = CanvasPlacement.clamp(t)
+                c.copy(placeX = p.x, placeY = p.y, placeScale = p.scale, placeRotation = ((p.rotation % 360) + 360) % 360)
             }
             is Selection.Text -> editText(sel.id, "move") { o ->
                 val clamped = t.copy(x = t.x.coerceIn(0.02f, 0.98f), y = t.y.coerceIn(0.02f, 0.98f))

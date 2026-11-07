@@ -36,11 +36,11 @@ class CanvasFillDeviceTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val app = context.applicationContext as FrameApp
 
-    private fun export(fill: CanvasFill): Bitmap {
+    private fun export(fill: CanvasFill, placed: (VideoClip) -> VideoClip = { it }, tag: String = fill.name): Bitmap {
         val f = File(context.filesDir, "cf_sample.mp4").also { File("/data/local/tmp/sample.mp4").copyTo(it, overwrite = true) }
         val p = Project(
             id = "cf", name = "Fill", createdAtEpochMs = 0,
-            videoClips = listOf(VideoClip(id = "v", sourceUri = Uri.fromFile(f).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, width = 1280, height = 720)),
+            videoClips = listOf(placed(VideoClip(id = "v", sourceUri = Uri.fromFile(f).toString(), sourceDurationMs = 4_000, trimEndMs = 2_000, width = 1280, height = 720))),
             aspect = CanvasAspect.R9_16, exportHeight = ExportHeight.SD_480, canvasFill = fill,
         )
         val out = File(context.cacheDir, "fill_$fill.mp4").apply { delete() }
@@ -63,7 +63,7 @@ class CanvasFillDeviceTest {
             r.setDataSource(out.absolutePath)
             val frame = r.getFrameAtTime(1_000_000, MediaMetadataRetriever.OPTION_CLOSEST)!!
             val dir = File(context.getExternalFilesDir(null), "fill_frames").apply { mkdirs() }
-            File(dir, "$fill.jpg").outputStream().use { frame.compress(Bitmap.CompressFormat.JPEG, 85, it) }
+            File(dir, "$tag.jpg").outputStream().use { frame.compress(Bitmap.CompressFormat.JPEG, 85, it) }
             return frame
         } finally {
             r.release()
@@ -93,5 +93,12 @@ class CanvasFillDeviceTest {
         assertTrue("Fit keeps black bars (${topBrightness(fit)})", topBrightness(fit) < 12f)
         assertTrue("Blur fills the bars (${topBrightness(blur)})", topBrightness(blur) > 25f)
         assertTrue("Fill covers the frame (${topBrightness(fill)})", topBrightness(fill) > 25f)
+    }
+
+    @Test
+    fun movedZoomedTurnedClipRenders() {
+        // Shrunk, moved up-left and turned 30° clockwise: the frame is saved for a visual check.
+        val b = export(CanvasFill.BLUR, { it.copy(placeX = 0.35f, placeY = 0.3f, placeScale = 0.7f, placeRotation = 30f) }, tag = "PLACED")
+        assertTrue(b.height > b.width)
     }
 }

@@ -134,6 +134,11 @@ data class VideoClip(
     val filterIntensity: Float = 1f,
     val adjust: ColorAdjust = ColorAdjust(),
     /** Transition into the next clip. */
+    /** Placement on the canvas (see CanvasPlacement): centre 0..1, scale over the fitted size, clockwise degrees. */
+    val placeX: Float = 0.5f,
+    val placeY: Float = 0.5f,
+    val placeScale: Float = 1f,
+    val placeRotation: Float = 0f,
     /** Noise reduction for the clip's own sound (voice), 0 = off .. 1 = strongest. */
     val noiseReduction: Float = 0f,
     val transition: TransitionType = TransitionType.NONE,
