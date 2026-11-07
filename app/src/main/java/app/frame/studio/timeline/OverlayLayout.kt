@@ -13,17 +13,21 @@ object OverlayLayout {
         if (o.durationMs() <= maxLen) o.copy(startMs = start) else o.copy(startMs = start, trimEndMs = o.trimStartMs + maxLen)
     }
 
-    /** Lane 0 is drawn on top. Clips that don't fit in [maxLanes] are left out. */
+    /**
+     * Lane 0 is drawn on top. Higher [OverlayClip.layer] is placed first, so when overlays overlap
+     * the user's top layer wins lane 0 (and the lowest is the one left out if they don't all fit
+     * in [maxLanes]). Each lane is in time order.
+     */
     fun lanes(overlays: List<OverlayClip>, maxLanes: Int): List<List<OverlayClip>> {
         val lanes = mutableListOf<MutableList<OverlayClip>>()
-        overlays.sortedBy { it.startMs }.forEach { o ->
-            val lane = lanes.firstOrNull { it.last().endMs() <= o.startMs }
+        overlays.sortedWith(compareByDescending<OverlayClip> { it.layer }.thenBy { it.startMs }).forEach { o ->
+            val lane = lanes.firstOrNull { lane -> lane.none { it.startMs < o.endMs() && o.startMs < it.endMs() } }
             when {
                 lane != null -> lane += o
                 lanes.size < maxLanes -> lanes += mutableListOf(o)
             }
         }
-        return lanes
+        return lanes.map { lane -> lane.sortedBy { it.startMs } }
     }
 
     /** First lane that is free over [startMs, startMs + durationMs), or null when all are busy. */

@@ -88,6 +88,15 @@ class KeyframesTest {
     }
 
     @Test
+    fun topLayerWinsTheTopLaneWhenOverlaysOverlap() {
+        val low = clip("low", 0, 3000)
+        val high = clip("high", 1000, 3000).copy(layer = 1)
+        assertEquals(listOf(listOf("high"), listOf("low")), OverlayLayout.lanes(listOf(low, high), maxLanes = 2).map { l -> l.map { it.id } })
+        // Only one lane: the lower layer is the one left out.
+        assertEquals(listOf(listOf("high")), OverlayLayout.lanes(listOf(low, high), maxLanes = 1).map { l -> l.map { it.id } })
+    }
+
+    @Test
     fun overlaysAreClampedToTheVideo() {
         val clamped = OverlayLayout.clampTo(listOf(clip("a", 8000, 5000), clip("b", 12_000, 1000)), 10_000)
         assertEquals(1, clamped.size)

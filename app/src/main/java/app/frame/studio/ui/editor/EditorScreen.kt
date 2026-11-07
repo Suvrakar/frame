@@ -2,6 +2,8 @@
 
 package app.frame.studio.ui.editor
 
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Layers
 import app.frame.studio.timeline.TimelineMath
 import app.frame.studio.timeline.CanvasPlacement
 import androidx.compose.material.icons.filled.RestartAlt
@@ -359,6 +361,7 @@ private fun EditorContent(
     DisposableEffect(recorder) { onDispose { recorder.cancel() } }
 
     var showRename by remember { mutableStateOf(false) }
+    var showLayers by remember { mutableStateOf(false) }
     var showAddText by remember { mutableStateOf(false) }
 
     BackHandler {
@@ -390,6 +393,9 @@ private fun EditorContent(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f).clickable { showRename = true }.padding(horizontal = 4.dp),
                 )
+                IconButton(onClick = { showLayers = true }, enabled = project.videoClips.isNotEmpty()) {
+                    Icon(Icons.Filled.Layers, contentDescription = "Layers")
+                }
                 TextButton(onClick = { controller.pause(); vm.flush(); onExport() }, enabled = project.videoClips.isNotEmpty()) {
                     Text(project.exportHeight.label, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -402,6 +408,21 @@ private fun EditorContent(
                     enabled = project.videoClips.isNotEmpty() && missing.isEmpty(),
                     modifier = Modifier.padding(end = 8.dp),
                 ) { Text("Export", fontWeight = FontWeight.SemiBold) }
+            }
+            if (showLayers) {
+                LayersSheet(
+                    project = project,
+                    selection = selection,
+                    onDismiss = { showLayers = false },
+                    onSelect = { sel, atMs ->
+                        showLayers = false
+                        tool = null
+                        vm.select(sel)
+                        controller.seekTo(atMs + 50)
+                    },
+                    onMove = vm::moveLayer,
+                    onLock = vm::setLocked,
+                )
             }
             if (importing) LinearProgressIndicator(Modifier.fillMaxWidth())
             if (missing.isNotEmpty()) MissingBanner(count = missing.size, onRemove = vm::removeMissing)
@@ -713,7 +734,15 @@ private fun PreviewArea(
             val playhead = controller.positionMs
             val transform = transformOf(project, selection, playhead)
             val box = boxOf(project, selection, outputSize.width, outputSize.height)
-            if (transform != null && box != null) {
+            val locked = lockedOf(project, selection)
+            if (locked && transform != null) {
+                Icon(
+                    Icons.Filled.Lock, contentDescription = "Locked layer", tint = Color.White,
+                    modifier = Modifier.align(Alignment.TopStart).padding(8.dp).size(28.dp)
+                        .clip(CircleShape).background(Color.Black.copy(alpha = 0.55f)).padding(5.dp),
+                )
+            }
+            if (transform != null && box != null && !locked) {
                 androidx.compose.runtime.key(selection) {
                     TransformFrame(
                         transform = transform,
@@ -730,7 +759,7 @@ private fun PreviewArea(
                 }
             }
             // A moved / resized main clip can be put back with one tap.
-            val placed = videoAtPlayhead(project, selection, playhead)?.takeIf { !CanvasPlacement.isDefault(it) }
+            val placed = videoAtPlayhead(project, selection, playhead)?.takeIf { !CanvasPlacement.isDefault(it) && !locked }
             if (placed != null) {
                 androidx.compose.material3.AssistChip(
                     onClick = { onTransform(Transform(0.5f, 0.5f, 1f, 0f, 1f)) },
@@ -781,6 +810,13 @@ private fun overlayGhost(project: Project, selection: Selection, playheadMs: Lon
             modifier = Modifier.fillMaxSize().graphicsLayer { alpha = overlay.opacity },
         )
     }
+}
+
+private fun lockedOf(project: Project, selection: Selection): Boolean = when (selection) {
+    is Selection.Video -> project.mainLocked
+    is Selection.Text -> project.textOverlays.firstOrNull { it.id == selection.id }?.locked == true
+    is Selection.Overlay -> project.overlays.firstOrNull { it.id == selection.id }?.locked == true
+    else -> false
 }
 
 /** The selected main clip, if the playhead is inside it (its frame is what the preview shows). */

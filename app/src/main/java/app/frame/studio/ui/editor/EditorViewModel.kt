@@ -428,10 +428,63 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
 
     // ---- Video clip edits ----------------------------------------------------------------
 
-    private fun editVideo(id: String, key: String? = null, transform: (VideoClip) -> VideoClip) =
+    private fun editVideo(id: String, key: String? = null, transform: (VideoClip) -> VideoClip) {
+        if (_project.value?.mainLocked == true) return lockedNotice()
         edit(key?.let { "$it:$id" }) { p ->
             p.copy(videoClips = p.videoClips.map { if (it.id == id) transform(it) else it })
         }
+    }
+
+    // ---- Layers ----
+
+    private fun lockedNotice() {
+        messageChannel.trySend("This layer is locked. Unlock it in Layers to edit.")
+    }
+
+    /** True (and tells the user) when [selection]'s layer is locked. */
+    fun isLocked(selection: Selection): Boolean {
+        val p = _project.value ?: return false
+        return when (selection) {
+            is Selection.Video -> p.mainLocked
+            is Selection.Text -> p.textOverlays.firstOrNull { it.id == selection.id }?.locked == true
+            is Selection.Overlay -> p.overlays.firstOrNull { it.id == selection.id }?.locked == true
+            else -> false
+        }
+    }
+
+    fun setLocked(selection: Selection, locked: Boolean) = edit { p ->
+        when (selection) {
+            is Selection.Video -> p.copy(mainLocked = locked)
+            is Selection.Text -> p.copy(textOverlays = p.textOverlays.map { if (it.id == selection.id) it.copy(locked = locked) else it })
+            is Selection.Overlay -> p.copy(overlays = p.overlays.map { if (it.id == selection.id) it.copy(locked = locked) else it })
+            else -> p
+        }
+    }
+
+    /** Moves a text or overlay one step up (+1) or down (-1) in the stack. */
+    fun moveLayer(selection: Selection, step: Int) = edit { p ->
+        when (selection) {
+            // Texts are drawn in list order: the last one is on top.
+            is Selection.Text -> {
+                val i = p.textOverlays.indexOfFirst { it.id == selection.id }
+                val j = i + step
+                if (i < 0 || j !in p.textOverlays.indices) p
+                else p.copy(textOverlays = p.textOverlays.toMutableList().apply { add(j, removeAt(i)) })
+            }
+            is Selection.Overlay -> {
+                // Normalise to distinct ranks (top first), swap, then write the ranks back.
+                val order = p.overlays.sortedByDescending { it.layer }.toMutableList()
+                val i = order.indexOfFirst { it.id == selection.id }
+                val j = i - step
+                if (i < 0 || j !in order.indices) p else {
+                    order.add(j, order.removeAt(i))
+                    val rank = order.withIndex().associate { (k, o) -> o.id to (order.size - k) }
+                    p.copy(overlays = p.overlays.map { it.copy(layer = rank.getValue(it.id)) })
+                }
+            }
+            else -> p
+        }
+    }
 
     private fun clampFades(clip: VideoClip): VideoClip {
         val half = clip.outputDurationMs() / 2
@@ -486,6 +539,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
 
     fun splitSelected() {
         val p = _project.value ?: return
+        if (isLocked(_selection.value)) return lockedNotice()
         val playhead = _playheadMs.value
         when (val sel = _selection.value) {
             is Selection.Audio -> {
@@ -574,12 +628,15 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
         )
     }
 
-    fun moveVideo(id: String, delta: Int) = edit { p ->
+    fun moveVideo(id: String, delta: Int) = if (_project.value?.mainLocked == true) lockedNotice() else edit { p ->
         val index = p.videoClips.indexOfFirst { it.id == id }
         p.copy(videoClips = TimelineOps.reorder(p.videoClips, index, index + delta))
     }
 
-    fun deleteVideo(id: String) = edit { p -> p.copy(videoClips = TimelineOps.delete(p.videoClips, id)) }
+    fun deleteVideo(id: String) {
+        if (_project.value?.mainLocked == true) return lockedNotice()
+        edit { p -> p.copy(videoClips = TimelineOps.delete(p.videoClips, id)) }
+    }
 
     // ---- Audio clip edits ----------------------------------------------------------------
 
@@ -612,10 +669,12 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
 
     // ---- Text overlays -----------------------------------------------------------------
 
-    private fun editText(id: String, key: String? = null, transform: (TextOverlay) -> TextOverlay) =
+    private fun editText(id: String, key: String? = null, transform: (TextOverlay) -> TextOverlay) {
+        if (_project.value?.textOverlays?.firstOrNull { it.id == id }?.locked == true) return lockedNotice()
         edit(key?.let { "$it:$id" }) { p ->
             p.copy(textOverlays = p.textOverlays.map { if (it.id == id) transform(it) else it })
         }
+    }
 
     fun setText(id: String, text: String) = editText(id, "text") { CaptionPlanner.retext(it, text) }
 
@@ -635,7 +694,10 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
         p.copy(textOverlays = p.textOverlays + o.copy(id = newId(), y = (o.y + 0.08f).coerceAtMost(0.95f)))
     }
 
-    fun deleteText(id: String) = edit { p -> p.copy(textOverlays = p.textOverlays.filter { it.id != id }) }
+    fun deleteText(id: String) {
+        if (isLocked(Selection.Text(id))) return lockedNotice()
+        edit { p -> p.copy(textOverlays = p.textOverlays.filter { it.id != id }) }
+    }
 
     // ---- Overlays (picture-in-picture) ----------------------------------------------------
 
@@ -703,8 +765,10 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
         }
     }
 
-    private fun editOverlay(id: String, key: String? = null, transform: (OverlayClip) -> OverlayClip) =
+    private fun editOverlay(id: String, key: String? = null, transform: (OverlayClip) -> OverlayClip) {
+        if (_project.value?.overlays?.firstOrNull { it.id == id }?.locked == true) return lockedNotice()
         edit(key?.let { "$it:$id" }) { p -> p.copy(overlays = p.overlays.map { if (it.id == id) transform(it) else it }) }
+    }
 
     fun setOverlayOpacity(id: String, opacity: Float) = editOverlay(id, "opacity") { o ->
         val v = opacity.coerceIn(0f, 1f)
@@ -740,7 +804,10 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
         }
     }
 
-    fun deleteOverlay(id: String) = edit { p -> p.copy(overlays = p.overlays.filter { it.id != id }) }
+    fun deleteOverlay(id: String) {
+        if (isLocked(Selection.Overlay(id))) return lockedNotice()
+        edit { p -> p.copy(overlays = p.overlays.filter { it.id != id }) }
+    }
 
     fun duplicateOverlay(id: String) {
         val p = _project.value ?: return

@@ -220,6 +220,8 @@ data class TextOverlay(
     /** Id from [app.frame.studio.text.TextFonts]; "default" = system font. */
     val font: String = app.frame.studio.text.TextFonts.DEFAULT_ID,
     /** Entrance / exit; null = the v1 behaviour ([animate] ? 250 ms fade : none). */
+    /** Locked layers can't be moved, trimmed, restyled or deleted. */
+    val locked: Boolean = false,
     val animIn: TextAnimation? = null,
     val animOut: TextAnimation? = null,
     /** Length of each of the entrance and the exit (capped to a third of the text's time). */
@@ -291,6 +293,10 @@ data class OverlayClip(
     val filterId: String = "none",
     val keyframes: List<Keyframe> = emptyList(),
     val needsProxy: Boolean = false,
+    /** Stacking priority among overlays: higher is drawn on top. */
+    val layer: Int = 0,
+    /** Locked layers can't be moved, trimmed, restyled or deleted. */
+    val locked: Boolean = false,
 ) {
     fun durationMs(): Long = (trimEndMs - trimStartMs).coerceAtLeast(0)
     fun endMs(): Long = startMs + durationMs()
@@ -366,6 +372,8 @@ data class Project(
     val canvasFill: CanvasFill = CanvasFill.FIT,
     /** Width / height when [aspect] is [CanvasAspect.CUSTOM]. */
     val customRatio: Float? = null,
+    /** The main video layer is locked (no trims, moves, placement or deletes). */
+    val mainLocked: Boolean = false,
 )
 
 /** How a clip whose shape differs from the canvas is placed in it. */
