@@ -1053,7 +1053,14 @@ private fun ActivePanel(
             Tool.VOICE -> VoicePanel(recording, recordElapsed, onToggleRecord)
             Tool.STICKERS -> StickersPanel { s -> vm.addText(s, sticker = true)?.let(controller::seekTo) }
             Tool.TEXT_STYLE -> text?.let { o ->
-                TextStylePanel(o, onText = { vm.setText(o.id, it) }) { transform -> vm.styleText(o.id, transform) }
+                val isPro by app.pro.isPro.collectAsStateWithLifecycle()
+                TextStylePanel(
+                    o,
+                    onText = { vm.setText(o.id, it) },
+                    onStyle = { transform -> vm.styleText(o.id, transform) },
+                    isPro = isPro,
+                    requirePro = { action -> proGate.require(ProFeature.TEXT_ANIMATIONS, action) },
+                )
             }
             Tool.BEAT_SYNC -> audio?.let { a ->
                 val detecting by vm.detectingBeats.collectAsStateWithLifecycle()

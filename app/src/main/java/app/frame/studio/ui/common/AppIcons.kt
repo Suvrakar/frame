@@ -1,5 +1,13 @@
 package app.frame.studio.ui.common
 
+import androidx.compose.material.icons.filled.BubbleChart
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.SportsBasketball
+import androidx.compose.material.icons.filled.RotateRight
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Gradient
 import androidx.compose.material.icons.filled.FlashOn
@@ -33,6 +41,7 @@ import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.ui.graphics.vector.ImageVector
 import app.frame.studio.domain.SceneEffectType
+import app.frame.studio.domain.TextAnimation
 import app.frame.studio.domain.TransitionType
 import app.frame.studio.magic.MagicVibe
 
@@ -74,6 +83,21 @@ val TransitionType.icon: ImageVector
         TransitionType.IRIS -> Icons.Filled.Camera
         TransitionType.SHAKE -> Icons.Filled.Vibration
         TransitionType.BURN -> Icons.Filled.LocalFireDepartment
+    }
+
+val TextAnimation.icon: ImageVector
+    get() = when (this) {
+        TextAnimation.NONE -> Icons.Filled.Block
+        TextAnimation.FADE -> Icons.Filled.Gradient
+        TextAnimation.POP -> Icons.Filled.BubbleChart
+        TextAnimation.SLIDE_UP -> Icons.Filled.ArrowUpward
+        TextAnimation.SLIDE_DOWN -> Icons.Filled.ArrowDownward
+        TextAnimation.SLIDE_LEFT -> Icons.AutoMirrored.Filled.ArrowBack
+        TextAnimation.SLIDE_RIGHT -> Icons.AutoMirrored.Filled.ArrowForward
+        TextAnimation.ZOOM -> Icons.Filled.ZoomIn
+        TextAnimation.BOUNCE -> Icons.Filled.SportsBasketball
+        TextAnimation.SPIN -> Icons.Filled.RotateRight
+        TextAnimation.TYPEWRITER -> Icons.Filled.Keyboard
     }
 
 val MagicVibe.icon: ImageVector

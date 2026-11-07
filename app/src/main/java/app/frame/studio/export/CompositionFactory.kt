@@ -1,5 +1,7 @@
 package app.frame.studio.export
 
+import app.frame.studio.domain.TextAnimation
+import app.frame.studio.text.TextMotion
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Spannable
@@ -57,7 +59,6 @@ import com.google.common.collect.ImmutableList
 object CompositionFactory {
 
     private const val IMAGE_FPS = 30
-    private const val TEXT_FADE_US = 250_000L
 
     /** A tiny transparent image that fills the gaps of overlay lanes (set by the app at start). */
     @Volatile
@@ -333,64 +334,48 @@ object CompositionFactory {
     ): TextureOverlay {
         if (overlay.isCaption) return captionOverlay(overlay, size)
         val padded = if (overlay.background && !overlay.isSticker) " ${overlay.text.trim()} " else overlay.text.trim()
-        val text = SpannableString(padded).apply {
-            setSpan(ForegroundColorSpan(overlay.color.toInt()), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            if (overlay.background && !overlay.isSticker) {
-                setSpan(BackgroundColorSpan(0x99000000.toInt()), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        /** The text with its first [shown] characters visible (typewriter); hidden ones keep their space. */
+        fun styled(shown: Int): SpannableString = SpannableString(padded).apply {
+            val visibleEnd = shown.coerceIn(0, length)
+            setSpan(ForegroundColorSpan(overlay.color.toInt()), 0, visibleEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (visibleEnd < length) setSpan(ForegroundColorSpan(0), visibleEnd, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (overlay.background && !overlay.isSticker && visibleEnd > 0) {
+                setSpan(BackgroundColorSpan(0x99000000.toInt()), 0, visibleEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
             if (overlay.bold) setSpan(StyleSpan(Typeface.BOLD), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             if (overlay.font != app.frame.studio.text.TextFonts.DEFAULT_ID) {
                 setSpan(app.frame.studio.text.FontSpan(overlay.font), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
+        val full = styled(padded.length)
+        val typed = TextMotion.entrance(overlay) == TextAnimation.TYPEWRITER || TextMotion.exit(overlay) == TextAnimation.TYPEWRITER
+        val partial = HashMap<Int, SpannableString>()
         // TextOverlay renders at a fixed 100px; scale it relative to a 1080p short side.
         val base = (minOf(size.width, size.height) / 1080f).coerceAtLeast(0.3f)
         val scale = base * overlay.scale.coerceIn(0.3f, 4f) * (if (overlay.isSticker) 2f else 1f)
-        val anchorX = overlay.x.coerceIn(0f, 1f) * 2 - 1
-        val anchorY = 1 - overlay.y.coerceIn(0f, 1f) * 2
-        fun settings(alpha: Float) = StaticOverlaySettings.Builder()
-            .setAlphaScale((alpha * overlay.opacity).coerceIn(0f, 1f))
-            .setScale(scale, scale)
-            .setRotationDegrees(-overlay.rotation)
-            .setBackgroundFrameAnchor(anchorX, anchorY)
-            .build()
+        val hidden = StaticOverlaySettings.Builder().setAlphaScale(0f).build()
         val keyframes = overlay.keyframes
         val restPose = Transform(overlay.x, overlay.y, 1f, overlay.rotation, overlay.opacity)
-        fun animated(presentationTimeUs: Long, alpha: Float): OverlaySettings {
-            val t = Keyframes.at(restPose, keyframes, presentationTimeUs / 1000 - overlay.startMs)
-            val s = scale * t.scale.coerceIn(0.1f, 6f)
-            return StaticOverlaySettings.Builder()
-                .setAlphaScale((alpha * t.opacity).coerceIn(0f, 1f))
-                .setScale(s, s)
-                .setRotationDegrees(-t.rotation)
-                .setBackgroundFrameAnchor(t.x.coerceIn(0f, 1f) * 2 - 1, 1 - t.y.coerceIn(0f, 1f) * 2)
-                .build()
-        }
-        val visible = settings(1f)
-        val hidden = settings(0f)
-        val startUs = overlay.startMs * 1000
-        val endUs = overlay.endMs * 1000
-        val animate = overlay.animate
         return object : TextOverlay() {
-            override fun getText(presentationTimeUs: Long): SpannableString = text
+            override fun getText(presentationTimeUs: Long): SpannableString {
+                if (!typed) return full
+                val pose = TextMotion.at(overlay, presentationTimeUs / 1000) ?: return full
+                val shown = TextMotion.visibleChars(padded, pose.reveal)
+                return if (shown >= padded.length) full else partial.getOrPut(shown) { styled(shown) }
+            }
+
             override fun getOverlaySettings(presentationTimeUs: Long): OverlaySettings {
-                if (presentationTimeUs < startUs || presentationTimeUs >= endUs) return hidden
-                if (keyframes.isNotEmpty()) {
-                    val fade = if (animate) minOf(TEXT_FADE_US, (endUs - startUs) / 3) else 0
-                    val alpha = if (fade <= 0) 1f else minOf(
-                        (presentationTimeUs - startUs).toFloat() / fade,
-                        (endUs - presentationTimeUs).toFloat() / fade,
-                    ).coerceAtMost(1f)
-                    return animated(presentationTimeUs, alpha)
-                }
-                if (!animate) return visible
-                val fade = minOf(TEXT_FADE_US, (endUs - startUs) / 3)
-                if (fade <= 0) return visible
-                val alpha = minOf(
-                    (presentationTimeUs - startUs).toFloat() / fade,
-                    (endUs - presentationTimeUs).toFloat() / fade,
-                )
-                return if (alpha >= 1f) visible else settings(alpha)
+                val ms = presentationTimeUs / 1000
+                val pose = TextMotion.at(overlay, ms) ?: return hidden
+                val t = if (keyframes.isEmpty()) restPose else Keyframes.at(restPose, keyframes, ms - overlay.startMs)
+                val s = scale * t.scale.coerceIn(0.1f, 6f) * pose.scale.coerceIn(0.05f, 6f)
+                return StaticOverlaySettings.Builder()
+                    .setAlphaScale((pose.alpha * t.opacity).coerceIn(0f, 1f))
+                    .setScale(s, s)
+                    // Media3 rotates counter-clockwise; the editor rotates clockwise.
+                    .setRotationDegrees(-(t.rotation + pose.rotation))
+                    .setBackgroundFrameAnchor((t.x + pose.dx).coerceIn(-0.5f, 1.5f) * 2 - 1, 1 - (t.y + pose.dy).coerceIn(-0.5f, 1.5f) * 2)
+                    .build()
             }
         }
     }

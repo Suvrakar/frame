@@ -2,6 +2,8 @@
 
 package app.frame.studio.ui.editor
 
+import app.frame.studio.domain.TextAnimation
+import app.frame.studio.text.TextMotion
 import app.frame.studio.export.TransitionPlan
 import app.frame.studio.ui.common.icon
 import androidx.compose.ui.semantics.Role
@@ -880,6 +882,9 @@ fun TextStylePanel(
     overlay: TextOverlay,
     onText: (String) -> Unit,
     onStyle: ((TextOverlay) -> TextOverlay) -> Unit,
+    isPro: Boolean = false,
+    /** Runs the action once the user has Pro (or a pass) for text animations. */
+    requirePro: (() -> Unit) -> Unit = { it() },
 ) {
     var showPicker by remember { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -896,6 +901,7 @@ fun TextStylePanel(
             modifier = Modifier.fillMaxWidth(),
             maxLines = 3,
         )
+        TextAnimationRows(overlay, isPro, requirePro, onStyle)
         if (!overlay.isSticker) {
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TEXT_PRESETS.forEach { preset ->
@@ -1032,6 +1038,53 @@ fun CaptionsPanel(
         }
         if (hasCaptions) {
             TextButton(onClick = onClear) { Text("Remove all captions") }
+        }
+    }
+}
+
+/** In / Out animation pickers and their length, for text and stickers (captions animate by word). */
+@Composable
+private fun TextAnimationRows(
+    overlay: TextOverlay,
+    isPro: Boolean,
+    requirePro: (() -> Unit) -> Unit,
+    onStyle: ((TextOverlay) -> TextOverlay) -> Unit,
+) {
+    if (overlay.isCaption) return
+    val entrance = TextMotion.entrance(overlay)
+    val exit = TextMotion.exit(overlay)
+    fun pick(animation: TextAnimation, apply: (TextOverlay) -> TextOverlay) {
+        // Choosing explicitly moves the text off the v1 fade (animIn/animOut stop being null).
+        val change: () -> Unit = { onStyle { apply(it.copy(animIn = TextMotion.entrance(it), animOut = TextMotion.exit(it))) } }
+        if (TextMotion.isPro(animation)) requirePro(change) else change()
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        AnimationRow("In", entrance, isPro) { a -> pick(a) { it.copy(animIn = a) } }
+        AnimationRow("Out", exit, isPro) { a -> pick(a) { it.copy(animOut = a) } }
+        if (entrance != TextAnimation.NONE || exit != TextAnimation.NONE) {
+            ValueSlider("Speed", formatDuration(overlay.animMs), overlay.animMs / 1000f, 0.2f..1.5f, { v ->
+                onStyle { it.copy(animIn = TextMotion.entrance(it), animOut = TextMotion.exit(it), animMs = (v * 10).roundToInt() * 100L) }
+            })
+        }
+    }
+}
+
+@Composable
+private fun AnimationRow(label: String, current: TextAnimation, isPro: Boolean, onPick: (TextAnimation) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(36.dp))
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextAnimation.entries.forEach { a ->
+                FilterChip(
+                    selected = current == a,
+                    onClick = { onPick(a) },
+                    label = { Text(a.label) },
+                    leadingIcon = { Icon(a.icon, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    trailingIcon = if (!isPro && TextMotion.isPro(a)) {
+                        { Icon(Icons.Filled.WorkspacePremium, contentDescription = "Pro", tint = Color(0xFFFFC94D), modifier = Modifier.size(14.dp)) }
+                    } else null,
+                )
+            }
         }
     }
 }

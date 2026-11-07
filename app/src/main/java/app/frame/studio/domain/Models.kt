@@ -208,8 +208,29 @@ data class TextOverlay(
     val keyframes: List<Keyframe> = emptyList(),
     /** Id from [app.frame.studio.text.TextFonts]; "default" = system font. */
     val font: String = app.frame.studio.text.TextFonts.DEFAULT_ID,
+    /** Entrance / exit; null = the v1 behaviour ([animate] ? 250 ms fade : none). */
+    val animIn: TextAnimation? = null,
+    val animOut: TextAnimation? = null,
+    /** Length of each of the entrance and the exit (capped to a third of the text's time). */
+    val animMs: Long = 400,
 ) {
     val isCaption: Boolean get() = words.isNotEmpty()
+}
+
+/** How a text or sticker enters and leaves (see [app.frame.studio.text.TextMotion]). */
+@Serializable
+enum class TextAnimation(val label: String) {
+    NONE("None"),
+    FADE("Fade"),
+    POP("Pop"),
+    SLIDE_UP("Rise"),
+    SLIDE_DOWN("Drop"),
+    SLIDE_LEFT("Slide left"),
+    SLIDE_RIGHT("Slide right"),
+    ZOOM("Zoom"),
+    BOUNCE("Bounce"),
+    SPIN("Spin"),
+    TYPEWRITER("Typewriter"),
 }
 
 /** How motion eases between two keyframes. */
