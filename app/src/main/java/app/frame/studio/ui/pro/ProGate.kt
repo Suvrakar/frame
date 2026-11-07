@@ -1,5 +1,6 @@
 package app.frame.studio.ui.pro
 
+import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.material.icons.outlined.Animation
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.activity.compose.LocalActivity
@@ -195,6 +196,7 @@ private fun iconFor(feature: ProFeature): ImageVector = when (feature) {
     ProFeature.PREMIUM_FILTERS -> Icons.Outlined.FilterVintage
     ProFeature.PREMIUM_TRANSITIONS -> Icons.Outlined.SwapHoriz
     ProFeature.TEXT_ANIMATIONS -> Icons.Outlined.Animation
+    ProFeature.NOISE_REDUCTION -> Icons.Outlined.GraphicEq
 }
 
 @Composable

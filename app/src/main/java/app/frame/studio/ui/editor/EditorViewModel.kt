@@ -449,6 +449,7 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     }
 
     fun setVideoVolume(id: String, volume: Float) = editVideo(id, "volume") { it.copy(volume = volume.coerceIn(0f, 2f)) }
+    fun setVideoNoiseReduction(id: String, amount: Float) = editVideo(id, "noise") { it.copy(noiseReduction = amount.coerceIn(0f, 1f)) }
     fun setVideoFadeIn(id: String, ms: Long) = editVideo(id, "fadeIn") { it.copy(fadeInMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
     fun setVideoFadeOut(id: String, ms: Long) = editVideo(id, "fadeOut") { it.copy(fadeOutMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
     fun rotate(id: String) = editVideo(id) { TimelineOps.rotate(it) }
@@ -596,6 +597,8 @@ class EditorViewModel(private val app: FrameApp, private val projectId: String) 
     }
 
     fun setAudioVolume(id: String, volume: Float) = editAudio(id, "volume") { it.copy(volume = volume.coerceIn(0f, 2f)) }
+    fun setAudioNoiseReduction(id: String, amount: Float) = editAudio(id, "noise") { it.copy(noiseReduction = amount.coerceIn(0f, 1f)) }
+    fun setDuckMusic(on: Boolean) = edit { it.copy(duckMusic = on) }
     fun setAudioFadeIn(id: String, ms: Long) = editAudio(id, "fadeIn") { it.copy(fadeInMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
     fun setAudioFadeOut(id: String, ms: Long) = editAudio(id, "fadeOut") { it.copy(fadeOutMs = ms.coerceIn(0, it.outputDurationMs() / 2)) }
 

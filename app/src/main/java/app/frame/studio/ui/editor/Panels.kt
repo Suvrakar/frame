@@ -1088,3 +1088,45 @@ private fun AnimationRow(label: String, current: TextAnimation, isPro: Boolean, 
         }
     }
 }
+
+/** Voice clean-up strength (Pro) and, for music, auto-ducking under voiceovers. */
+@Composable
+fun SoundCleanupPanel(
+    noiseReduction: Float,
+    isPro: Boolean,
+    onNoiseReduction: (Float) -> Unit,
+    duckMusic: Boolean? = null,
+    onDuckMusic: (Boolean) -> Unit = {},
+) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Reduce noise", style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
+            if (!isPro) Icon(Icons.Filled.WorkspacePremium, contentDescription = "Pro", tint = Color(0xFFFFC94D), modifier = Modifier.size(16.dp))
+        }
+        val label = when {
+            noiseReduction <= 0f -> "Off"
+            noiseReduction < 0.4f -> "Light"
+            noiseReduction < 0.75f -> "Medium"
+            else -> "Strong"
+        }
+        ValueSlider("Voice clean-up", label, noiseReduction, 0f..1f, { onNoiseReduction((it * 4).roundToInt() / 4f) })
+        Text(
+            "Best for speech: removes hiss, hum and room noise.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (duckMusic != null) {
+            Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Auto-duck music", style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        "Music gets quieter while a voiceover plays.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                androidx.compose.material3.Switch(checked = duckMusic, onCheckedChange = onDuckMusic)
+            }
+        }
+    }
+}

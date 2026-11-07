@@ -1000,10 +1000,27 @@ private fun ActivePanel(
         when (tool) {
             Tool.SPEED -> clip?.let { c -> SpeedPanel(c) { vm.setSpeed(c.id, it) } }
             Tool.DURATION -> clip?.let { c -> DurationPanel(c) { vm.setImageDuration(c.id, it) } }
-            Tool.VOLUME -> when {
-                overlayClip != null -> VolumePanel(overlayClip.volume) { vm.setOverlayVolume(overlayClip.id, it) }
-                clip != null -> VolumePanel(clip.volume) { vm.setVideoVolume(clip.id, it) }
-                audio != null -> VolumePanel(audio.volume) { vm.setAudioVolume(audio.id, it) }
+            Tool.VOLUME -> {
+                val isPro by app.pro.isPro.collectAsStateWithLifecycle()
+                fun cleanup(set: () -> Unit, amount: Float) =
+                    if (amount > 0f) proGate.require(ProFeature.NOISE_REDUCTION, set) else set()
+                when {
+                    overlayClip != null -> VolumePanel(overlayClip.volume) { vm.setOverlayVolume(overlayClip.id, it) }
+                    clip != null -> Column {
+                        VolumePanel(clip.volume) { vm.setVideoVolume(clip.id, it) }
+                        if (!clip.isImage) {
+                            SoundCleanupPanel(clip.noiseReduction, isPro, { v -> cleanup({ vm.setVideoNoiseReduction(clip.id, v) }, v) })
+                        }
+                    }
+                    audio != null -> Column {
+                        VolumePanel(audio.volume) { vm.setAudioVolume(audio.id, it) }
+                        SoundCleanupPanel(
+                            audio.noiseReduction, isPro, { v -> cleanup({ vm.setAudioNoiseReduction(audio.id, v) }, v) },
+                            duckMusic = if (audio.kind == AudioKind.MUSIC) project.duckMusic else null,
+                            onDuckMusic = vm::setDuckMusic,
+                        )
+                    }
+                }
             }
             Tool.FADE -> when {
                 clip != null -> FadePanel(clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs(), { vm.setVideoFadeIn(clip.id, it) }, { vm.setVideoFadeOut(clip.id, it) })

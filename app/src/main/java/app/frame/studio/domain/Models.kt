@@ -132,6 +132,8 @@ data class VideoClip(
     val filterIntensity: Float = 1f,
     val adjust: ColorAdjust = ColorAdjust(),
     /** Transition into the next clip. */
+    /** Noise reduction for the clip's own sound (voice), 0 = off .. 1 = strongest. */
+    val noiseReduction: Float = 0f,
     val transition: TransitionType = TransitionType.NONE,
     val transitionMs: Long = 500,
     /** Mirror horizontally. */
@@ -175,6 +177,8 @@ data class AudioClip(
     /** Detected beats, in source time (ms). Empty until beat detection runs. */
     val beatsMs: List<Long> = emptyList(),
     val bpm: Float = 0f,
+    /** Voice noise reduction, 0 = off .. 1 = strongest. */
+    val noiseReduction: Float = 0f,
 ) {
     fun outputDurationMs(): Long = (trimEndMs - trimStartMs).coerceAtLeast(0)
     fun endMs(): Long = startMs.coerceAtLeast(0) + outputDurationMs()
@@ -349,6 +353,8 @@ data class Project(
     val audioBitrateKbps: Int = 192,
     /** Videos and photos layered above the main video. */
     val overlays: List<OverlayClip> = emptyList(),
+    /** Music dips automatically while a voiceover plays. */
+    val duckMusic: Boolean = false,
 )
 
 @Serializable

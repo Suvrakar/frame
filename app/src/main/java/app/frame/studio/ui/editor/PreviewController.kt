@@ -1,5 +1,6 @@
 package app.frame.studio.ui.editor
 
+import app.frame.studio.export.PreviewClock
 import app.frame.studio.telemetry.Telemetry
 import android.annotation.SuppressLint
 import android.content.Context
@@ -215,7 +216,7 @@ class PreviewController(
         val s = surface
         val size = surfaceSize
         if (s != null && size != null) next.setVideoSurface(s, size)
-        next.seekTo(resumeAt)
+        next.seekTo((resumeAt).also { pos -> PreviewClock.startMs = pos })
         next.prepare()
         next.playWhenReady = resume
         player = next
@@ -246,7 +247,7 @@ class PreviewController(
             if (resized) player?.clearVideoSurface(newSurface)
             player?.setVideoSurface(newSurface, Size(width, height))
             // Redraw the current frame at the new size when paused.
-            player?.let { if (!it.isPlaying) it.seekTo(it.currentPosition) }
+            player?.let { if (!it.isPlaying) it.seekTo((it.currentPosition).also { pos -> PreviewClock.startMs = pos }) }
         }
         // A player released while the surface was gone is rebuilt now.
         val project = lastProject
@@ -312,7 +313,7 @@ class PreviewController(
 
     /** Re-renders the current frame, e.g. after the preview surface was resized while paused. */
     fun redraw() {
-        onPlayer { player?.let { if (!it.isPlaying) it.seekTo(it.currentPosition) } }
+        onPlayer { player?.let { if (!it.isPlaying) it.seekTo((it.currentPosition).also { pos -> PreviewClock.startMs = pos }) } }
     }
 
     /** Silences the preview, e.g. while recording a voiceover. */
@@ -336,7 +337,7 @@ class PreviewController(
         if (target >= 0) {
             pendingScrubMs = -1
             lastScrubSeekAt = android.os.SystemClock.uptimeMillis()
-            onPlayer { player?.seekTo(target) }
+            onPlayer { player?.seekTo((target).also { pos -> PreviewClock.startMs = pos }) }
         }
     }
 
@@ -356,7 +357,7 @@ class PreviewController(
         if (now - lastScrubSeekAt >= SCRUB_SEEK_INTERVAL_MS) {
             lastScrubSeekAt = now
             pendingScrubMs = -1
-            onPlayer { player?.seekTo(target) }
+            onPlayer { player?.seekTo((target).also { pos -> PreviewClock.startMs = pos }) }
         } else {
             pendingScrubMs = target
             main.postDelayed(trailingScrubSeek, SCRUB_SEEK_INTERVAL_MS)
@@ -376,7 +377,7 @@ class PreviewController(
             setProject(project, force = true)
             return
         }
-        onPlayer { player?.seekTo(target) }
+        onPlayer { player?.seekTo((target).also { pos -> PreviewClock.startMs = pos }) }
     }
 
     fun release() {

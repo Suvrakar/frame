@@ -18,6 +18,12 @@ class GainAudioProcessor(
     private val fadeInMs: Long,
     private val fadeOutMs: Long,
     private val durationMs: Long,
+    /** Where this clip starts on the output timeline (for ducking and preview seeks). */
+    private val timelineStartMs: Long = 0,
+    /** Voice spans to dip under (see [app.frame.studio.audio.Ducking]); empty = no ducking. */
+    private val duckSpans: List<LongRange> = emptyList(),
+    /** Preview: after a seek, resume the gain curve at [PreviewClock.startMs]. */
+    private val followPreviewSeeks: Boolean = false,
 ) : BaseAudioProcessor() {
 
     private var framesProcessed = 0L
@@ -26,7 +32,7 @@ class GainAudioProcessor(
         if (inputAudioFormat.encoding != C.ENCODING_PCM_16BIT) {
             throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)
         }
-        val isNoOp = volume == 1f && fadeInMs <= 0 && fadeOutMs <= 0
+        val isNoOp = volume == 1f && fadeInMs <= 0 && fadeOutMs <= 0 && duckSpans.isEmpty()
         return if (isNoOp) AudioProcessor.AudioFormat.NOT_SET else inputAudioFormat
     }
 
@@ -57,11 +63,19 @@ class GainAudioProcessor(
         output.flip()
     }
 
-    private fun gainForFrame(frame: Long, sampleRate: Int): Float =
-        ExportPlan.gainAt(volume, fadeInMs, fadeOutMs, durationMs, frame * 1000 / sampleRate)
+    private fun gainForFrame(frame: Long, sampleRate: Int): Float {
+        val clipMs = frame * 1000 / sampleRate
+        val base = ExportPlan.gainAt(volume, fadeInMs, fadeOutMs, durationMs, clipMs)
+        return if (duckSpans.isEmpty()) base else base * app.frame.studio.audio.Ducking.gainAt(duckSpans, timelineStartMs + clipMs)
+    }
 
     override fun onFlush() {
-        framesProcessed = 0
+        framesProcessed = if (followPreviewSeeks) {
+            val clipMs = (PreviewClock.startMs - timelineStartMs).coerceIn(0, durationMs.coerceAtLeast(0))
+            clipMs * inputAudioFormat.sampleRate.coerceAtLeast(1) / 1000
+        } else {
+            0
+        }
     }
 
     override fun onReset() {

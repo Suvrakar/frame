@@ -28,6 +28,7 @@ enum class ProFeature(val title: String, val pitch: String) {
     PREMIUM_TEMPLATES("Premium templates", "Every frame, invitation and collage design."),
     PREMIUM_FILTERS("Premium filters", "The full filter library, including film and cinematic looks."),
     TEXT_ANIMATIONS("Text animations", "Typewriter, bounce, spin, zoom and slide-ins for titles and stickers."),
+    NOISE_REDUCTION("Voice clean-up", "Removes hiss, hum and room noise from voices and recordings."),
     PREMIUM_TRANSITIONS("Premium transitions", "Zoom, spin, glitch, iris, film burn and more between your clips."),
 }
 

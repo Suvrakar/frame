@@ -1,5 +1,7 @@
 package app.frame.studio.export
 
+import app.frame.studio.audio.Ducking
+import app.frame.studio.domain.AudioKind
 import app.frame.studio.domain.TextAnimation
 import app.frame.studio.text.TextMotion
 import android.graphics.Typeface
@@ -86,7 +88,7 @@ object CompositionFactory {
         require(project.videoClips.isNotEmpty()) { "Add at least one clip" }
         val size = ExportPlan.outputSize(project.videoClips, project.exportHeight, project.aspect)
 
-        val videoSequence = EditedMediaItemSequence.Builder(project.videoClips.map { videoItem(it, size, forExport) })
+        val videoSequence = EditedMediaItemSequence.Builder(project.videoClips.let { clips -> val starts = TimelineMath.videoStarts(clips); clips.mapIndexed { i, c -> videoItem(c, size, forExport, starts[i]) } })
             // Clips without an audio track (and photos) still contribute silence so the mix stays in sync.
             .experimentalSetForceAudioTrack(true)
             .build()
@@ -105,14 +107,16 @@ object CompositionFactory {
         // lane asks for the audio mixer before the lane that owns it has created it.
         lanes.forEach { lane -> overlayAudioLane(lane, forExport)?.let { sequences += it } }
 
-        AudioLayout.byLane(AudioLayout.clampTo(project.audioClips, totalMs)).forEach { lane ->
+        val fittedAudio = AudioLayout.clampTo(project.audioClips, totalMs)
+        val duckSpans = if (project.duckMusic) Ducking.voiceSpans(fittedAudio) else emptyList()
+        AudioLayout.byLane(fittedAudio).forEach { lane ->
             if (lane.isEmpty()) return@forEach
             val builder = EditedMediaItemSequence.Builder()
             var cursorMs = 0L
             lane.forEach { clip ->
                 val gap = clip.startMs - cursorMs
                 if (gap > 0) builder.addGap(gap * 1000)
-                builder.addItem(audioItem(clip))
+                builder.addItem(audioItem(clip, forExport, if (project.duckMusic && clip.kind == AudioKind.MUSIC) duckSpans else emptyList()))
                 cursorMs = clip.startMs + clip.outputDurationMs()
             }
             sequences += builder.experimentalSetForceAudioTrack(true).build()
@@ -240,7 +244,7 @@ object CompositionFactory {
             )
             .build()
 
-    private fun videoItem(clip: VideoClip, size: ExportPlan.Size, forExport: Boolean): EditedMediaItem {
+    private fun videoItem(clip: VideoClip, size: ExportPlan.Size, forExport: Boolean, timelineStartMs: Long): EditedMediaItem {
         val audio = mutableListOf<AudioProcessor>()
         val video = mutableListOf<Effect>()
 
@@ -269,8 +273,12 @@ object CompositionFactory {
                     video += pair.second
                 }
             }
+            if (clip.noiseReduction > 0f) audio += NoiseReductionAudioProcessor(clip.noiseReduction)
             if (clip.volume != 1f || clip.fadeInMs > 0 || clip.fadeOutMs > 0) {
-                audio += GainAudioProcessor(clip.volume, clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs())
+                audio += GainAudioProcessor(
+                    clip.volume, clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs(),
+                    timelineStartMs = timelineStartMs, followPreviewSeeks = !forExport,
+                )
             }
             EditedMediaItem.Builder(clipped(sourceFor(clip.sourceUri, clip.needsProxy, forExport), clip.trimStartMs, clip.trimEndMs))
                 .setDurationUs(clip.sourceDurationMs.coerceAtLeast(1) * 1000)
@@ -304,10 +312,14 @@ object CompositionFactory {
             .build()
     }
 
-    private fun audioItem(clip: AudioClip): EditedMediaItem {
+    private fun audioItem(clip: AudioClip, forExport: Boolean, duckSpans: List<LongRange>): EditedMediaItem {
         val audio = mutableListOf<AudioProcessor>()
-        if (clip.volume != 1f || clip.fadeInMs > 0 || clip.fadeOutMs > 0) {
-            audio += GainAudioProcessor(clip.volume, clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs())
+        if (clip.noiseReduction > 0f) audio += NoiseReductionAudioProcessor(clip.noiseReduction)
+        if (clip.volume != 1f || clip.fadeInMs > 0 || clip.fadeOutMs > 0 || duckSpans.isNotEmpty()) {
+            audio += GainAudioProcessor(
+                clip.volume, clip.fadeInMs, clip.fadeOutMs, clip.outputDurationMs(),
+                timelineStartMs = clip.startMs.coerceAtLeast(0), duckSpans = duckSpans, followPreviewSeeks = !forExport,
+            )
         }
         return EditedMediaItem.Builder(clipped(clip.sourceUri, clip.trimStartMs, clip.trimEndMs))
             .setDurationUs(clip.sourceDurationMs.coerceAtLeast(1) * 1000)
